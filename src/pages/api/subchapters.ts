@@ -72,8 +72,20 @@ async function saveChapters(chapters: any[], commitMessage: string) {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
+    const sessionCookie = cookies.get('session_token');
+    let session = null;
+    if (sessionCookie) {
+      try {
+        session = JSON.parse(sessionCookie.value);
+      } catch (e) {}
+    }
+
+    if (!session || session.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo los administradores pueden añadir subtemas a la estructura del curso.' }), { status: 403 });
+    }
+
     const data = await request.json();
     const { chapterNumber, newSection } = data;
 
@@ -124,8 +136,20 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ request, cookies }) => {
   try {
+    const sessionCookie = cookies.get('session_token');
+    let session = null;
+    if (sessionCookie) {
+      try {
+        session = JSON.parse(sessionCookie.value);
+      } catch (e) {}
+    }
+
+    if (!session || session.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo los administradores pueden modificar o reordenar subtemas.' }), { status: 403 });
+    }
+
     const data = await request.json();
     const { chapterNumber, sections } = data;
 

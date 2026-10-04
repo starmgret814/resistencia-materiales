@@ -3,8 +3,20 @@ import fs from 'fs/promises';
 import path from 'path';
 import chapters from '@/lib/chapters.json';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
+    const sessionCookie = cookies.get('session_token');
+    let session = null;
+    if (sessionCookie) {
+      try {
+        session = JSON.parse(sessionCookie.value);
+      } catch (e) {}
+    }
+
+    if (!session || session.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo los administradores pueden aprobar y publicar cambios a GitHub.' }), { status: 403 });
+    }
+
     const data = await request.json();
     const { chapterId, slug, contentMarkdown } = data;
 

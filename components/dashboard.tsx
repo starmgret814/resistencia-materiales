@@ -256,12 +256,14 @@ export default function Dashboard({ session }: { session: any }) {
                 <Folder className="w-5 h-5 text-[#8b6d6d]" />
                 <h2 className="font-serif font-bold text-lg text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</h2>
               </div>
-              <button 
-                onClick={() => { setCreatingInChapter(chapter.number); setNewTitle(''); }}
-                className="text-xs font-bold uppercase tracking-wider text-[#8B0000] hover:bg-[#f1dddd] px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" /> Añadir Subtema
-              </button>
+              {session?.role === 'admin' && (
+                <button 
+                  onClick={() => { setCreatingInChapter(chapter.number); setNewTitle(''); }}
+                  className="text-xs font-bold uppercase tracking-wider text-[#8B0000] hover:bg-[#f1dddd] px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Añadir Subtema
+                </button>
+              )}
             </div>
             
             <div className="divide-y divide-[#f5ecec]">
@@ -314,22 +316,26 @@ export default function Dashboard({ session }: { session: any }) {
                       </div>
                       <div className="flex items-center gap-3">
                         {statusBadge}
-                        <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
-                             <Pencil className="w-4 h-4" />
-                           </button>
-                           <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
-                             <Trash2 className="w-4 h-4" />
-                           </button>
-                        </div>
-                        <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
-                          <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
-                            <ChevronUp className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
-                            <ChevronDown className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {session?.role === 'admin' && (
+                          <>
+                            <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                               <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
+                                 <Pencil className="w-4 h-4" />
+                               </button>
+                               <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
+                                 <Trash2 className="w-4 h-4" />
+                               </button>
+                            </div>
+                            <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
+                              <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                                <ChevronUp className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                                <ChevronDown className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </>
+                        )}
                         <a data-astro-reload href={`/workspace-mc361/content/chapters/${chapter.number}/edit?slug=${docSlug}`}>
                           <ChevronRight className="w-5 h-5 text-[#dcc3c3] hover:text-[#8B0000] transition-colors" />
                         </a>
