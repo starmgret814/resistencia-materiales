@@ -82,33 +82,8 @@
     "sections": [
       {
         "id": "8.1",
-        "title": "esf",
-        "slug": "08-flexion-asimetrica/esf"
-      },
-      {
-        "id": "8.2",
-        "title": "torsion1",
-        "slug": "08-flexion-asimetrica/torsion1"
-      },
-      {
-        "id": "8.3",
-        "title": "aaaa",
-        "slug": "08-flexion-asimetrica/aaaa"
-      },
-      {
-        "id": "8.4",
-        "title": "sad",
-        "slug": "08-flexion-asimetrica/sad"
-      },
-      {
-        "id": "8.5",
-        "title": "ti amu gordo",
-        "slug": "08-flexion-asimetrica/ti-amu-gordo"
-      },
-      {
-        "id": "8.6",
-        "title": "asfsd",
-        "slug": "08-flexion-asimetrica/asfsd"
+        "title": "Conceptos principales",
+        "slug": "08-flexion-asimetrica/conceptos-principales"
       }
     ]
   },
