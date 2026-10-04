@@ -2,7 +2,7 @@
 import { allSections } from '@/lib/course-data';
 
 const first = allSections.find((s) => s.slug !== null);
-const targetUrl = first?.slug ? `/curso/${first.slug}` : '/curso/01-esfuerzos-falla/conceptos-principales';
+const targetUrl = first?.slug ? `/curso/${first.slug}` : '/curso/01-esfuerzos-falla/subtema-inicial';
 
 return Astro.redirect(targetUrl);
 ---

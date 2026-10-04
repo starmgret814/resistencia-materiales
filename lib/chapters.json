@@ -5,8 +5,8 @@
     "sections": [
       {
         "id": "1.1",
-        "title": "Esfuerzos Principales",
-        "slug": "01-esfuerzos-falla/esfuerzos-principales"
+        "title": "Subtema inicial",
+        "slug": "01-esfuerzos-falla/subtema-inicial"
       }
     ]
   },
@@ -16,8 +16,8 @@
     "sections": [
       {
         "id": "2.1",
-        "title": "Conceptos principales",
-        "slug": "02-deformaciones-ley-hooke/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "02-deformaciones-ley-hooke/subtema-inicial"
       }
     ]
   },
@@ -27,8 +27,8 @@
     "sections": [
       {
         "id": "3.1",
-        "title": "Conceptos principales",
-        "slug": "03-cambio-temperatura-hiperestaticos/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "03-cambio-temperatura-hiperestaticos/subtema-inicial"
       }
     ]
   },
@@ -38,8 +38,8 @@
     "sections": [
       {
         "id": "4.1",
-        "title": "Conceptos principales",
-        "slug": "04-transformacion-esfuerzos/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "04-transformacion-esfuerzos/subtema-inicial"
       }
     ]
   },
@@ -49,8 +49,8 @@
     "sections": [
       {
         "id": "5.1",
-        "title": "Conceptos principales",
-        "slug": "05-recipientes-presion/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "05-recipientes-presion/subtema-inicial"
       }
     ]
   },
@@ -60,8 +60,8 @@
     "sections": [
       {
         "id": "6.1",
-        "title": "Conceptos principales",
-        "slug": "06-torsion/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "06-torsion/subtema-inicial"
       }
     ]
   },
@@ -71,8 +71,8 @@
     "sections": [
       {
         "id": "7.1",
-        "title": "Conceptos principales",
-        "slug": "07-flexion-cortante/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "07-flexion-cortante/subtema-inicial"
       }
     ]
   },
@@ -82,8 +82,8 @@
     "sections": [
       {
         "id": "8.1",
-        "title": "Conceptos principales",
-        "slug": "08-flexion-asimetrica/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "08-flexion-asimetrica/subtema-inicial"
       }
     ]
   },
@@ -93,8 +93,8 @@
     "sections": [
       {
         "id": "9.1",
-        "title": "Conceptos principales",
-        "slug": "09-deflexion-integracion/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "09-deflexion-integracion/subtema-inicial"
       }
     ]
   },
@@ -104,8 +104,8 @@
     "sections": [
       {
         "id": "10.1",
-        "title": "Conceptos principales",
-        "slug": "10-funciones-discontinuidad/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "10-funciones-discontinuidad/subtema-inicial"
       }
     ]
   },
@@ -115,8 +115,8 @@
     "sections": [
       {
         "id": "11.1",
-        "title": "Conceptos principales",
-        "slug": "11-vigas-hiperestaticas/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "11-vigas-hiperestaticas/subtema-inicial"
       }
     ]
   },
@@ -126,8 +126,8 @@
     "sections": [
       {
         "id": "12.1",
-        "title": "Conceptos principales",
-        "slug": "12-columnas/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "12-columnas/subtema-inicial"
       }
     ]
   },
@@ -137,8 +137,8 @@
     "sections": [
       {
         "id": "13.1",
-        "title": "Conceptos principales",
-        "slug": "13-formula-secante/conceptos-principales"
+        "title": "Subtema inicial",
+        "slug": "13-formula-secante/subtema-inicial"
       }
     ]
   }
