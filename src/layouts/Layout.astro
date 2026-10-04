@@ -25,8 +25,20 @@ const { title, description } = Astro.props;
       integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71bZBTIQHQ"
       crossorigin="anonymous"
     />
+    <script is:inline>
+      function applyTheme() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
   </head>
-  <body class="bg-[#faf5f3] text-[#4d3838] antialiased min-h-screen selection:bg-[#dfc4c4] selection:text-[#4b1719]">
+  <body class="bg-[#faf5f3] dark:bg-[#140b0c] text-[#4d3838] dark:text-[#f2e1df] antialiased min-h-screen selection:bg-[#dfc4c4] dark:selection:bg-[#522024] selection:text-[#4b1719] dark:selection:text-[#fee2e2]">
     <slot />
   </body>
 </html>

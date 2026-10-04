@@ -298,3 +298,35 @@ math {
   clip: auto !important;
   white-space: normal !important;
 }
+
+/* ─── Modo Oscuro para MDX ─── */
+.dark .mdx-content {
+  color: #d8c3c1;
+}
+
+.dark .mdx-content h1 {
+  color: #fae8e7;
+}
+
+.dark .mdx-content h2 {
+  color: #fae8e7;
+  border-top-color: #442527;
+  border-bottom-color: #442527;
+}
+
+.dark .mdx-content h3 {
+  color: #e5b8b6;
+}
+
+.dark .mdx-content strong {
+  color: #ffffff;
+}
+
+.dark .mdx-content hr {
+  border-top-color: #442527;
+}
+
+.dark .mdx-content math,
+.dark .mdx-content .katex {
+  color: #fce7e7;
+}

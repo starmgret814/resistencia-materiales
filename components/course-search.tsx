@@ -121,10 +121,10 @@ export default function CourseSearch() {
 
       {/* Modal */}
       <div className="fixed inset-x-0 top-[15vh] z-50 mx-auto w-full max-w-lg px-4">
-        <div className="overflow-hidden rounded-xl border border-[#e3caca] bg-[#fbf7f4] shadow-2xl shadow-[#7f0303]/10">
+        <div className="overflow-hidden rounded-xl border border-[#e3caca] dark:border-[#382022] bg-[#fbf7f4] dark:bg-[#1a0f10] shadow-2xl shadow-[#7f0303]/10">
           {/* Search input */}
-          <div className="flex items-center gap-3 border-b border-[#e3caca] px-4">
-            <Search className="size-4 shrink-0 text-[#967070]" />
+          <div className="flex items-center gap-3 border-b border-[#e3caca] dark:border-[#382022] px-4">
+            <Search className="size-4 shrink-0 text-[#967070] dark:text-[#a08282]" />
             <input
               ref={inputRef}
               type="text"
@@ -132,10 +132,10 @@ export default function CourseSearch() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleInputKeyDown}
               placeholder="Buscar en el curso..."
-              className="h-12 flex-1 bg-transparent text-sm text-[#3b2022] outline-none placeholder:text-[#b28a8a]"
+              className="h-12 flex-1 bg-transparent text-sm text-[#3b2022] dark:text-[#f3e6e4] outline-none placeholder:text-[#b28a8a] dark:placeholder:text-[#7d5e60]"
               aria-label="Buscar en el curso"
             />
-            <kbd className="hidden rounded border border-[#e3caca] bg-[#f7f5f0] px-1.5 py-0.5 text-[10px] text-[#967070] sm:inline-flex">
+            <kbd className="hidden rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1.5 py-0.5 text-[10px] text-[#967070] dark:text-[#a08282] sm:inline-flex">
               ESC
             </kbd>
           </div>
@@ -144,8 +144,8 @@ export default function CourseSearch() {
           <div ref={listRef} className="max-h-[50vh] overflow-y-auto p-2">
             {results.length === 0 ? (
               <div className="px-3 py-8 text-center">
-                <p className="text-sm text-[#967070]">No se encontraron resultados</p>
-                <p className="mt-1 text-xs text-[#b28a8a]">Intenta con otro término</p>
+                <p className="text-sm text-[#967070] dark:text-[#a08282]">No se encontraron resultados</p>
+                <p className="mt-1 text-xs text-[#b28a8a] dark:text-[#7d5e60]">Intenta con otro término</p>
               </div>
             ) : (
               results.map((section, index) => (
@@ -154,32 +154,32 @@ export default function CourseSearch() {
                   onClick={() => section.slug && navigateTo(section.slug)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left',
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors',
                     index === selectedIndex
-                      ? 'bg-[#f2dddd] text-[#7f0303]'
-                      : 'text-[#604747] hover:bg-[#f2dddd]/50'
+                      ? 'bg-[#f2dddd] dark:bg-[#381618] text-[#7f0303] dark:text-[#fca5a5]'
+                      : 'text-[#604747] dark:text-[#dfc2c0] hover:bg-[#f2dddd]/50 dark:hover:bg-[#2e1517]'
                   )}
                 >
                   <FileText className={cn(
                     'size-4 shrink-0 transition-colors',
-                    index === selectedIndex ? 'text-[#a34a4a]' : 'text-[#b28a8a]'
+                    index === selectedIndex ? 'text-[#a34a4a] dark:text-[#f87171]' : 'text-[#b28a8a] dark:text-[#8a686a]'
                   )} />
                   <div className="min-w-0 flex-1">
                     <p className={cn(
                       'truncate text-sm font-medium transition-colors',
-                      index === selectedIndex ? 'text-[#7f0303]' : 'text-[#4b1719]'
+                      index === selectedIndex ? 'text-[#7f0303] dark:text-[#fca5a5]' : 'text-[#4b1719] dark:text-[#e8d2d0]'
                     )}>
                       {section.title}
                     </p>
                     <p className={cn(
                       'truncate text-[11px] transition-colors',
-                      index === selectedIndex ? 'text-[#a34a4a]' : 'text-[#967070]'
+                      index === selectedIndex ? 'text-[#a34a4a] dark:text-[#f87171]' : 'text-[#967070] dark:text-[#ab8e8e]'
                     )}>
                       Capítulo {section.chapterNumber} · {section.chapterTitle}
                     </p>
                   </div>
                   {index === selectedIndex && (
-                    <ArrowRight className="size-3.5 shrink-0 text-[#a34a4a] transition-all" />
+                    <ArrowRight className="size-3.5 shrink-0 text-[#a34a4a] dark:text-[#f87171] transition-all" />
                   )}
                 </button>
               ))
@@ -187,17 +187,17 @@ export default function CourseSearch() {
           </div>
 
           {/* Footer hints */}
-          <div className="flex items-center gap-4 border-t border-[#e3caca] px-4 py-2.5">
-            <div className="flex items-center gap-1.5 text-[10px] text-[#967070]">
-              <kbd className="rounded border border-[#e3caca] bg-[#f7f5f0] px-1 py-0.5">↑↓</kbd>
+          <div className="flex items-center gap-4 border-t border-[#e3caca] dark:border-[#382022] bg-[#f7f0ee]/40 dark:bg-[#140b0c]/40 px-4 py-2.5">
+            <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">
+              <kbd className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5">↑↓</kbd>
               <span>navegar</span>
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] text-[#967070]">
-              <kbd className="rounded border border-[#e3caca] bg-[#f7f5f0] px-1 py-0.5">↵</kbd>
+            <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">
+              <kbd className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5">↵</kbd>
               <span>abrir</span>
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] text-[#967070]">
-              <kbd className="rounded border border-[#e3caca] bg-[#f7f5f0] px-1 py-0.5">esc</kbd>
+            <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">
+              <kbd className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5">esc</kbd>
               <span>cerrar</span>
             </div>
           </div>

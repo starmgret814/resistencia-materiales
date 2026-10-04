@@ -6,27 +6,27 @@ import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
 
 export function Definition({ children, title = 'Definición' }: { children: ReactNode; title?: string }) {
-  return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] bg-[#f8eaea] px-5 py-4"><p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e]">{title}</p><div className="text-sm leading-7 text-[#4d3838]">{children}</div></aside>
+  return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] dark:border-l-[#f87171] bg-[#f8eaea] dark:bg-[#281517] px-5 py-4"><p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e] dark:text-[#fca5a5]">{title}</p><div className="text-sm leading-7 text-[#4d3838] dark:text-[#ead4d2]">{children}</div></aside>
 }
 
 export function Formula({ children, label }: { children: ReactNode; label?: string }) {
-  return <div className="my-7 px-5 py-6 text-center"><div className="font-serif text-3xl italic tracking-wide text-[#4b1719] sm:text-4xl">{children}</div>{label && <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#9a7777]">{label}</p>}</div>
+  return <div className="my-7 px-5 py-6 text-center"><div className="font-serif text-3xl italic tracking-wide text-[#4b1719] dark:text-[#fca5a5] sm:text-4xl">{children}</div>{label && <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#9a7777] dark:text-[#bca4a3]">{label}</p>}</div>
 }
 
 export function Example({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {
   const displayTitle = number ? `Ejemplo ${number}${title ? `: ${title}` : ''}` : (title || 'Ejemplo resuelto')
-  return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] border-r-[#e3caca] border-l-[#8f2525] bg-[#fdfaf9] p-5 sm:p-6 shadow-sm"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747]">{children}</div></section>
+  return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
 export function Problem({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {
   const displayTitle = number ? `Problema ${number}${title ? `: ${title}` : ''}` : (title || 'Problema propuesto')
-  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] bg-[#fcf7f5] p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747]">{children}</div></section>
+  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
 export function Solution({ children }: { children?: ReactNode }) {
   return (
     <details className="mt-5 group">
-      <summary className="cursor-pointer list-none border-t border-[#e3caca] pt-4 font-semibold text-[#8f2525] text-[11px] uppercase tracking-[0.16em] hover:text-[#4b1719] transition-colors">
+      <summary className="cursor-pointer list-none border-t border-[#e3caca] dark:border-[#382022] pt-4 font-semibold text-[#8f2525] dark:text-[#f87171] text-[11px] uppercase tracking-[0.16em] hover:text-[#4b1719] dark:hover:text-[#fca5a5] transition-colors">
         <span className="inline-flex items-center gap-1.5">
           <svg className="h-3 w-3 transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -34,7 +34,7 @@ export function Solution({ children }: { children?: ReactNode }) {
           Mostrar Solución
         </span>
       </summary>
-      <div className="mt-4 pl-4 border-l-2 border-[#e3caca] text-base leading-relaxed text-[#604747]">
+      <div className="mt-4 pl-4 border-l-2 border-[#e3caca] dark:border-[#382022] text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">
         {children}
       </div>
     </details>
@@ -42,7 +42,7 @@ export function Solution({ children }: { children?: ReactNode }) {
 }
 
 export function Summary({ children, title = 'Resumen' }: { children: ReactNode; title?: string }) {
-  return <section className="my-8 rounded-lg border border-[#dec4c1] bg-[#f9ebe9] p-5 sm:p-6"><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7f0303]">{title}</p><div className="text-sm leading-7 text-[#4d3838]">{children}</div></section>
+  return <section className="my-8 rounded-lg border border-[#dec4c1] dark:border-[#422225] bg-[#f9ebe9] dark:bg-[#251214] p-5 sm:p-6"><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7f0303] dark:text-[#f87171]">{title}</p><div className="text-sm leading-7 text-[#4d3838] dark:text-[#ead4d2]">{children}</div></section>
 }
 
 export function Image({ 
@@ -99,7 +99,7 @@ export function Image({
         className="h-auto w-full rounded-lg border border-[#e5cfcd]" 
         loading="lazy" 
       />
-      {caption && <figcaption className="mt-2 text-center text-xs text-[#765e5e]">{caption}</figcaption>}
+      {caption && <figcaption className="mt-2 text-center text-xs text-[#765e5e] dark:text-[#bca4a3]">{caption}</figcaption>}
     </figure>
   )
 }
