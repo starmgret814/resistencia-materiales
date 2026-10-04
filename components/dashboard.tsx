@@ -5,13 +5,36 @@ import { db } from '@/lib/firebase'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
-import { chapters as initialChapters } from '@/lib/course-data'
+import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
 
 export default function Dashboard({ session }: { session: any }) {
   const [assignedChapters, setAssignedChapters] = useState<string[]>([])
   const [documentsStatus, setDocumentsStatus] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
-  const [localChapters, setLocalChapters] = useState(initialChapters)
+  const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('mc361_local_chapters');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const countCached = parsed.reduce((acc: number, c: any) => acc + (c.sections?.length || 0), 0);
+            const countInitial = initialChapters.reduce((acc: number, c: any) => acc + (c.sections?.length || 0), 0);
+            if (countCached >= countInitial) {
+              return parsed;
+            }
+          }
+        }
+      } catch {}
+    }
+    return initialChapters;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localChapters) {
+      localStorage.setItem('mc361_local_chapters', JSON.stringify(localChapters));
+    }
+  }, [localChapters]);
 
   // Para crear nuevo subtema in-line
   const [creatingInChapter, setCreatingInChapter] = useState<string | null>(null)
@@ -73,7 +96,7 @@ export default function Dashboard({ session }: { session: any }) {
     // Auto calcular ID buscando el número más alto existente + 1
     const chapterNumInt = parseInt(chapterNumber, 10);
     const existingNums = chData.sections
-      .map(s => {
+      .map((s: Section) => {
         const parts = s.id ? s.id.split('.') : [];
         const num = parseInt(parts[1], 10);
         return isNaN(num) ? 0 : num;

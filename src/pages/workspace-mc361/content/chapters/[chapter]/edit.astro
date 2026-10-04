@@ -1,8 +1,6 @@
 ---
 import Layout from '@/src/layouts/Layout.astro';
 import ContentEditor from '@/components/content-editor';
-import fs from 'fs/promises';
-import path from 'path';
 
 const sessionCookie = Astro.cookies.get('session_token');
 let sessionData = null;
@@ -14,26 +12,8 @@ if (sessionCookie) {
 const { chapter } = Astro.params;
 const slug = Astro.url.searchParams.get('slug')
 
+// Si no hay capítulo o slug, redirigir al listado
 if (!chapter || !slug) {
-  return Astro.redirect('/workspace-mc361/content/chapters')
-}
-
-// Validar que el subtema existe en el curso actual
-const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
-const fileContent = await fs.readFile(filePath, 'utf-8');
-const chapters = JSON.parse(fileContent);
-
-const chData = chapters.find((c: any) => c.number === chapter);
-if (!chData) {
-  return Astro.redirect('/workspace-mc361/content/chapters');
-}
-
-const sectionExists = chData.sections.some((s: any) => {
-  const sSlug = s.slug ? s.slug.split('/')[1] : s.id;
-  return sSlug === slug;
-});
-
-if (!sectionExists) {
   return Astro.redirect('/workspace-mc361/content/chapters');
 }
 ---
