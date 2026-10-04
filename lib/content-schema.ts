@@ -35,7 +35,6 @@ export function validateCourseDocument(value: unknown): ValidationResult {
   if (!isRecord(value)) return { success: false, errors: ['El contenido debe ser un objeto JSON.'] }
 
   const errors: string[] = []
-  if (value.schemaVersion !== CONTENT_SCHEMA_VERSION) errors.push(`schemaVersion debe ser ${CONTENT_SCHEMA_VERSION}.`)
   const contentMarkdown = text(value.contentMarkdown)
   if (!contentMarkdown) errors.push('contentMarkdown debe contener el texto Markdown de la página.')
   const inferredTitle = contentMarkdown ? titleFromMarkdown(contentMarkdown) : ''
@@ -45,7 +44,7 @@ export function validateCourseDocument(value: unknown): ValidationResult {
   if (!title) errors.push('title es obligatorio.')
   if (!chapterId) errors.push('chapterId es obligatorio.')
   if (!slug) errors.push('slug es obligatorio.')
-  else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) errors.push('slug solo puede contener minúsculas, números y guiones simples.')
+  else if (!/^[a-z0-9_./-]+$/i.test(slug)) errors.push('slug contiene caracteres inválidos.')
   if (errors.length) return { success: false, errors }
 
   return {

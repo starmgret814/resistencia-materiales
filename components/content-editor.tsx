@@ -446,19 +446,24 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             {session?.role === 'admin' ? (
               <button
                 onClick={publishDraft}
-                disabled={isSaving || !validation.success}
+                disabled={isSaving}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#1c663b] hover:bg-[#15502e] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
-                title={!validation.success ? "Corrige los errores antes de publicar" : "Publicar directamente en la web"}
+                title="Publicar directamente en la web"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Aprobar y Publicar
               </button>
             ) : (
               <button
-                onClick={() => saveDraft('pending_approval')}
-                disabled={isSaving || !validation.success}
+                onClick={() => {
+                  if (!document.contentMarkdown.trim()) {
+                    return showToast('El contenido no puede estar vacío.', 'error');
+                  }
+                  saveDraft('pending_approval');
+                }}
+                disabled={isSaving}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
-                title={!validation.success ? "Corrige los errores antes de enviar" : "Enviar a revisión"}
+                title="Enviar a revisión del administrador"
               >
                 <Send className="w-4 h-4" />
                 Solicitar Revisión
@@ -581,7 +586,36 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       </section>}
 
       <aside className={`flex min-w-0 flex-col min-h-0 ${previewExpanded ? '' : ''}`}>
-        <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#d8c2c2] bg-white shadow-lg shadow-[#4b1719]/5"><div className="flex flex-wrap shrink-0 items-center justify-between gap-2 border-b border-[#eadada] bg-[#fbf7f4] px-4 py-3"><p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.13em] text-[#765e5e]"><Eye className="size-4 text-[#7f0303]" />Vista previa en vivo</p><div className="flex items-center gap-2">{document.contentMarkdown.trim() !== '' && <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${validation.success ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>{validation.success ? 'Markdown válido' : (validation.errors.length === 1 ? '1 observación' : `${validation.errors.length} observaciones`)}</span>}<button type="button" onClick={downloadMarkdown} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" title="Descargar como archivo Markdown"><Download className="size-3.5" /><span className="hidden sm:inline">Exportar MD</span></button><button type="button" onClick={() => setPreviewExpanded((expanded) => !expanded)} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" aria-label={previewExpanded ? 'Mostrar editor Markdown' : 'Expandir vista previa'}>{previewExpanded ? <PanelLeftOpen className="size-3.5" /> : <Maximize2 className="size-3.5" />}<span className="hidden sm:inline">{previewExpanded ? 'Volver a editar' : 'Vista completa'}</span></button></div></div><div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]"><div className="mx-auto max-w-[760px]"><ContentRenderer document={deferredDocument} /></div></div></div>
+        <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#d8c2c2] bg-white shadow-lg shadow-[#4b1719]/5">
+          <div className="flex flex-wrap shrink-0 items-center justify-between gap-2 border-b border-[#eadada] bg-[#fbf7f4] px-4 py-3">
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.13em] text-[#765e5e]">
+              <Eye className="size-4 text-[#7f0303]" />Vista previa en vivo
+            </p>
+            <div className="flex items-center gap-2">
+              {document.contentMarkdown.trim() !== '' && (
+                <span
+                  title={validation.errors.join(' | ')}
+                  className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${validation.success ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}
+                >
+                  {validation.success ? 'Markdown válido' : (validation.errors[0] || 'Observación')}
+                </span>
+              )}
+              <button type="button" onClick={downloadMarkdown} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" title="Descargar como archivo Markdown">
+                <Download className="size-3.5" />
+                <span className="hidden sm:inline">Exportar MD</span>
+              </button>
+              <button type="button" onClick={() => setPreviewExpanded((expanded) => !expanded)} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" aria-label={previewExpanded ? 'Mostrar editor Markdown' : 'Expandir vista previa'}>
+                {previewExpanded ? <PanelLeftOpen className="size-3.5" /> : <Maximize2 className="size-3.5" />}
+                <span className="hidden sm:inline">{previewExpanded ? 'Volver a editar' : 'Vista completa'}</span>
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]">
+            <div className="mx-auto max-w-[760px]">
+              <ContentRenderer document={deferredDocument} />
+            </div>
+          </div>
+        </div>
       </aside>
     </div>
   </div>
