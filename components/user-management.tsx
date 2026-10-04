@@ -14,6 +14,7 @@ interface Collaborator {
   email: string;
   role: 'admin' | 'editor';
   assignedChapters: string[];
+  createdAt?: string;
 }
 
 export default function UserManagement({ currentUserEmail }: { currentUserEmail?: string }) {
@@ -53,18 +54,14 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         usersList.push({ email: doc.id, ...doc.data() } as Collaborator);
       });
 
-      // Ordenar: 1. Tu usuario actual, 2. Otros admins, 3. Editores
+      // Ordenar por fecha y hora: el más antiguo primero, el más reciente abajo
       usersList.sort((a, b) => {
-        const emailA = a.email.toLowerCase();
-        const emailB = b.email.toLowerCase();
-        const current = (currentUserEmail || '').toLowerCase();
-
-        if (emailA === current) return -1;
-        if (emailB === current) return 1;
-        if (a.role === 'admin' && b.role === 'editor') return -1;
-        if (a.role === 'editor' && b.role === 'admin') return 1;
-        
-        return emailA.localeCompare(emailB);
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        if (timeA !== timeB) {
+          return timeA - timeB;
+        }
+        return a.email.localeCompare(b.email);
       });
 
       setUsers(usersList);
@@ -99,16 +96,20 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
       setSaving(true);
       const userRef = doc(db, 'users', newEmail.toLowerCase().trim());
       
-      const newUserData = {
+      const newUserData: any = {
         role: newRole,
         assignedChapters: newRole === 'admin' ? [] : newChapters
       };
 
-      await setDoc(userRef, newUserData);
+      if (!isEditing) {
+        newUserData.createdAt = new Date().toISOString();
+      }
+
+      await setDoc(userRef, newUserData, { merge: true });
       
       setIsModalOpen(false);
       await fetchUsers();
-      
+      showToast(isEditing ? 'Colaborador actualizado' : 'Colaborador agregado exitosamente', 'success');
     } catch (error) {
       console.error("Error guardando usuario:", error);
       showToast("Hubo un error al guardar el usuario. Revisa los permisos de Firestore.", 'error');
@@ -188,9 +189,17 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                             {user.email}
                             {isMe && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#E5D7D4] text-[#5A4A4A]">TÚ</span>}
                           </p>
-                          <div className="flex items-center gap-1.5 mt-1">
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                             {user.role === 'admin' ? <Shield className="w-3 h-3 text-[#8B0000]" /> : <UserIcon className="w-3 h-3 text-[#756565]" />}
                             <p className="text-xs font-medium text-[#756565] uppercase tracking-wider">{user.role}</p>
+                            {user.createdAt && (
+                              <>
+                                <span className="text-[#c9b5b5] text-xs">·</span>
+                                <span className="text-[11px] text-[#8b6d6d]" title={`Registrado: ${new Date(user.createdAt).toLocaleString('es-PE')}`}>
+                                  {new Date(user.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
