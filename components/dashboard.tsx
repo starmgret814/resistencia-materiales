@@ -70,10 +70,16 @@ export default function Dashboard({ session }: { session: any }) {
     const chData = localChapters.find(c => c.number === chapterNumber)
     if (!chData) return
     
-    // Auto calcular ID basado en la longitud, sin ceros a la izquierda
-    const nextNum = chData.sections.length + 1
-    const chapterNumInt = parseInt(chapterNumber, 10)
-    const autoId = `${chapterNumInt}.${nextNum}`
+    // Auto calcular ID buscando el número más alto existente + 1
+    const chapterNumInt = parseInt(chapterNumber, 10);
+    const existingNums = chData.sections
+      .map(s => {
+        const parts = s.id ? s.id.split('.') : [];
+        const num = parseInt(parts[1], 10);
+        return isNaN(num) ? 0 : num;
+      });
+    const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+    const autoId = `${chapterNumInt}.${maxNum + 1}`;
     
     const safeTitle = newTitle.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]/g, '-')
     const chapterFolder = chData.sections[0]?.slug?.split('/')[0] || `${chapterNumber}-capitulo`
@@ -93,9 +99,10 @@ export default function Dashboard({ session }: { session: any }) {
         setNewTitle('')
         showToast('Subtema creado', 'success')
       } else {
-        showToast('Error al crear', 'error')
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.error || 'Error al crear', 'error')
       }
-    } catch (e) {
+    } catch (e: any) {
       showToast('Error de conexión', 'error')
     } finally {
       setIsProcessing(false)

@@ -1,35 +1,121 @@
 import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
+import defaultChapters from '@/lib/chapters.json';
+
+async function getChapters(): Promise<any[]> {
+  try {
+    const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(fileContent);
+  } catch {
+    return structuredClone(defaultChapters);
+  }
+}
+
+async function saveChapters(chapters: any[], commitMessage: string) {
+  const contentStr = JSON.stringify(chapters, null, 2);
+  const isVercel = Boolean(process.env.VERCEL);
+  const githubToken = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
+  const githubRepo = process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
+
+  if (githubToken && githubRepo) {
+    try {
+      const getUrl = `https://api.github.com/repos/${githubRepo}/contents/lib/chapters.json`;
+      const headers = {
+        'Authorization': `Bearer ${githubToken.trim()}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'resistencia-materiales-app'
+      };
+
+      const getRes = await fetch(getUrl, { headers });
+      let sha: string | undefined = undefined;
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        sha = fileData.sha;
+      }
+
+      const commitRes = await fetch(getUrl, {
+        method: 'PUT',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: commitMessage,
+          content: Buffer.from(contentStr).toString('base64'),
+          sha: sha
+        })
+      });
+
+      if (!commitRes.ok) {
+        const errData = await commitRes.json();
+        console.error("Error en GitHub API al guardar chapters.json:", errData);
+        if (isVercel) {
+          throw new Error(`Error en GitHub API: ${errData.message || JSON.stringify(errData)}`);
+        }
+      }
+    } catch (githubErr: any) {
+      console.error("Fallo la subida de chapters.json a Github:", githubErr);
+      if (isVercel) {
+        throw githubErr;
+      }
+    }
+  } else if (isVercel) {
+    throw new Error('GITHUB_TOKEN y GITHUB_REPO no están configurados en Vercel.');
+  }
+
+  // Si estamos en entorno local, escribir también en disco local
+  if (!isVercel) {
+    const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
+    await fs.writeFile(filePath, contentStr, 'utf-8');
+  }
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
     const { chapterNumber, newSection } = data;
 
-    if (!chapterNumber || !newSection || !newSection.id || !newSection.title || !newSection.slug) {
-      return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });
+    if (!chapterNumber || !newSection || !newSection.title?.trim()) {
+      return new Response(JSON.stringify({ error: 'Faltan datos requeridos (capítulo o título)' }), { status: 400 });
     }
 
-    // Ruta absoluta a chapters.json
-    const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const chapters = JSON.parse(fileContent);
+    const chapters = await getChapters();
 
-    // Buscar el capítulo y agregar la nueva sección
     const chapterIndex = chapters.findIndex((c: any) => c.number === chapterNumber);
     if (chapterIndex === -1) {
-      return new Response(JSON.stringify({ error: 'Capítulo no encontrado' }), { status: 404 });
+      return new Response(JSON.stringify({ error: `Capítulo ${chapterNumber} no encontrado` }), { status: 404 });
     }
 
-    if (chapters[chapterIndex].sections.find((s: any) => s.id === newSection.id)) {
-      return new Response(JSON.stringify({ error: 'El ID del subtema ya existe' }), { status: 400 });
+    const targetChapter = chapters[chapterIndex];
+    const chapterNumInt = parseInt(chapterNumber, 10);
+
+    // Calcular el siguiente ID numérico disponible
+    const existingNums = targetChapter.sections
+      .map((s: any) => {
+        const parts = s.id ? s.id.split('.') : [];
+        const num = parseInt(parts[1], 10);
+        return isNaN(num) ? 0 : num;
+      });
+    const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+    const nextAutoId = `${chapterNumInt}.${maxNum + 1}`;
+
+    // Si el ID viene vacío o ya existe, asignar automáticamente el siguiente
+    if (!newSection.id || targetChapter.sections.some((s: any) => s.id === newSection.id)) {
+      newSection.id = nextAutoId;
     }
 
-    chapters[chapterIndex].sections.push(newSection);
+    // Si el slug viene vacío, generarlo automáticamente
+    if (!newSection.slug) {
+      const chapterFolder = targetChapter.sections[0]?.slug?.split('/')[0] || `${chapterNumber}-capitulo`;
+      const safeTitle = newSection.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]/g, '-');
+      newSection.slug = `${chapterFolder}/${safeTitle}`;
+    }
 
-    // Guardar los cambios
-    await fs.writeFile(filePath, JSON.stringify(chapters, null, 2), 'utf-8');
+    targetChapter.sections.push(newSection);
+
+    await saveChapters(chapters, `Añadir subtema ${newSection.id}: ${newSection.title}`);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {
@@ -47,23 +133,20 @@ export const PUT: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const chapters = JSON.parse(fileContent);
+    const chapters = await getChapters();
 
     const chapterIndex = chapters.findIndex((c: any) => c.number === chapterNumber);
     if (chapterIndex === -1) {
       return new Response(JSON.stringify({ error: 'Capítulo no encontrado' }), { status: 404 });
     }
 
-    // Actualizar secciones
     chapters[chapterIndex].sections = sections;
 
-    await fs.writeFile(filePath, JSON.stringify(chapters, null, 2), 'utf-8');
+    await saveChapters(chapters, `Actualizar subtemas del capítulo ${chapterNumber}`);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {
-    console.error('Error al reordenar subtemas:', error);
+    console.error('Error al actualizar subtemas:', error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 };
