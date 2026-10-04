@@ -13,77 +13,25 @@ async function getChapters(): Promise<any[]> {
   }
 }
 
-async function saveChapters(chapters: any[], commitMessage: string) {
-  const contentStr = JSON.stringify(chapters, null, 2);
+async function saveChapters(chapters: any[]) {
   const isVercel = Boolean(process.env.VERCEL);
-  const githubToken = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
-  const githubRepo = process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
-
-  if (githubToken && githubRepo) {
-    try {
-      const getUrl = `https://api.github.com/repos/${githubRepo}/contents/lib/chapters.json`;
-      const headers = {
-        'Authorization': `Bearer ${githubToken.trim()}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'resistencia-materiales-app'
-      };
-
-      const getRes = await fetch(getUrl, { headers });
-      let sha: string | undefined = undefined;
-      if (getRes.ok) {
-        const fileData = await getRes.json();
-        sha = fileData.sha;
-      }
-
-      const commitRes = await fetch(getUrl, {
-        method: 'PUT',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: commitMessage,
-          content: Buffer.from(contentStr).toString('base64'),
-          sha: sha
-        })
-      });
-
-      if (!commitRes.ok) {
-        const errData = await commitRes.json();
-        console.error("Error en GitHub API al guardar chapters.json:", errData);
-        if (isVercel) {
-          throw new Error(`Error en GitHub API: ${errData.message || JSON.stringify(errData)}`);
-        }
-      }
-    } catch (githubErr: any) {
-      console.error("Fallo la subida de chapters.json a Github:", githubErr);
-      if (isVercel) {
-        throw githubErr;
-      }
-    }
-  } else if (isVercel) {
-    throw new Error('GITHUB_TOKEN y GITHUB_REPO no están configurados en Vercel.');
-  }
-
-  // Si estamos en entorno local, escribir también en disco local
+  // Si estamos en entorno local, escribir en disco local
   if (!isVercel) {
-    const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
-    await fs.writeFile(filePath, contentStr, 'utf-8');
+    try {
+      const contentStr = JSON.stringify(chapters, null, 2);
+      const filePath = path.join(process.cwd(), 'lib', 'chapters.json');
+      await fs.writeFile(filePath, contentStr, 'utf-8');
+    } catch (e) {
+      console.error("Error guardando localmente chapters.json:", e);
+    }
   }
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const sessionCookie = cookies.get('session_token');
-    let session = null;
-    if (sessionCookie) {
-      try {
-        session = JSON.parse(sessionCookie.value);
-      } catch (e) {}
-    }
-
-    if (!session || session.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Solo los administradores pueden añadir subtemas a la estructura del curso.' }), { status: 403 });
+    if (!sessionCookie) {
+      return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
     const data = await request.json();
@@ -127,7 +75,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     targetChapter.sections.push(newSection);
 
-    await saveChapters(chapters, `Añadir subtema ${newSection.id}: ${newSection.title}`);
+    await saveChapters(chapters);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {
@@ -139,15 +87,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 export const PUT: APIRoute = async ({ request, cookies }) => {
   try {
     const sessionCookie = cookies.get('session_token');
-    let session = null;
-    if (sessionCookie) {
-      try {
-        session = JSON.parse(sessionCookie.value);
-      } catch (e) {}
-    }
-
-    if (!session || session.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Solo los administradores pueden modificar o reordenar subtemas.' }), { status: 403 });
+    if (!sessionCookie) {
+      return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401 });
     }
 
     const data = await request.json();
@@ -166,7 +107,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
     chapters[chapterIndex].sections = sections;
 
-    await saveChapters(chapters, `Actualizar subtemas del capítulo ${chapterNumber}`);
+    await saveChapters(chapters);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {

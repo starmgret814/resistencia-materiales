@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { db } from '@/lib/firebase'
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
 import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
@@ -67,6 +67,16 @@ export default function Dashboard({ session }: { session: any }) {
           setAssignedChapters(assigned)
         }
 
+        // Cargar estructura compartida de capítulos desde Firestore (si existe)
+        try {
+          const structDoc = await getDoc(doc(db, 'course', 'chapters'));
+          if (structDoc.exists() && Array.isArray(structDoc.data()?.list)) {
+            setLocalChapters(structDoc.data().list);
+          }
+        } catch (err) {
+          console.error("Error al cargar capítulos de Firestore:", err);
+        }
+
         // Cargar estado de los documentos (borradores/avances)
         const q = session.role === 'admin' 
           ? query(collection(db, 'drafts'))
@@ -109,26 +119,49 @@ export default function Dashboard({ session }: { session: any }) {
     const fullSlug = `${chapterFolder}/${safeTitle}`
     const newSection = { id: autoId, title: newTitle, slug: fullSlug }
 
+    const updatedChapters = localChapters.map(c => {
+      if (c.number === chapterNumber) {
+        return { ...c, sections: [...c.sections, newSection] };
+      }
+      return c;
+    });
+
     try {
-      const res = await fetch('/api/subchapters', {
+      // 1. Guardar la estructura en Firestore
+      await setDoc(doc(db, 'course', 'chapters'), {
+        list: updatedChapters,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // 2. Crear borrador inicial en Firestore
+      const docSlug = safeTitle;
+      const draftId = `${chapterNumber}_${docSlug}`;
+      await setDoc(doc(db, 'drafts', draftId), {
+        chapterId: chapterNumber,
+        slug: docSlug,
+        title: newTitle,
+        contentMarkdown: `# ${newTitle}\n\nEscribe el contenido aquí...`,
+        authorEmail: session.email,
+        status: 'draft',
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // 3. Sincronizar en desarrollo local (opcional)
+      fetch('/api/subchapters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, newSection })
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setLocalChapters(data.chapters)
-        setCreatingInChapter(null)
-        setNewTitle('')
-        showToast('Subtema creado', 'success')
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        showToast(errData.error || 'Error al crear', 'error')
-      }
+      }).catch(() => {});
+
+      setLocalChapters(updatedChapters);
+      setCreatingInChapter(null);
+      setNewTitle('');
+      showToast('Subtema creado exitosamente', 'success');
     } catch (e: any) {
-      showToast('Error de conexión', 'error')
+      console.error(e);
+      showToast('Error al crear subtema: ' + (e.message || ''), 'error');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
   }
 
@@ -147,22 +180,28 @@ export default function Dashboard({ session }: { session: any }) {
     }
 
     // Recalcular IDs basados en el nuevo orden, sin ceros a la izquierda
-    const chapterNumInt = parseInt(chapterNumber, 10)
+    const chapterNumInt = parseInt(chapterNumber, 10);
     newSections.forEach((sec, idx) => {
       sec.id = `${chapterNumInt}.${idx + 1}`;
     });
 
     setIsProcessing(true);
-    // Optimistic UI update
-    setLocalChapters(prev => prev.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c));
+    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
+    setLocalChapters(updatedChapters);
 
     try {
-      await fetch('/api/subchapters', {
+      await setDoc(doc(db, 'course', 'chapters'), {
+        list: updatedChapters,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      fetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
-      });
-      showToast('Orden actualizado', 'success')
+      }).catch(() => {});
+
+      showToast('Orden actualizado', 'success');
     } catch (e) {
       showToast('Error reordenando', 'error');
     } finally {
@@ -183,19 +222,27 @@ export default function Dashboard({ session }: { session: any }) {
       sec.id = `${chapterNumInt}.${idx + 1}`;
     });
 
-    setLocalChapters(prev => prev.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c));
+    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
+    setLocalChapters(updatedChapters);
 
     try {
-      await fetch('/api/subchapters', {
+      await setDoc(doc(db, 'course', 'chapters'), {
+        list: updatedChapters,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      fetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
-      });
-      showToast('Subtema eliminado', 'success')
+      }).catch(() => {});
+
+      showToast('Subtema eliminado', 'success');
     } catch (e) {
       showToast('Error eliminando', 'error');
     } finally {
       setIsProcessing(false);
+      setDeleteConfirm(null);
     }
   }
 
@@ -211,16 +258,23 @@ export default function Dashboard({ session }: { session: any }) {
     const newSections = [...chData.sections];
     newSections[sectionIndex].title = editTitle;
 
-    setLocalChapters(prev => prev.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c));
+    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
+    setLocalChapters(updatedChapters);
 
     try {
-      await fetch('/api/subchapters', {
+      await setDoc(doc(db, 'course', 'chapters'), {
+        list: updatedChapters,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      fetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
-      });
+      }).catch(() => {});
+
       setEditingSection(null);
-      showToast('Subtema editado', 'success')
+      showToast('Subtema editado', 'success');
     } catch (e) {
       showToast('Error editando', 'error');
     } finally {
@@ -256,14 +310,12 @@ export default function Dashboard({ session }: { session: any }) {
                 <Folder className="w-5 h-5 text-[#8b6d6d]" />
                 <h2 className="font-serif font-bold text-lg text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</h2>
               </div>
-              {session?.role === 'admin' && (
-                <button 
-                  onClick={() => { setCreatingInChapter(chapter.number); setNewTitle(''); }}
-                  className="text-xs font-bold uppercase tracking-wider text-[#8B0000] hover:bg-[#f1dddd] px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Añadir Subtema
-                </button>
-              )}
+              <button 
+                onClick={() => { setCreatingInChapter(chapter.number); setNewTitle(''); }}
+                className="text-xs font-bold uppercase tracking-wider text-[#8B0000] hover:bg-[#f1dddd] px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" /> Añadir Subtema
+              </button>
             </div>
             
             <div className="divide-y divide-[#f5ecec]">
@@ -316,26 +368,22 @@ export default function Dashboard({ session }: { session: any }) {
                       </div>
                       <div className="flex items-center gap-3">
                         {statusBadge}
-                        {session?.role === 'admin' && (
-                          <>
-                            <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                               <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
-                                 <Pencil className="w-4 h-4" />
-                               </button>
-                               <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
-                                 <Trash2 className="w-4 h-4" />
-                               </button>
-                            </div>
-                            <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
-                              <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
-                                <ChevronUp className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
-                                <ChevronDown className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </>
-                        )}
+                        <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
+                             <Pencil className="w-4 h-4" />
+                           </button>
+                           <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
+                             <Trash2 className="w-4 h-4" />
+                           </button>
+                        </div>
+                        <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
+                          <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </div>
                         <a data-astro-reload href={`/workspace-mc361/content/chapters/${chapter.number}/edit?slug=${docSlug}`}>
                           <ChevronRight className="w-5 h-5 text-[#dcc3c3] hover:text-[#8B0000] transition-colors" />
                         </a>
