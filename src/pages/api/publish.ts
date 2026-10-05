@@ -1,7 +1,41 @@
 import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
-import chapters from '@/lib/chapters.json';
+import staticChapters from '@/lib/chapters.json';
+
+/**
+ * Load chapters from Firestore first (where dynamically-created subtemas live),
+ * falling back to the static chapters.json bundled at build time.
+ */
+async function loadChapters(): Promise<any[]> {
+  try {
+    // Use the client-side Firebase SDK via dynamic import to read course/chapters
+    // We use a lightweight fetch to the Firestore REST API to avoid importing
+    // the full client SDK in a server context.
+    const { initializeApp: initClientApp, getApps: getClientApps, getApp: getClientApp } = await import('firebase/app');
+    const { getFirestore, doc, getDoc } = await import('firebase/firestore');
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBuHiDaNFsryCyFDjqUtdymTYH93oqltg0",
+      authDomain: "resistencia-materiales.firebaseapp.com",
+      projectId: "resistencia-materiales",
+      storageBucket: "resistencia-materiales.firebasestorage.app",
+      messagingSenderId: "721587919055",
+      appId: "1:721587919055:web:c6bf064ea1a84ab8bc3fba",
+    };
+
+    const app = getClientApps().length > 0 ? getClientApp() : initClientApp(firebaseConfig);
+    const db = getFirestore(app);
+    const snapshot = await getDoc(doc(db, 'course', 'chapters'));
+
+    if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
+      return snapshot.data().list;
+    }
+  } catch (e) {
+    console.warn('Could not load chapters from Firestore, using static fallback:', e);
+  }
+  return structuredClone(staticChapters) as any[];
+}
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -18,7 +52,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });
     }
 
-    const chData = (chapters as any[]).find((c: any) => c.number === chapterId);
+    // Load chapters from Firestore (includes dynamically-created subtemas)
+    const chapters = await loadChapters();
+
+    const chData = chapters.find((c: any) => c.number === chapterId);
     if (!chData) {
       return new Response(JSON.stringify({ error: 'Capítulo no encontrado' }), { status: 404 });
     }
