@@ -7,6 +7,11 @@
         "id": "1.1",
         "title": "Fallas y factor de seguridad",
         "slug": "01-esfuerzos-falla/subtema-inicial"
+      },
+      {
+        "id": "1.2",
+        "title": "Esfuerzos",
+        "slug": "01-esfuerzos-falla/esfuerzos"
       }
     ]
   },
