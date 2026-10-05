@@ -38,6 +38,11 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const assignedChapters: string[] = session?.assignedChapters || []
+  const canEditChapter = (chapterNumber: string) => {
+    if (!session) return false
+    if (session.role === 'admin') return true
+    return assignedChapters.includes(chapterNumber)
+  }
   const [documentsStatus, setDocumentsStatus] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
@@ -82,7 +87,7 @@ export default function Dashboard({ session }: { session: any }) {
   const [editTitle, setEditTitle] = useState('')
   
   // Confirmar eliminación
-  const [deleteConfirm, setDeleteConfirm] = useState<{chapter: string, index: number, title: string} | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{chapter: string, index: number, title: string, isPublished: boolean} | null>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -260,8 +265,8 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const executeDelete = async (chapterNumber: string, sectionIndex: number) => {
-    if (session?.role !== 'admin') {
-      showToast('Solo los administradores pueden eliminar subtemas.', 'error');
+    if (!canEditChapter(chapterNumber)) {
+      showToast('No tienes permisos para modificar este capítulo.', 'error');
       setDeleteConfirm(null);
       return;
     }
@@ -271,6 +276,17 @@ export default function Dashboard({ session }: { session: any }) {
     if (!chData) return;
     
     const sectionToDelete = chData.sections[sectionIndex];
+    const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
+    const docId = `${chapterNumber}_${rawSlug}`;
+    const docStatus = documentsStatus[docId];
+    const isPublished = Boolean(docStatus?.publishedContent || docStatus?.status === 'approved');
+
+    if (isPublished && session?.role !== 'admin') {
+      showToast('Solo los administradores pueden eliminar subtemas ya publicados.', 'error');
+      setDeleteConfirm(null);
+      setIsProcessing(false);
+      return;
+    }
     const newSections = [...chData.sections];
     newSections.splice(sectionIndex, 1);
     
@@ -527,8 +543,16 @@ export default function Dashboard({ session }: { session: any }) {
                            <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
                              <Pencil className="w-4 h-4" />
                            </button>
-                           {session?.role === 'admin' && (
-                             <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
+                           {canEditChapter(chapter.number) && (
+                             <button 
+                               onClick={() => {
+                                 const isPublished = Boolean(docStatus?.publishedContent || docStatus?.status === 'approved');
+                                 setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title, isPublished });
+                               }} 
+                               disabled={isProcessing} 
+                               className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" 
+                               title="Eliminar"
+                             >
                                <Trash2 className="w-4 h-4" />
                              </button>
                            )}
@@ -578,27 +602,45 @@ export default function Dashboard({ session }: { session: any }) {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3e3030]/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-[#E5D7D4] overflow-hidden flex flex-col p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#f8eaea] text-[#8B0000] flex items-center justify-center mx-auto mb-4">
+            <div className={`w-12 h-12 rounded-full ${deleteConfirm.isPublished && session?.role !== 'admin' ? 'bg-[#fff5e6] text-[#b45309]' : 'bg-[#f8eaea] text-[#8B0000]'} flex items-center justify-center mx-auto mb-4`}>
               <Trash2 className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-[#3E3030] mb-2">Eliminar Subtema</h3>
-            <p className="text-sm text-[#756565] mb-6">
-              ¿Estás seguro de que quieres eliminar <strong>{deleteConfirm.title}</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2 text-sm font-medium text-[#756565] bg-[#fbf7f4] hover:bg-[#E5D7D4] rounded-lg transition-colors">
-                Cancelar
-              </button>
-              <button 
-                onClick={() => {
-                  executeDelete(deleteConfirm.chapter, deleteConfirm.index);
-                  setDeleteConfirm(null);
-                }}
-                className="flex-1 px-4 py-2 text-sm font-bold text-white bg-[#8B0000] hover:bg-[#6a0000] rounded-lg transition-colors"
-              >
-                Eliminar
-              </button>
-            </div>
+            
+            {deleteConfirm.isPublished && session?.role !== 'admin' ? (
+              <>
+                <h3 className="text-lg font-bold text-[#3E3030] mb-2">Subtema Publicado</h3>
+                <p className="text-sm text-[#756565] mb-6">
+                  <strong>{deleteConfirm.title}</strong> ya ha sido aprobado y está publicado en el curso oficial. Por seguridad, solo los <strong>Administradores</strong> pueden eliminar contenido público.
+                </p>
+                <button 
+                  onClick={() => setDeleteConfirm(null)} 
+                  className="w-full px-4 py-2.5 text-sm font-semibold text-white bg-[#8B0000] hover:bg-[#6a0000] rounded-lg transition-colors"
+                >
+                  Entendido
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-[#3E3030] mb-2">Eliminar Subtema</h3>
+                <p className="text-sm text-[#756565] mb-6">
+                  ¿Estás seguro de que quieres eliminar <strong>{deleteConfirm.title}</strong>? Esta acción no se puede deshacer.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => setDeleteConfirm(null)} className="flex-1 px-4 py-2 text-sm font-medium text-[#756565] bg-[#fbf7f4] hover:bg-[#E5D7D4] rounded-lg transition-colors">
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={() => {
+                      executeDelete(deleteConfirm.chapter, deleteConfirm.index);
+                      setDeleteConfirm(null);
+                    }}
+                    className="flex-1 px-4 py-2 text-sm font-bold text-white bg-[#8B0000] hover:bg-[#6a0000] rounded-lg transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

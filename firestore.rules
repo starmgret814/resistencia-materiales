@@ -54,7 +54,8 @@ service cloud.firestore {
             || (resource.data.status == 'approved'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'contentMarkdown']))
           )));
-      allow delete: if admin();
+      allow delete: if admin()
+        || (canEditChapter(resource.data.chapterId) && resource.data.status != 'approved');
     }
 
     match /course/chapters {
@@ -65,8 +66,7 @@ service cloud.firestore {
           || request.resource.data.list[index] == resource.data.list[index]
           || (request.resource.data.list[index].number == resource.data.list[index].number
             && request.resource.data.list[index].diff(resource.data.list[index]).affectedKeys().hasOnly(['sections'])
-            && canEditChapter(resource.data.list[index].number)
-            && request.resource.data.list[index].sections.size() >= resource.data.list[index].sections.size());
+            && canEditChapter(resource.data.list[index].number));
       }
       allow read: if true;
       allow create, delete: if admin();
