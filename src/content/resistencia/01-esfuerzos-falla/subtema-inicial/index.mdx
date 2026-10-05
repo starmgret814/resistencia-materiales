@@ -1,97 +1,395 @@
 # Esfuerzos
 
-<Definition title="Definición de Esfuerzo">
-En el estudio de la resistencia de materiales, cuando aplicamos cargas externas sobre un cuerpo, se generan fuerzas internas que actúan entre sus partículas. La intensidad de esta fuerza interna distribuida sobre una sección transversal es lo que denominamos **esfuerzo**.
+
+<Definition title="Definición de Falla">
+En resistencia de materiales, se considera que un elemento **falla** cuando deja de cumplir de manera segura la función para la cual fue diseñado. La falla no necesariamente significa que el elemento se haya fracturado; también puede ocurrir debido a una deformación excesiva, fluencia, pandeo o cualquier condición que comprometa su funcionamiento.
 </Definition>
 
-## 1. Tipos de Esfuerzos
+## 1. ¿Qué es una falla?
 
-Existen diferentes tipos de esfuerzos dependiendo de cómo se aplique la carga sobre la superficie del material.
+Cuando un elemento estructural o mecánico está sometido a cargas, desarrolla esfuerzos internos. Si estos esfuerzos superan la capacidad resistente del material o se alcanza una condición límite de diseño, el elemento puede experimentar una **falla**.
 
-### Esfuerzo Normal
+La forma en que ocurre la falla depende principalmente del tipo de material, las cargas aplicadas, la geometría del elemento y las condiciones de apoyo.
 
-Ocurre cuando la carga se aplica de manera perpendicular a la superficie transversal del elemento. Puede ser de tensión (estiramiento) o de compresión (aplastamiento).
+Entre las principales formas de falla se encuentran:
 
-<ImageGrid columns={2}> 
-  <Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1791179001/t7d60mghgoah4okppjmg.jpg"
-  alt="Esfuerzo Normal"
-  caption="Figura 1. Representación gráfica del esfuerzo normal en un cuerpo sometido a carga axial." />
+* **Fluencia:** el material comienza a deformarse permanentemente.
+* **Fractura:** el material se separa o rompe debido a la acción de los esfuerzos.
+* **Pandeo:** un elemento sometido a compresión pierde estabilidad y presenta una deformación lateral importante.
+* **Deformación excesiva:** las deformaciones superan los límites aceptables para el funcionamiento del elemento.
+* **Falla por fatiga:** el material falla después de soportar repetidamente cargas variables o cíclicas.
 
-  <Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1791179001/t7d60mghgoah4okppjmg.jpg"
-  alt="Esfuerzo Normal"
-  caption="Figura 1. Representación gráfica del esfuerzo normal en un cuerpo sometido a carga axial."/>
-</ImageGrid>
+## 2. Esfuerzo de falla
 
-<Formula label="Ecuación del Esfuerzo Normal">
-  $$ \sigma = \frac{P}{A} $$
+El **esfuerzo de falla** es el esfuerzo asociado con la condición en la que el material alcanza un estado límite determinado.
+
+Dependiendo del comportamiento del material, pueden utilizarse diferentes propiedades para establecer este límite.
+
+### Materiales dúctiles
+
+En materiales dúctiles, como muchos aceros estructurales, suele utilizarse el **esfuerzo de fluencia** como criterio para evitar que el elemento entre en deformación plástica.
+
+$$
+\sigma_{\text{falla}} \approx \sigma_Y
+$$
+
+Donde:
+
+* $\sigma_Y$: esfuerzo de fluencia del material.
+
+### Materiales frágiles
+
+En materiales frágiles, como algunos tipos de concreto, cerámicas y fundiciones, puede utilizarse el **esfuerzo último** como referencia para determinar la resistencia del material.
+
+$$
+\sigma_{\text{falla}} \approx \sigma_U
+$$
+
+Donde:
+
+* $\sigma_U$: esfuerzo último del material.
+
+<Summary title="Importante">
+El esfuerzo que se utiliza como límite de falla depende del material y del criterio de diseño empleado. Por ello, no siempre debe utilizarse directamente el esfuerzo último como límite de diseño.
+</Summary>
+
+## 3. Factor de Seguridad
+
+El **factor de seguridad (F.S.)** permite comparar la resistencia disponible de un elemento con la solicitación que experimenta durante su funcionamiento.
+
+Su objetivo es proporcionar un margen adicional de seguridad frente a incertidumbres presentes en el diseño, como variaciones en las cargas, propiedades reales del material, condiciones de fabricación y simplificaciones utilizadas en los cálculos.
+
+<Formula label="Factor de Seguridad">
+$$
+F.S. = \frac{\text{Resistencia}}{\text{Solicitación}}
+$$
+</Formula>
+
+Cuando se trabaja directamente con esfuerzos:
+
+<Formula label="Factor de Seguridad mediante Esfuerzos">
+$$
+F.S. = \frac{\sigma_{\text{falla}}}{\sigma_{\text{trabajo}}}
+$$
 </Formula>
 
 Donde:
-* **$P$**: Es la carga axial aplicada.
-* **$A$**: Es el área de la sección transversal perpendicular a la carga.
 
-### Esfuerzo Cortante
+* $\sigma_{\text{falla}}$: esfuerzo correspondiente a la condición de falla.
+* $\sigma_{\text{trabajo}}$: esfuerzo producido por las cargas de servicio.
 
-Se genera cuando la carga se aplica paralelamente a la sección transversal, provocando un efecto de "corte" o deslizamiento entre los planos del material.
+## 4. Esfuerzo permisible
 
-<Formula label="Ecuación del Esfuerzo Cortante">
-  $$ \tau = \frac{V}{A} $$
+Una forma común de utilizar el factor de seguridad es determinar el **esfuerzo permisible** o esfuerzo admisible.
+
+Este representa el esfuerzo máximo que se permite alcanzar durante las condiciones normales de funcionamiento.
+
+<Formula label="Esfuerzo Permisible">
+$$
+\sigma_{\text{perm}} = \frac{\sigma_{\text{falla}}}{F.S.}
+$$
 </Formula>
 
-Donde **$V$** es la fuerza cortante interna resultante.
+Por lo tanto, para que el diseño cumpla con el criterio establecido:
 
-## 2. Factor de Seguridad
-
-El factor de seguridad es un indicador de la capacidad excedente que tiene un diseño estructural más allá de las cargas a las que se espera someter. Sirve para mitigar incertidumbres sobre el material o posibles variaciones imprevistas de carga.
-
-<Formula label="Factor de Seguridad (F.S.)">
-  $$ F.S. = \frac{\sigma_{falla}}{\sigma_{permitido}} $$
+<Formula label="Condición de Diseño">
+$$
+\sigma_{\text{trabajo}} \leq \sigma_{\text{perm}}
+$$
 </Formula>
 
-Una estructura segura debe tener siempre un $F.S. > 1$.
+También puede expresarse como:
+<Formula>
+$$
+F.S. \geq \frac{\sigma_{\text{falla}}}{\sigma_{\text{trabajo}}}
+$$
+</Formula>
 
-## 3. Ejemplo Práctico
+## 5. Interpretación del Factor de Seguridad
 
-A continuación, te presentamos un ejemplo básico sobre cómo calcular el esfuerzo en una varilla tensada.
+El valor obtenido del factor de seguridad permite conocer qué tan cerca se encuentra el elemento de la condición de falla considerada.
 
-<Example number={1} title="Cálculo de Tensión en un Cable">
-Un cable de acero con un diámetro de $10\text{ mm}$ soporta un peso colgante de $8\text{ kN}$. Calcular el esfuerzo normal promedio desarrollado en la sección transversal del cable.
+* Si $F.S. > 1$, la resistencia disponible es mayor que la solicitación.
+* Si $F.S. = 1$, el elemento se encuentra en el límite de la condición de falla considerada.
+* Si $F.S. < 1$, la solicitación supera la resistencia disponible y el elemento no cumple el criterio de seguridad establecido.
+
+<Summary title="Interpretación">
+Un factor de seguridad mayor que uno indica que existe un margen entre la condición de trabajo y la condición límite considerada. Sin embargo, que $F.S. > 1$ no significa automáticamente que cualquier diseño sea adecuado; el valor requerido depende del material, tipo de carga, normativa y condiciones de servicio.
+</Summary>
+
+## 6. Selección del Factor de Seguridad
+
+El factor de seguridad no debe elegirse arbitrariamente. Su valor depende de diferentes factores relacionados con el diseño.
+
+Entre ellos se encuentran:
+
+* Incertidumbre en las cargas aplicadas.
+* Variación de las propiedades del material.
+* Tipo de material.
+* Consecuencias de una posible falla.
+* Condiciones de operación.
+* Calidad de fabricación.
+* Precisión del modelo utilizado.
+* Presencia de cargas repetitivas o variables.
+* Normas y códigos de diseño aplicables.
+
+En general, mientras mayor sea la incertidumbre o las consecuencias asociadas a una falla, mayor puede ser el margen de seguridad requerido.
+
+## 7. Relación entre carga, esfuerzo y falla
+
+Para una barra sometida a una carga axial, el esfuerzo normal promedio puede calcularse mediante:
+
+<Formula label="Esfuerzo Normal">
+$$
+\sigma = \frac{P}{A}
+$$
+</Formula>
+
+Si además se conoce el esfuerzo de falla y el factor de seguridad requerido, puede determinarse el esfuerzo permisible:
+
+$$
+\sigma_{\text{perm}} =
+\frac{\sigma_{\text{falla}}}{F.S.}
+$$
+
+El diseño será aceptable cuando:
+
+$$
+\frac{P}{A} \leq
+\frac{\sigma_{\text{falla}}}{F.S.}
+$$
+
+Esta expresión permite relacionar directamente la carga aplicada, la geometría de la sección, la resistencia del material y el factor de seguridad.
+
+## 8. Ejemplo Práctico
+
+<Example number={1} title="Cálculo del Factor de Seguridad">
+
+Una barra de acero tiene un área transversal de $500\text{ mm}^2$ y está sometida a una carga axial de tensión de $50\text{ kN}$. El esfuerzo de fluencia del acero es de $250\text{ MPa}$. Determinar el esfuerzo de trabajo y el factor de seguridad respecto a la fluencia.
 
 <Solution>
-**1. Calcular el área transversal:**
-Como el diámetro es $d = 10\text{ mm}$, su área es:
-$$ A = \frac{\pi}{4} d^2 = \frac{\pi}{4} (10)^2 \approx 78.54\text{ mm}^2 $$
 
-**2. Calcular el esfuerzo:**
-Dividimos la carga total entre el área obtenida:
-$$ \sigma = \frac{P}{A} = \frac{8000\text{ N}}{78.54\text{ mm}^2} \approx 101.86\text{ MPa} $$
+**1. Calcular el esfuerzo de trabajo:**
 
-El esfuerzo promedio en el cable es de **101.86 MPa**.
+La carga aplicada es:
+
+$$
+P = 50\text{ kN} = 50\,000\text{ N}
+$$
+
+El área transversal es:
+
+$$
+A = 500\text{ mm}^2
+$$
+
+Por lo tanto:
+
+$$
+\sigma_{\text{trabajo}}
+=
+\frac{P}{A}
+=
+\frac{50\,000}{500}
+=
+100\text{ MPa}
+$$
+
+**2. Calcular el factor de seguridad:**
+
+Como se utiliza el esfuerzo de fluencia como condición de falla:
+
+$$
+\sigma_{\text{falla}} = \sigma_Y = 250\text{ MPa}
+$$
+
+Entonces:
+
+$$
+F.S.
+=
+\frac{\sigma_{\text{falla}}}
+{\sigma_{\text{trabajo}}}
+=
+\frac{250}{100}
+=
+2.5
+$$
+
+Por lo tanto, el factor de seguridad respecto a la fluencia es:
+
+$$
+\boxed{F.S. = 2.5}
+$$
+
+Esto significa que, bajo este criterio, la resistencia asociada a la fluencia es 2.5 veces el esfuerzo de trabajo.
+
 </Solution>
 </Example>
 
-## 4. Problemas Propuestos
+## 9. Ejemplo de Esfuerzo Permisible
 
-Intenta resolver los siguientes problemas para poner a prueba tus conocimientos sobre los esfuerzos.
+<Example number={2} title="Determinación del Esfuerzo Permisible">
 
-<Problem number={1} title="Compresión en un pilar">
-Un pilar cilíndrico de concreto de $250\text{ mm}$ de radio debe soportar una carga de compresión de $1.5\text{ MN}$. Sabiendo que el esfuerzo máximo de falla del concreto es de $25\text{ MPa}$, calcula el esfuerzo generado y verifica si la estructura es segura.
+Un elemento fabricado con un material cuyo esfuerzo de falla es de $360\text{ MPa}$ debe diseñarse utilizando un factor de seguridad de $3$. Determinar el esfuerzo permisible.
 
 <Solution>
-**1. Calcular el área transversal:**
-$$ A = \pi r^2 = \pi (250\text{ mm})^2 \approx 196,349.54\text{ mm}^2 $$
 
-**2. Calcular el esfuerzo de compresión:**
-$$ \sigma = \frac{1,500,000\text{ N}}{196,349.54\text{ mm}^2} \approx 7.64\text{ MPa} $$
+**1. Aplicar la ecuación del esfuerzo permisible:**
 
-**3. Determinar la seguridad de la estructura:**
-Comparando con el esfuerzo de falla:
-$$ F.S. = \frac{25\text{ MPa}}{7.64\text{ MPa}} \approx 3.27 $$
+$$
+\sigma_{\text{perm}}
+=
+\frac{\sigma_{\text{falla}}}{F.S.}
+$$
 
-Como el factor de seguridad es mayor a $1$, la estructura es **segura**.
+**2. Sustituir los valores:**
+
+$$
+\sigma_{\text{perm}}
+=
+\frac{360\text{ MPa}}{3}
+=
+120\text{ MPa}
+$$
+
+Por lo tanto:
+
+$$
+\boxed{\sigma_{\text{perm}} = 120\text{ MPa}}
+$$
+
+El esfuerzo de trabajo del elemento no deberá superar los $120\text{ MPa}$ bajo el criterio de diseño utilizado.
+
+</Solution>
+</Example>
+
+## 10. Problemas Propuestos
+
+<Problem number={1} title="Factor de Seguridad de una Barra">
+
+Una barra de acero tiene un área transversal de $800\text{ mm}^2$ y soporta una carga axial de tensión de $80\text{ kN}$. Si el esfuerzo de fluencia del material es de $320\text{ MPa}$, calcula:
+
+1. El esfuerzo normal de trabajo.
+2. El factor de seguridad respecto a la fluencia.
+3. Indica si el elemento supera el criterio de fluencia.
+
+<Solution>
+
+**1. Esfuerzo de trabajo:**
+
+$$
+\sigma_{\text{trabajo}}
+=
+\frac{80\,000}{800}
+=
+100\text{ MPa}
+$$
+
+**2. Factor de seguridad:**
+
+$$
+F.S.
+=
+\frac{320}{100}
+=
+3.2
+$$
+
+**3. Verificación:**
+
+Como el esfuerzo de trabajo es menor que el esfuerzo de fluencia:
+
+$$
+100\text{ MPa} < 320\text{ MPa}
+$$
+
+El elemento no alcanza la condición de fluencia bajo la carga indicada.
+
 </Solution>
 </Problem>
 
+<Problem number={2} title="Carga Máxima Permisible">
+
+Una barra circular de acero tiene un diámetro de $20\text{ mm}$. El esfuerzo de fluencia del material es de $250\text{ MPa}$ y se requiere un factor de seguridad de $2.5$. Determina la carga axial máxima permisible.
+
+<Solution>
+
+**1. Determinar el esfuerzo permisible:**
+
+$$
+\sigma_{\text{perm}}
+=
+\frac{250}{2.5}
+=
+100\text{ MPa}
+$$
+
+**2. Calcular el área de la sección transversal:**
+
+$$
+A
+=
+\frac{\pi}{4}d^2
+=
+\frac{\pi}{4}(20)^2
+\approx
+314.16\text{ mm}^2
+$$
+
+**3. Determinar la carga máxima permisible:**
+
+$$
+P_{\max}
+=
+\sigma_{\text{perm}}A
+$$
+
+$$
+P_{\max}
+=
+(100)(314.16)
+\approx
+31\,416\text{ N}
+$$
+
+Por lo tanto:
+
+$$
+\boxed{P_{\max}\approx31.42\text{ kN}}
+$$
+
+</Solution>
+</Problem>
+
+## 11. Consideraciones Finales
+
+El análisis de fallas permite determinar las condiciones que pueden llevar a un elemento a perder su capacidad de cumplir adecuadamente su función. El factor de seguridad introduce un margen entre las condiciones normales de trabajo y la condición límite considerada.
+
+En un diseño de ingeniería, no basta con comprobar que el esfuerzo sea menor que el esfuerzo de falla. Es necesario establecer un **criterio de falla apropiado**, seleccionar un **factor de seguridad adecuado** y verificar que el elemento cumpla las condiciones de servicio requeridas.
+
 <Summary title="Resumen">
-El análisis correcto de los esfuerzos principales y la aplicación de un factor de seguridad adecuado son los pilares de la mecánica de materiales, garantizando que estructuras y máquinas puedan soportar su entorno operativo sin llegar a un punto de falla.
+La falla representa una condición en la que un elemento deja de cumplir adecuadamente su función. El factor de seguridad relaciona la resistencia disponible con la solicitación de trabajo y permite establecer un margen de seguridad en el diseño.
+
+Las relaciones fundamentales son:
+
+$$
+F.S. = \frac{\sigma_{\text{falla}}}{\sigma_{\text{trabajo}}}
+$$
+
+$$
+\sigma_{\text{perm}} =
+\frac{\sigma_{\text{falla}}}{F.S.}
+$$
+
+y la condición básica de diseño es:
+
+$$
+\sigma_{\text{trabajo}}
+\leq
+\sigma_{\text{perm}}
+$$
+
+Estas relaciones constituyen una base fundamental para evaluar la seguridad de elementos sometidos a diferentes tipos de carga.
+
 </Summary>
