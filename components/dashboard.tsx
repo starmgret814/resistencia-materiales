@@ -10,7 +10,7 @@ import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check, RotateCcw } from 'lucide-react'
 import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
 
-const RESET_VERSION = 'v2_clean_baseline_0';
+const RESET_VERSION = '2026_10_05_clean_v4';
 
 export default function Dashboard({ session }: { session: any }) {
   const expansionStorageKey = `mc361_expanded_chapters:${session?.email || 'guest'}`
@@ -43,10 +43,8 @@ export default function Dashboard({ session }: { session: any }) {
   const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const storedVersion = localStorage.getItem('mc361_clean_version');
-        if (storedVersion !== RESET_VERSION) {
+        if (localStorage.getItem('mc361_clean_version') !== RESET_VERSION) {
           localStorage.removeItem('mc361_local_chapters');
-          localStorage.setItem('mc361_clean_version', RESET_VERSION);
           return initialChapters;
         }
         const cached = localStorage.getItem('mc361_local_chapters');
@@ -91,20 +89,27 @@ export default function Dashboard({ session }: { session: any }) {
       if (!session?.email) { setIsLoading(false); return }
       
       try {
-        const storedVersion = typeof window !== 'undefined' ? localStorage.getItem('mc361_clean_version') : null;
-        if (storedVersion !== RESET_VERSION && session.role === 'admin') {
+        const structureSnap = await getDoc(doc(db, 'course', 'chapters'));
+        const firestoreVersion = structureSnap.exists() ? structureSnap.data()?.version : null;
+
+        if (session.role === 'admin' && firestoreVersion !== RESET_VERSION) {
           try {
             await setDoc(doc(db, 'course', 'chapters'), {
               list: initialChapters,
               updatedAt: new Date().toISOString(),
               version: RESET_VERSION
             });
+
             const allDrafts = await getDocs(collection(db, 'drafts'));
             const batch = writeBatch(db);
             allDrafts.docs.forEach(d => batch.delete(d.ref));
             await batch.commit();
-            localStorage.setItem('mc361_clean_version', RESET_VERSION);
-            localStorage.removeItem('mc361_local_chapters');
+
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('mc361_local_chapters');
+              localStorage.setItem('mc361_clean_version', RESET_VERSION);
+            }
+
             setLocalChapters(initialChapters);
             setDocumentsStatus({});
             setIsLoading(false);
@@ -114,33 +119,26 @@ export default function Dashboard({ session }: { session: any }) {
           }
         }
 
+        if (structureSnap.exists() && Array.isArray(structureSnap.data().list)) {
+          setLocalChapters(structureSnap.data().list);
+        }
+
         const q = session.role === 'admin' 
           ? query(collection(db, 'drafts'))
-          : query(collection(db, 'drafts'), where("authorEmail", "==", session.email))
-          
-        const results = await Promise.allSettled([
-          getDoc(doc(db, 'course', 'chapters')),
-          getDocs(q),
-        ])
-        const [structure, drafts] = results
-        if (structure.status === 'fulfilled') {
-          if (structure.value.exists() && Array.isArray(structure.value.data().list)) {
-            setLocalChapters(structure.value.data().list)
-          }
-        } else console.error('Error al cargar capítulos:', structure.reason)
-        if (drafts.status === 'fulfilled') {
-          const statusMap: Record<string, any> = {}
-          drafts.value.forEach(d => { statusMap[d.id] = d.data() })
-          setDocumentsStatus(statusMap)
-        } else console.error('Error al cargar borradores:', drafts.reason)
+          : query(collection(db, 'drafts'), where("authorEmail", "==", session.email));
+
+        const draftsSnap = await getDocs(q);
+        const statusMap: Record<string, any> = {};
+        draftsSnap.forEach(d => { statusMap[d.id] = d.data(); });
+        setDocumentsStatus(statusMap);
       } catch (e) {
-        console.error(e)
+        console.error(e);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-    loadData()
-  }, [session])
+    loadData();
+  }, [session]);
 
   const handleCreate = async (chapterNumber: string) => {
     if (!newTitle.trim()) return showToast('Escribe el título', 'error')
@@ -346,19 +344,27 @@ export default function Dashboard({ session }: { session: any }) {
     if (!confirm('¿Estás seguro de que deseas restablecer todos los subtemas y borradores a 0? Esta acción borrará borradores y subtemas extras.')) return;
     try {
       setIsProcessing(true);
-      const res = await workspaceFetch('/api/reset-db', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('mc361_local_chapters');
-        }
-        showToast('Base de datos y subtemas restablecidos a 0.', 'success');
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        showToast(data.error || 'Error al restablecer', 'error');
+      await setDoc(doc(db, 'course', 'chapters'), {
+        list: initialChapters,
+        updatedAt: new Date().toISOString(),
+        version: RESET_VERSION
+      });
+      const allDrafts = await getDocs(collection(db, 'drafts'));
+      const batch = writeBatch(db);
+      allDrafts.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('mc361_local_chapters');
+        localStorage.setItem('mc361_clean_version', RESET_VERSION);
       }
+      setLocalChapters(initialChapters);
+      setDocumentsStatus({});
+      showToast('Base de datos y subtemas restablecidos a 0.', 'success');
+      setTimeout(() => window.location.reload(), 600);
     } catch (e: any) {
-      showToast('Error de conexión', 'error');
+      console.error(e);
+      showToast('Error al restablecer: ' + (e.message || ''), 'error');
     } finally {
       setIsProcessing(false);
     }
