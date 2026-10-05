@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await request.json();
-    const { chapterId, slug, contentMarkdown } = data;
+    const { chapterId, slug, contentMarkdown, title } = data;
 
     if (!chapterId || !slug || !contentMarkdown) {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });
@@ -82,6 +82,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // El path relativo dentro de src/
     const relativePath = `src/content/resistencia/${fullSectionSlug}/index.mdx`;
+    const subtopicTitle = title || section?.title || slug;
 
     const githubToken = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
     const githubRepo = process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
@@ -90,13 +91,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (githubToken && githubRepo) {
       // 1. Integración con GitHub (Requerido en producción Vercel)
       try {
-        const getUrl = `https://api.github.com/repos/${githubRepo}/contents/${relativePath}`;
         const headers = {
           'Authorization': `Bearer ${githubToken.trim()}`,
           'Accept': 'application/vnd.github.v3+json',
           'User-Agent': 'resistencia-materiales-app'
         };
 
+        // 1.1 Commit del archivo MDX
+        const getUrl = `https://api.github.com/repos/${githubRepo}/contents/${relativePath}`;
         const getRes = await fetch(getUrl, { headers });
 
         let sha: string | undefined = undefined;
@@ -105,8 +107,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
           sha = fileData.sha;
         }
 
-        // Hacer el commit en GitHub
-        const subtopicTitle = section?.title || slug;
         const commitRes = await fetch(getUrl, {
           method: 'PUT',
           headers: {
@@ -127,6 +127,59 @@ export const POST: APIRoute = async ({ request, locals }) => {
             JSON.stringify({ error: `Error en GitHub API: ${errData.message || JSON.stringify(errData)}` }),
             { status: commitRes.status }
           );
+        }
+
+        // 1.2 Actualizar lib/chapters.json en GitHub para que el subtema aparezca en la web pública
+        try {
+          const chaptersUrl = `https://api.github.com/repos/${githubRepo}/contents/lib/chapters.json`;
+          const chaptersRes = await fetch(chaptersUrl, { headers });
+          if (chaptersRes.ok) {
+            const chaptersFileData = await chaptersRes.json();
+            const currentRepoChapters = JSON.parse(Buffer.from(chaptersFileData.content, 'base64').toString('utf-8'));
+            
+            const targetCh = currentRepoChapters.find((c: any) => c.number === chapterId);
+            if (targetCh) {
+              const secIdx = targetCh.sections.findIndex((s: any) => {
+                const sSlug = s.slug ? (s.slug.includes('/') ? s.slug.split('/')[1] : s.slug) : s.id;
+                return sSlug === slug || s.slug === fullSectionSlug;
+              });
+
+              if (secIdx !== -1) {
+                targetCh.sections[secIdx].title = subtopicTitle;
+                targetCh.sections[secIdx].slug = fullSectionSlug;
+              } else {
+                const existingNums = targetCh.sections.map((s: any) => {
+                  const parts = s.id ? s.id.split('.') : [];
+                  const num = parseInt(parts[1], 10);
+                  return isNaN(num) ? 0 : num;
+                });
+                const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+                const newId = `${parseInt(chapterId, 10)}.${maxNum + 1}`;
+                
+                targetCh.sections.push({
+                  id: newId,
+                  title: subtopicTitle,
+                  slug: fullSectionSlug
+                });
+              }
+
+              // Hacer commit de lib/chapters.json en GitHub
+              await fetch(chaptersUrl, {
+                method: 'PUT',
+                headers: {
+                  ...headers,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  message: `Actualizar estructura del curso: ${subtopicTitle} en lib/chapters.json`,
+                  content: Buffer.from(JSON.stringify(currentRepoChapters, null, 2)).toString('base64'),
+                  sha: chaptersFileData.sha
+                })
+              });
+            }
+          }
+        } catch (chaptersUpdateErr) {
+          console.error("Error sincronizando lib/chapters.json en GitHub:", chaptersUpdateErr);
         }
 
         // Si estamos en Vercel, no intentamos escribir en disco (es read-only)
@@ -150,11 +203,41 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // 2. Guardar en el disco duro local (Solo en desarrollo local)
     try {
-      const sectionDir = path.join(process.cwd(), 'src', 'content', 'resistencia', section.slug);
+      const sectionDir = path.join(process.cwd(), 'src', 'content', 'resistencia', fullSectionSlug);
       const filePath = path.join(sectionDir, 'index.mdx');
 
       await fs.mkdir(sectionDir, { recursive: true });
       await fs.writeFile(filePath, contentMarkdown, 'utf-8');
+
+      // Actualizar también localmente lib/chapters.json
+      const localChaptersPath = path.join(process.cwd(), 'lib', 'chapters.json');
+      const localContent = await fs.readFile(localChaptersPath, 'utf-8');
+      const localChapters = JSON.parse(localContent);
+      const targetLocalCh = localChapters.find((c: any) => c.number === chapterId);
+      if (targetLocalCh) {
+        const secIdx = targetLocalCh.sections.findIndex((s: any) => {
+          const sSlug = s.slug ? (s.slug.includes('/') ? s.slug.split('/')[1] : s.slug) : s.id;
+          return sSlug === slug || s.slug === fullSectionSlug;
+        });
+        if (secIdx !== -1) {
+          targetLocalCh.sections[secIdx].title = subtopicTitle;
+          targetLocalCh.sections[secIdx].slug = fullSectionSlug;
+        } else {
+          const existingNums = targetLocalCh.sections.map((s: any) => {
+            const parts = s.id ? s.id.split('.') : [];
+            const num = parseInt(parts[1], 10);
+            return isNaN(num) ? 0 : num;
+          });
+          const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+          const newId = `${parseInt(chapterId, 10)}.${maxNum + 1}`;
+          targetLocalCh.sections.push({
+            id: newId,
+            title: subtopicTitle,
+            slug: fullSectionSlug
+          });
+        }
+        await fs.writeFile(localChaptersPath, JSON.stringify(localChapters, null, 2), 'utf-8');
+      }
     } catch (fsErr: any) {
       if (!isVercel) {
         throw fsErr;

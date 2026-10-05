@@ -112,7 +112,7 @@ export default function RequestsDashboard() {
             requests.map(req => (
               <a 
                 key={req.id}
-                href={`/workspace-mc361/content/chapters/${req.chapterId}/edit?slug=${req.slug}`}
+                href={`/workspace-mc361/content/chapters/${req.chapterId}/edit?slug=${req.slug}&from=requests`}
                 data-astro-reload
                 className="flex items-center justify-between px-6 py-5 hover:bg-[#FCF9F7] transition-colors group"
               >

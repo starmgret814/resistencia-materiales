@@ -129,9 +129,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       ]);
       if (snap.exists()) {
         const data = snap.data();
-        if (data.authorEmail === session.email || session?.role === 'admin') {
-          setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
-        }
+        setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
       } else {
         const params = new URLSearchParams({ chapter: chapterId, slug });
         const mdxRes = await fetch(`/api/mdx?${params}`);
@@ -147,6 +145,18 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       }
     } catch (error) {
       console.error('Error cargando borrador', error);
+      // Fallback a leer el archivo MDX real si Firebase da error de permisos
+      try {
+        const params = new URLSearchParams({ chapter: chapterId, slug });
+        const mdxRes = await fetch(`/api/mdx?${params}`);
+        if (mdxRes.ok) {
+          const mdxData = await mdxRes.json();
+          setDocument(prev => ({
+            ...prev,
+            contentMarkdown: mdxData.content,
+          }));
+        }
+      } catch {}
     } finally {
       setIsLoaded(true);
     }
@@ -248,6 +258,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         body: JSON.stringify({
           chapterId: document.chapterId,
           slug: document.slug,
+          title: currentTitle || document.title,
           contentMarkdown: currentDocument.contentMarkdown
         })
       });
@@ -257,21 +268,24 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         throw new Error(errorData.error || 'Error al publicar');
       }
 
-      // 2. Actualizar el estado en Firebase a 'approved'
+      // 2. Actualizar el estado en Firebase a 'approved' preservando al autor original
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
+      const existingSnap = await getDoc(draftRef);
+      const originalAuthor = existingSnap.exists() ? existingSnap.data()?.authorEmail : session.email;
+
       await setDoc(draftRef, {
         ...currentDocument,
-        authorEmail: session.email,
+        authorEmail: originalAuthor || session.email,
         status: 'approved',
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
       
       showToast('¡Aprobado y publicado exitosamente!', 'success');
       
-      // Regresar al dashboard después de un momento
+      const isFromRequests = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'requests';
       setTimeout(() => {
-        window.location.href = '/workspace-mc361/management/requests';
+        window.location.href = isFromRequests ? '/workspace-mc361/management/requests' : '/workspace-mc361/content/chapters';
       }, 1500);
 
     } catch (e: any) {
@@ -420,9 +434,15 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
     <div className="mx-auto w-full max-w-[1800px] shrink-0 px-4 pt-3 sm:px-6">
-      <a href="/workspace-mc361/content/chapters" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Volver a capítulos
-      </a>
+      {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'requests' ? (
+        <a href="/workspace-mc361/management/requests" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
+          <ArrowLeft className="size-4" aria-hidden="true" /> Volver a solicitudes de revisión
+        </a>
+      ) : (
+        <a href="/workspace-mc361/content/chapters" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
+          <ArrowLeft className="size-4" aria-hidden="true" /> Volver a capítulos
+        </a>
+      )}
     </div>
 
     <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 gap-5 p-4 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
