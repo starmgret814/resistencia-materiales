@@ -46,23 +46,19 @@ service cloud.firestore {
           && canEditChapter(draftId.split('_')[0]))
         || resource.data.authorEmail == request.auth.token.email
         || canEditChapter(resource.data.chapterId));
-      // Editors query their own drafts; write permission still checks current chapter assignments.
-      allow list: if registered() && (admin() || resource.data.authorEmail == request.auth.token.email);
+      // Editors query their own drafts or drafts belonging to chapters assigned to them.
+      allow list: if registered() && (admin()
+        || resource.data.authorEmail == request.auth.token.email
+        || canEditChapter(resource.data.chapterId));
       allow create: if validDraft() && (admin()
         || (canEditChapter(request.resource.data.chapterId)
-          && request.resource.data.authorEmail == request.auth.token.email
           && request.resource.data.status in ['draft', 'pending_approval']));
       allow update: if validDraft() && (admin()
         || (canEditChapter(resource.data.chapterId)
           && request.resource.data.chapterId == resource.data.chapterId
           && request.resource.data.slug == resource.data.slug
           && (
-            (resource.data.authorEmail == request.auth.token.email
-              && request.resource.data.authorEmail == resource.data.authorEmail
-              && request.resource.data.status in ['draft', 'pending_approval'])
-            || (resource.data.status == 'approved'
-              && request.resource.data.authorEmail == request.auth.token.email
-              && request.resource.data.status in ['draft', 'pending_approval'])
+            request.resource.data.status in ['draft', 'pending_approval']
             || (resource.data.status == 'approved'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'contentMarkdown']))
           )));

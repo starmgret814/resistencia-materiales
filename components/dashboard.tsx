@@ -119,17 +119,53 @@ export default function Dashboard({ session }: { session: any }) {
           }
         }
 
+        const statusMap: Record<string, any> = {};
+        const currentList: Chapter[] = (structureSnap.exists() && Array.isArray(structureSnap.data().list))
+          ? structureSnap.data().list
+          : initialChapters;
+
         if (structureSnap.exists() && Array.isArray(structureSnap.data().list)) {
           setLocalChapters(structureSnap.data().list);
         }
 
-        const q = session.role === 'admin' 
-          ? query(collection(db, 'drafts'))
-          : query(collection(db, 'drafts'), where("authorEmail", "==", session.email));
+        if (session.role === 'admin') {
+          const draftsSnap = await getDocs(query(collection(db, 'drafts')));
+          draftsSnap.forEach(d => { statusMap[d.id] = d.data(); });
+        } else {
+          // 1. Borradores con autoría del usuario
+          try {
+            const ownSnap = await getDocs(query(collection(db, 'drafts'), where("authorEmail", "==", session.email)));
+            ownSnap.forEach(d => { statusMap[d.id] = d.data(); });
+          } catch (err) {
+            console.warn('No se pudieron consultar borradores por autor:', err);
+          }
 
-        const draftsSnap = await getDocs(q);
-        const statusMap: Record<string, any> = {};
-        draftsSnap.forEach(d => { statusMap[d.id] = d.data(); });
+          // 2. Para los subtemas de capítulos asignados, consultar borradores individuales
+          // permitidos por canEditChapter en firestore.rules (ej. editados o iniciados por admin)
+          const assignedList = currentList.filter(c => assignedChapters.includes(c.number));
+          const draftFetches: Promise<any>[] = [];
+          for (const ch of assignedList) {
+            for (const sec of ch.sections) {
+              const parts = sec.slug ? sec.slug.split('/') : [];
+              const slug = parts.length > 1 ? parts[1] : (sec.slug || sec.id);
+              const draftId = `${ch.number}_${slug}`;
+              if (!statusMap[draftId]) {
+                draftFetches.push(
+                  getDoc(doc(db, 'drafts', draftId))
+                    .then(snap => {
+                      if (snap.exists()) {
+                        statusMap[draftId] = snap.data();
+                      }
+                    })
+                    .catch(() => null)
+                );
+              }
+            }
+          }
+          if (draftFetches.length > 0) {
+            await Promise.all(draftFetches);
+          }
+        }
         setDocumentsStatus(statusMap);
       } catch (e) {
         console.error(e);

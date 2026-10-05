@@ -140,27 +140,37 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const draftId = `${chapterId}_${slug}`;
       const [structureSnap, snap] = await Promise.all([
         getDoc(doc(db, 'course', 'chapters')).catch(() => null),
-        getDoc(doc(db, 'drafts', draftId)),
+        getDoc(doc(db, 'drafts', draftId)).catch(err => {
+          console.warn('No se pudo leer el borrador directo de Firestore:', err);
+          return null;
+        }),
       ]);
       const list: Chapter[] = structureSnap?.exists() && Array.isArray(structureSnap.data().list)
         ? structureSnap.data().list as Chapter[]
         : chapters;
       setCourseChapters(list);
       const currentTitle = findSubtopicTitle(list, chapterId, slug);
-      if (snap.exists()) {
+      if (snap && snap.exists()) {
         const data = snap.data();
         setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
       } else {
         const params = new URLSearchParams({ chapter: chapterId, slug });
-        const mdxRes = await fetch(`/api/mdx?${params}`);
-        if (mdxRes.ok) {
+        const mdxRes = await fetch(`/api/mdx?${params}`).catch(() => null);
+        if (mdxRes && mdxRes.ok) {
           const mdxData = await mdxRes.json();
           setDocument(withSubtopicTitle({
             ...structuredClone(starterDocument), chapterId, slug,
             contentMarkdown: mdxData.content,
           }, currentTitle));
         } else {
-          setDocument(withSubtopicTitle({ ...structuredClone(starterDocument), chapterId, slug }, currentTitle));
+          const initialTitle = currentTitle || 'Subtema';
+          setDocument({
+            schemaVersion: 2,
+            title: initialTitle,
+            chapterId,
+            slug,
+            contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
+          });
         }
       }
     } catch (error) {
@@ -249,17 +259,30 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const currentDocument = withSubtopicTitle(document, currentTitle);
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
+
+      // Preservar el autor original si existe para evitar conflictos de permisos y colaboración
+      const existingSnap = await getDoc(draftRef).catch(() => null);
+      const existingAuthor = existingSnap?.exists() ? existingSnap.data()?.authorEmail : null;
+      
+      let authorEmail = session.email;
+      if (session.role === 'admin' && existingAuthor) {
+        // El admin preserva el autor original si colabora sobre el trabajo de un editor
+        authorEmail = existingAuthor;
+      }
+
       await setDoc(draftRef, {
         ...currentDocument,
-        authorEmail: session.email,
+        authorEmail,
+        lastEditedBy: session.email,
         status,
         updatedAt: new Date().toISOString()
-      });
+      }, { merge: true });
+
       setDocument(currentDocument);
       if (!silent) showToast(status === 'draft' ? 'Borrador guardado exitosamente.' : 'Enviado para revisión del administrador.', 'success');
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      if (!silent) showToast('Error guardando en la nube.', 'error');
+      if (!silent) showToast('Error guardando en la nube: ' + (e.message || ''), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -292,12 +315,13 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       // 2. Actualizar el estado en Firebase a 'approved' preservando al autor original
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
-      const existingSnap = await getDoc(draftRef);
-      const originalAuthor = existingSnap.exists() ? existingSnap.data()?.authorEmail : session.email;
+      const existingSnap = await getDoc(draftRef).catch(() => null);
+      const originalAuthor = existingSnap?.exists() ? existingSnap.data()?.authorEmail : session.email;
 
       await setDoc(draftRef, {
         ...currentDocument,
         authorEmail: originalAuthor || session.email,
+        lastEditedBy: session.email,
         status: 'approved',
         updatedAt: new Date().toISOString()
       }, { merge: true });

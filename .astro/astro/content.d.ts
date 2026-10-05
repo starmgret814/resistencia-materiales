@@ -152,6 +152,13 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"resistencia": {
+"01-esfuerzos-falla/esfuerzos/index.mdx": {
+	id: "01-esfuerzos-falla/esfuerzos/index.mdx";
+  slug: "01-esfuerzos-falla/esfuerzos";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "01-esfuerzos-falla/subtema-inicial/index.mdx": {
 	id: "01-esfuerzos-falla/subtema-inicial/index.mdx";
   slug: "01-esfuerzos-falla/subtema-inicial";
