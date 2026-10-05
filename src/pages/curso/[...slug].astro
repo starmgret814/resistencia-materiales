@@ -1,20 +1,35 @@
 ---
 import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
-import { findSectionBySlug, allSections } from '@/lib/course-data';
+import ContentRenderer from '@/components/content-renderer';
+import { findSectionBySlug } from '@/lib/course-data';
+import { getLiveChapters, getApprovedSubtopic } from '@/lib/course-service';
 import { mdxComponents } from '@/components/mdx-components';
 import { ContentProvider } from '@/lib/content-context';
 
-export function getStaticPaths() {
-  return allSections
-    .filter((s) => s.slug !== null)
-    .map((s) => ({
-      params: { slug: s.slug },
-    }));
-}
-
 const { slug } = Astro.params;
-const sectionData = findSectionBySlug(slug!);
+
+// 1. Cargar el temario en vivo desde Firestore (con respaldo estático)
+const liveChapters = await getLiveChapters();
+const allLiveSections = liveChapters.flatMap((ch) =>
+  ch.sections.map((sec) => ({ ...sec, chapterNumber: ch.number, chapterTitle: ch.title }))
+);
+
+const sectionIndex = allLiveSections.findIndex((s) => {
+  if (!s.slug) return s.id === slug;
+  return s.slug === slug || s.slug.split('/').pop() === slug || s.id === slug;
+});
+
+let sectionData: any = null;
+if (sectionIndex !== -1) {
+  sectionData = {
+    section: allLiveSections[sectionIndex],
+    previous: sectionIndex > 0 ? allLiveSections[sectionIndex - 1] : null,
+    next: sectionIndex < allLiveSections.length - 1 ? allLiveSections[sectionIndex + 1] : null,
+  };
+} else {
+  sectionData = findSectionBySlug(slug!);
+}
 
 if (!sectionData) {
   return Astro.redirect('/404');
@@ -22,29 +37,44 @@ if (!sectionData) {
 
 const { section, previous, next } = sectionData;
 
-// Load MDX/Markdown content dynamically
-const mdxFiles = import.meta.glob('/src/content/resistencia/**/*.{mdx,md}', { eager: true });
-const exactPathMdx = `/src/content/resistencia/${slug}/index.mdx`;
-const exactPathMd = `/src/content/resistencia/${slug}/index.md`;
-const fallbackPathMdx = `/src/content/resistencia/${slug}.mdx`;
-const fallbackPathMd = `/src/content/resistencia/${slug}.md`;
+// 2. Intentar cargar el contenido aprobado directamente de Firestore (Single Source of Truth)
+const rawSlug = section.slug?.includes('/') ? section.slug.split('/').pop()! : (section.slug || section.id);
+const approvedDoc = await getApprovedSubtopic(section.chapterNumber, rawSlug);
 
 let Content = null;
-let headings = [];
+let mappedHeadings: { level: number; id: string; text: string }[] = [];
 
-const targetModule = (mdxFiles[exactPathMdx] || mdxFiles[exactPathMd] || mdxFiles[fallbackPathMdx] || mdxFiles[fallbackPathMd]) as any;
+if (approvedDoc && approvedDoc.contentMarkdown) {
+  // Extraer encabezados de Markdown para el índice "En esta página"
+  const regex = /^(#{2,3})\s+(.+)$/gm;
+  let match;
+  while ((match = regex.exec(approvedDoc.contentMarkdown)) !== null) {
+    mappedHeadings.push({
+      level: match[1].length,
+      id: match[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      text: match[2].trim(),
+    });
+  }
+} else {
+  // Respaldo secundario: Si no está en Firestore todavía, buscar archivo estático .mdx en disco
+  const mdxFiles = import.meta.glob('/src/content/resistencia/**/*.{mdx,md}', { eager: true });
+  const exactPathMdx = `/src/content/resistencia/${slug}/index.mdx`;
+  const exactPathMd = `/src/content/resistencia/${slug}/index.md`;
+  const fallbackPathMdx = `/src/content/resistencia/${slug}.mdx`;
+  const fallbackPathMd = `/src/content/resistencia/${slug}.md`;
 
-if (targetModule) {
-  Content = targetModule.default;
-  headings = targetModule.getHeadings?.() || [];
+  const targetModule = (mdxFiles[exactPathMdx] || mdxFiles[exactPathMd] || mdxFiles[fallbackPathMdx] || mdxFiles[fallbackPathMd]) as any;
+
+  if (targetModule) {
+    Content = targetModule.default;
+    const headings = targetModule.getHeadings?.() || [];
+    mappedHeadings = headings.map((h: any) => ({
+      level: h.depth,
+      id: h.slug,
+      text: h.text,
+    }));
+  }
 }
-
-// Map Astro's headings { depth, slug, text } to { level, id, text }
-const mappedHeadings = headings.map((h: any) => ({
-  level: h.depth,
-  id: h.slug,
-  text: h.text,
-}));
 ---
 
 <Layout title={`${section.title} | Resistencia de Materiales — UNI`} description={`Capítulo ${section.chapterNumber}: ${section.chapterTitle}`}>
@@ -58,8 +88,20 @@ const mappedHeadings = headings.map((h: any) => ({
       headings={mappedHeadings}
       previous={previous as any}
       next={next as any}
+      customChapters={liveChapters}
     >
-      {Content ? (
+      {approvedDoc ? (
+        <ContentRenderer
+          client:load
+          document={{
+            schemaVersion: 2,
+            title: approvedDoc.title,
+            chapterId: approvedDoc.chapterId,
+            slug: approvedDoc.slug,
+            contentMarkdown: approvedDoc.contentMarkdown,
+          }}
+        />
+      ) : Content ? (
         <Content components={{ ...mdxComponents, Image: (props: any) => mdxComponents.Image({ ...props, slug: slug as string }) }} />
       ) : (
         <div class="flex min-h-[40vh] items-center justify-center rounded-xl border border-dashed border-[#d9aaaa] bg-[#faf0ef] p-10 text-center text-[#765e5e]">

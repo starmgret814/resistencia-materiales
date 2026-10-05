@@ -295,24 +295,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
       const currentDocument = withSubtopicTitle(document, currentTitle);
       
-      // 1. Guardar el archivo real en el backend (.mdx)
-      const res = await workspaceFetch('/api/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chapterId: document.chapterId,
-          slug: document.slug,
-          title: currentTitle || document.title,
-          contentMarkdown: currentDocument.contentMarkdown
-        })
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Error al publicar');
-      }
-
-      // 2. Actualizar el estado en Firebase a 'approved' preservando al autor original
+      // 1. Actualizar el estado en Firebase a 'approved' (Single Source of Truth para la web pública)
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
       const existingSnap = await getDoc(draftRef).catch(() => null);
@@ -325,8 +308,22 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         status: 'approved',
         updatedAt: new Date().toISOString()
       }, { merge: true });
+
+      // 2. Sincronización secundaria en segundo plano con GitHub (respaldo en el repositorio)
+      workspaceFetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chapterId: document.chapterId,
+          slug: document.slug,
+          title: currentTitle || document.title,
+          contentMarkdown: currentDocument.contentMarkdown
+        })
+      }).catch(err => {
+        console.warn('Respaldo en GitHub no completado:', err);
+      });
       
-      showToast('¡Aprobado y publicado exitosamente!', 'success');
+      showToast('¡Aprobado y publicado exitosamente en la plataforma!', 'success');
       
       const isFromRequests = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'requests';
       setTimeout(() => {
@@ -335,7 +332,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
     } catch (e: any) {
       console.error(e);
-      showToast(e.message || 'Error al publicar el documento.', 'error');
+      showToast(e.message || 'Error al aprobar el documento.', 'error');
       setIsSaving(false);
     }
   }

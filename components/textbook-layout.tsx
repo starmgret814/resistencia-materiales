@@ -79,22 +79,25 @@ function Sidebar({
   open,
   onClose,
   activeSlug,
+  customChapters,
 }: {
   open: boolean
   onClose: () => void
   activeSlug: string | null
+  customChapters?: Chapter[]
 }) {
+  const courseChapters = customChapters && customChapters.length > 0 ? customChapters : chapters
   const [expanded, setExpanded] = useState(() => {
     // Auto-expand the chapter that contains the active section
     if (!activeSlug) return '01'
-    for (const ch of chapters) {
+    for (const ch of courseChapters) {
       if (ch.sections.some((s) => s.slug === activeSlug)) return ch.number
     }
     return '01'
   })
 
   /** Total section count for the subtitle. */
-  const totalSections = chapters.reduce((acc, ch) => acc + ch.sections.length, 0)
+  const totalSections = courseChapters.reduce((acc, ch) => acc + ch.sections.length, 0)
 
   return (
     <>
@@ -103,12 +106,12 @@ function Sidebar({
         <div className="flex items-center justify-between px-5 pb-4 pt-6">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#967070] dark:text-[#ab8e8e]">Contenido del curso</p>
-            <p className="mt-1 text-sm text-[#6b5150] dark:text-[#d3bcbb]">{chapters.length} capítulos · {totalSections} secciones</p>
+            <p className="mt-1 text-sm text-[#6b5150] dark:text-[#d3bcbb]">{courseChapters.length} capítulos · {totalSections} secciones</p>
           </div>
           <button onClick={onClose} className="inline-flex size-8 items-center justify-center rounded-md text-[#795e5e] dark:text-[#cbb0ae] hover:bg-[#f2dddd] dark:hover:bg-[#2d181a] lg:hidden transition-colors" aria-label="Cerrar navegación"><X className="size-4" /></button>
         </div>
         <nav className="scrollbar-none flex-1 overflow-y-auto px-3 pb-8" aria-label="Capítulos del curso">
-          {chapters.map((chapter) => {
+          {courseChapters.map((chapter) => {
             const isExpanded = expanded === chapter.number
             return (
               <div key={chapter.number} className="mb-1">
@@ -202,6 +205,7 @@ export interface TextbookLayoutProps {
   headings?: { id: string; text: string; level: number }[]
   previous?: { slug: string; title: string } | null
   next?: { slug: string; title: string } | null
+  customChapters?: Chapter[]
   children: React.ReactNode
 }
 
@@ -213,6 +217,7 @@ export default function TextbookLayout({
   headings,
   previous,
   next,
+  customChapters,
   children,
 }: TextbookLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -224,7 +229,7 @@ export default function TextbookLayout({
       }} />
       <CourseSearch />
       <div className="mx-auto flex max-w-[1600px]">
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} activeSlug={activeSlug} />
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} activeSlug={activeSlug} customChapters={customChapters} />
         <main className="min-w-0 flex-1">
           <div className="flex justify-center">
             {/* ─── Content area ─── */}
