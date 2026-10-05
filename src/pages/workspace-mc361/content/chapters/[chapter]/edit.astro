@@ -1,14 +1,9 @@
 ---
 import Layout from '@/src/layouts/Layout.astro';
 import ContentEditor from '@/components/content-editor';
+import WorkspaceHeader from '@/src/components/WorkspaceHeader.astro';
 
-const sessionCookie = Astro.cookies.get('session_token');
-let sessionData = null;
-if (sessionCookie) {
-  try {
-    sessionData = JSON.parse(sessionCookie.value);
-  } catch (e) {}
-}
+const sessionData = Astro.locals.session;
 const { chapter } = Astro.params;
 const slug = Astro.url.searchParams.get('slug')
 
@@ -19,5 +14,6 @@ if (!chapter || !slug) {
 ---
 
 <Layout title="Editor de contenido | Resistencia de Materiales" description="Editor y vista previa de páginas del curso">
+  <WorkspaceHeader session={sessionData} />
   <ContentEditor session={sessionData} initialChapter={chapter} initialSlug={slug} client:only="react" />
 </Layout>

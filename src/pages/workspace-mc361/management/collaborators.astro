@@ -1,75 +1,20 @@
 ---
 import Layout from '@/src/layouts/Layout.astro';
-import { Users, BookOpen, GitPullRequest, LogOut } from 'lucide-react';
+import WorkspaceHeader from '@/src/components/WorkspaceHeader.astro';
 import UserManagement from '@/components/user-management';
 
-// El middleware ya garantiza que quien llegue a esta pantalla es un Admin.
-// Podríamos leer la cookie aquí para mostrar el email del admin:
-const sessionCookie = Astro.cookies.get('session_token');
-let adminEmail = 'Administrador';
-if (sessionCookie) {
-  try {
-    const session = JSON.parse(sessionCookie.value);
-    adminEmail = session.email;
-  } catch (e) {}
+const session = Astro.locals.session;
+
+if (!session || session.role !== 'admin') {
+  return Astro.redirect('/workspace-mc361/login')
 }
 ---
 
-<Layout title="Panel de Administración | Resistencia de Materiales" description="Gestión de usuarios y solicitudes de cambio">
-  <div class="flex h-screen bg-[#FCF9F7]">
-    
-    <!-- Barra lateral de navegación -->
-    <aside class="w-64 flex-shrink-0 border-r border-[#E5D7D4] bg-white flex flex-col">
-      <div class="p-6 border-b border-[#E5D7D4]">
-        <h1 class="text-xl font-serif font-bold text-[#3E3030]">Gestor MC-361</h1>
-        <p class="text-xs text-[#756565] mt-1 truncate" title={adminEmail}>{adminEmail}</p>
-      </div>
-      
-      <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-        <a href="/workspace-mc361/management/collaborators" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#f8eaea] text-[#8B0000] font-medium transition-colors">
-          <Users className="w-5 h-5" />
-          Colaboradores
-        </a>
-        <a href="/workspace-mc361/management/requests" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#5A4A4A] hover:bg-[#F3EBE9] transition-colors">
-          <GitPullRequest className="w-5 h-5" />
-          Solicitudes
-        </a>
-        <a href="/workspace-mc361/editor" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#5A4A4A] hover:bg-[#F3EBE9] transition-colors">
-          <BookOpen className="w-5 h-5" />
-          Ir al Editor
-        </a>
-      </nav>
-
-      <div class="p-4 border-t border-[#E5D7D4]">
-        <button id="btn-logout" class="flex w-full items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-[#5A4A4A] hover:bg-[#F3EBE9] hover:text-[#3E3030] transition-colors">
-          <LogOut className="w-4 h-4" />
-          <span class="text-sm font-medium">Cerrar Sesión</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- Contenido principal -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-      <UserManagement currentUserEmail={adminEmail} client:only="react" />
+<Layout title="Colaboradores | Resistencia de Materiales">
+  <div class="min-h-screen bg-[#f8f5f4]">
+    <WorkspaceHeader session={session} />
+    <main>
+      <UserManagement currentUserEmail={session.email} client:only="react" />
     </main>
-
   </div>
 </Layout>
-
-
-
-<script>
-  import { auth } from '@/lib/firebase';
-  
-  const btnLogout = document.getElementById('btn-logout');
-  if (btnLogout) {
-    btnLogout.addEventListener('click', async () => {
-      // 1. Borramos la cookie de sesión del servidor
-      document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      // 2. Cerramos la sesión de Firebase en el cliente
-      await auth.signOut();
-      // 3. Redirigimos al login
-      window.location.href = '/workspace-mc361/login';
-    });
-  }
-</script>

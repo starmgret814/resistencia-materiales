@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
 import defaultChapters from '@/lib/chapters.json';
+import { canEditChapter } from '@/lib/server-session';
 
 async function getChapters(): Promise<any[]> {
   try {
@@ -27,7 +28,7 @@ async function saveChapters(chapters: any[]) {
   }
 }
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   try {
     const sessionCookie = cookies.get('session_token');
     if (!sessionCookie) {
@@ -36,6 +37,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const data = await request.json();
     const { chapterNumber, newSection } = data;
+    if (!locals.session || !canEditChapter(locals.session, chapterNumber)) return Response.json({ error: 'No tienes permisos para este capítulo.' }, { status: 403 });
 
     if (!chapterNumber || !newSection || !newSection.title?.trim()) {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos (capítulo o título)' }), { status: 400 });
@@ -84,7 +86,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request, cookies }) => {
+export const PUT: APIRoute = async ({ request, cookies, locals }) => {
   try {
     const sessionCookie = cookies.get('session_token');
     if (!sessionCookie) {
@@ -93,6 +95,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
     const data = await request.json();
     const { chapterNumber, sections } = data;
+    if (!locals.session || !canEditChapter(locals.session, chapterNumber)) return Response.json({ error: 'No tienes permisos para este capítulo.' }, { status: 403 });
 
     if (!chapterNumber || !Array.isArray(sections)) {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });

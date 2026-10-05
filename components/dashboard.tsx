@@ -2,13 +2,40 @@
 
 import { useEffect, useState } from 'react'
 import { db } from '@/lib/firebase'
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { workspaceFetch } from '@/lib/workspace-api'
+import { doc, getDoc, setDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore'
+import { withSubtopicTitle } from '@/lib/course-titles'
+import type { CourseDocument } from '@/lib/content-schema'
 import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
 import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
 
 export default function Dashboard({ session }: { session: any }) {
-  const [assignedChapters, setAssignedChapters] = useState<string[]>([])
+  const expansionStorageKey = `mc361_expanded_chapters:${session?.email || 'guest'}`
+  const [expandedChapters, setExpandedChapters] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(expansionStorageKey) || '[]')
+      return Array.isArray(saved) ? saved.filter((value): value is string => typeof value === 'string') : []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(expansionStorageKey, JSON.stringify(expandedChapters))
+    } catch {
+      // Chapters still expand when browser storage is unavailable.
+    }
+  }, [expansionStorageKey, expandedChapters])
+
+  const toggleChapter = (number: string) => {
+    setExpandedChapters((current) => current.includes(number)
+      ? current.filter((chapter) => chapter !== number)
+      : [...current, number])
+  }
+
+  const assignedChapters: string[] = session?.assignedChapters || []
   const [documentsStatus, setDocumentsStatus] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
@@ -39,6 +66,7 @@ export default function Dashboard({ session }: { session: any }) {
   // Para crear nuevo subtema in-line
   const [creatingInChapter, setCreatingInChapter] = useState<string | null>(null)
   const [newTitle, setNewTitle] = useState('')
+  const newSubtopicInputRef = useRef<HTMLInputElement>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
   
@@ -56,38 +84,30 @@ export default function Dashboard({ session }: { session: any }) {
 
   useEffect(() => {
     async function loadData() {
-      if (!session?.email) return
+      if (!session?.email) { setIsLoading(false); return }
       
       try {
-        // Cargar capítulos asignados
-        const userDoc = await getDoc(doc(db, 'users', session.email))
-        let assigned: string[] = []
-        if (userDoc.exists()) {
-          assigned = userDoc.data().assignedChapters || []
-          setAssignedChapters(assigned)
-        }
-
-        // Cargar estructura compartida de capítulos desde Firestore (si existe)
-        try {
-          const structDoc = await getDoc(doc(db, 'course', 'chapters'));
-          if (structDoc.exists() && Array.isArray(structDoc.data()?.list)) {
-            setLocalChapters(structDoc.data().list);
-          }
-        } catch (err) {
-          console.error("Error al cargar capítulos de Firestore:", err);
-        }
-
-        // Cargar estado de los documentos (borradores/avances)
+        // Permissions already come from the server's current, verified user record.
+        // Load the independent course and draft queries concurrently.
         const q = session.role === 'admin' 
           ? query(collection(db, 'drafts'))
           : query(collection(db, 'drafts'), where("authorEmail", "==", session.email))
           
-        const snap = await getDocs(q)
-        const statusMap: Record<string, any> = {}
-        snap.forEach(d => {
-          statusMap[d.id] = d.data()
-        })
-        setDocumentsStatus(statusMap)
+        const results = await Promise.allSettled([
+          getDoc(doc(db, 'course', 'chapters')),
+          getDocs(q),
+        ])
+        const [structure, drafts] = results
+        if (structure.status === 'fulfilled') {
+          if (structure.value.exists() && Array.isArray(structure.value.data().list)) {
+            setLocalChapters(structure.value.data().list)
+          }
+        } else console.error('Error al cargar capítulos:', structure.reason)
+        if (drafts.status === 'fulfilled') {
+          const statusMap: Record<string, any> = {}
+          drafts.value.forEach(d => { statusMap[d.id] = d.data() })
+          setDocumentsStatus(statusMap)
+        } else console.error('Error al cargar borradores:', drafts.reason)
       } catch (e) {
         console.error(e)
       } finally {
@@ -147,7 +167,7 @@ export default function Dashboard({ session }: { session: any }) {
       }, { merge: true });
 
       // 3. Sincronizar en desarrollo local (opcional)
-      fetch('/api/subchapters', {
+      workspaceFetch('/api/subchapters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, newSection })
@@ -195,7 +215,7 @@ export default function Dashboard({ session }: { session: any }) {
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      fetch('/api/subchapters', {
+      workspaceFetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
@@ -231,7 +251,7 @@ export default function Dashboard({ session }: { session: any }) {
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      fetch('/api/subchapters', {
+      workspaceFetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
@@ -255,19 +275,32 @@ export default function Dashboard({ session }: { session: any }) {
     const chData = localChapters.find(c => c.number === chapterNumber);
     if (!chData) return;
     
-    const newSections = [...chData.sections];
-    newSections[sectionIndex].title = editTitle;
+    const newSections = chData.sections.map((section, index) => index === sectionIndex ? { ...section, title: editTitle.trim() } : section);
 
     const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
-    setLocalChapters(updatedChapters);
 
     try {
-      await setDoc(doc(db, 'course', 'chapters'), {
+      const section = newSections[sectionIndex];
+      const slug = section.slug?.split('/').slice(1).join('/') || section.id;
+      const draftRef = doc(db, 'drafts', `${chapterNumber}_${slug}`);
+      const draft = await getDoc(draftRef);
+      const batch = writeBatch(db);
+      batch.set(doc(db, 'course', 'chapters'), {
         list: updatedChapters,
         updatedAt: new Date().toISOString()
       }, { merge: true });
+      if (draft.exists()) {
+        const renamed = withSubtopicTitle(draft.data() as CourseDocument, section.title);
+        batch.update(draftRef, { title: renamed.title, contentMarkdown: renamed.contentMarkdown });
+      }
+      await batch.commit();
+      setLocalChapters(updatedChapters);
+      setDocumentsStatus((current) => current[draftRef.id] ? {
+        ...current,
+        [draftRef.id]: withSubtopicTitle(current[draftRef.id], section.title),
+      } : current);
 
-      fetch('/api/subchapters', {
+      workspaceFetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
@@ -284,6 +317,7 @@ export default function Dashboard({ session }: { session: any }) {
 
   // Filtrar capítulos que el usuario puede ver
   const visibleChapters = localChapters.filter(c => session.role === 'admin' || assignedChapters.includes(c.number))
+  const allChaptersExpanded = visibleChapters.length > 0 && visibleChapters.every((chapter) => expandedChapters.includes(chapter.number))
 
   if (isLoading) return <div className="p-10 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#8B0000] border-t-transparent rounded-full" /></div>
 
@@ -295,30 +329,61 @@ export default function Dashboard({ session }: { session: any }) {
           <p className="font-semibold text-sm">{toast.message}</p>
         </div>
       )}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-serif font-bold text-[#4b1719]">Contenido</h1>
-          <p className="text-sm text-[#8b6d6d] mt-1">Gestiona los subtemas y revisa su estado</p>
+          <p className="text-sm text-[#8b6d6d] mt-1">Abre un capítulo para gestionar sus subtemas. Recordaremos los que dejes abiertos.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setExpandedChapters(allChaptersExpanded ? [] : visibleChapters.map((chapter) => chapter.number))}
+            disabled={visibleChapters.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-3 py-2 text-xs font-semibold text-[#6a2022] hover:bg-[#f8eaea] disabled:cursor-default disabled:opacity-40"
+          >
+            {allChaptersExpanded ? <ChevronUp className="size-4" aria-hidden="true" /> : <ChevronDown className="size-4" aria-hidden="true" />}
+            {allChaptersExpanded ? 'Contraer todo' : 'Expandir todo'}
+          </button>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-3">
         {visibleChapters.map(chapter => (
           <div key={chapter.number} className="bg-white rounded-xl border border-[#eadada] overflow-hidden shadow-sm">
-            <div className="bg-[#fbf7f4] px-5 py-3 border-b border-[#eadada] flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Folder className="w-5 h-5 text-[#8b6d6d]" />
-                <h2 className="font-serif font-bold text-lg text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</h2>
-              </div>
+            <div className={`bg-[#fbf7f4] flex flex-wrap items-center gap-2 pr-3 ${expandedChapters.includes(chapter.number) ? 'border-b border-[#eadada]' : ''}`}>
+              <h2 className="min-w-0 flex-1">
+                <button
+                  type="button"
+                  onClick={() => toggleChapter(chapter.number)}
+                  aria-expanded={expandedChapters.includes(chapter.number)}
+                  aria-controls={`chapter-sections-${chapter.number}`}
+                  className="flex w-full items-center gap-3 rounded-lg px-5 py-4 text-left hover:bg-[#f5ecec] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8B0000]"
+                >
+                  <ChevronRight aria-hidden="true" className={`size-4 shrink-0 text-[#8b6d6d] transition-transform ${expandedChapters.includes(chapter.number) ? 'rotate-90' : ''}`} />
+                  <Folder aria-hidden="true" className="size-5 shrink-0 text-[#8b6d6d]" />
+                  <span className="min-w-0 flex-1 font-serif text-lg font-bold text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</span>
+                  <span className="hidden shrink-0 text-xs font-normal text-[#8b6d6d] sm:inline">{chapter.sections.length} {chapter.sections.length === 1 ? 'subtema' : 'subtemas'}</span>
+                </button>
+              </h2>
               <button 
-                onClick={() => { setCreatingInChapter(chapter.number); setNewTitle(''); }}
+                onClick={() => {
+                  setExpandedChapters((current) => current.includes(chapter.number) ? current : [...current, chapter.number]);
+                  setCreatingInChapter(chapter.number);
+                  setNewTitle('');
+                  // Wait until the chapter and its input are visible before focusing.
+                  requestAnimationFrame(() => {
+                    const input = newSubtopicInputRef.current;
+                    input?.focus({ preventScroll: true });
+                    input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  });
+                }}
                 className="text-xs font-bold uppercase tracking-wider text-[#8B0000] hover:bg-[#f1dddd] px-3 py-1.5 rounded-md transition-colors flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" /> Añadir Subtema
               </button>
             </div>
             
-            <div className="divide-y divide-[#f5ecec]">
+            <div id={`chapter-sections-${chapter.number}`} hidden={!expandedChapters.includes(chapter.number)} className="divide-y divide-[#f5ecec]">
               {chapter.sections.length === 0 && creatingInChapter !== chapter.number ? (
                 <p className="p-5 text-sm text-[#8b6d6d] italic">No hay subtemas aún.</p>
               ) : (
@@ -397,7 +462,8 @@ export default function Dashboard({ session }: { session: any }) {
                 <div className="p-4 bg-[#fcf9f9]">
                   <div className="flex items-center gap-3">
                     <input 
-                      autoFocus
+                      ref={newSubtopicInputRef}
+                      aria-label={`Título del nuevo subtema del capítulo ${chapter.number}`}
                       value={newTitle} 
                       onChange={e => setNewTitle(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleCreate(chapter.number)}

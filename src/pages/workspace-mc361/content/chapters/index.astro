@@ -1,72 +1,22 @@
 ---
 import Layout from '@/src/layouts/Layout.astro'
 import DashboardComponent from '@/components/dashboard'
+import WorkspaceHeader from '@/src/components/WorkspaceHeader.astro'
 
-const sessionCookie = Astro.cookies.get('session_token');
-let session = null;
-if (sessionCookie) {
-  try {
-    session = JSON.parse(sessionCookie.value);
-  } catch (e) {}
-}
+const session = Astro.locals.session;
 
 if (!session) {
   return Astro.redirect('/workspace-mc361/login')
 }
 
-const formatName = (email: string) => {
-  if (!email) return 'Invitado';
-  const parts = email.split('@')[0].split('.');
-  if (parts.length >= 3) {
-    const nombre = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-    const apellido = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
-    const inicial = parts[2].charAt(0).toUpperCase();
-    return `${nombre} ${apellido} ${inicial}.`;
-  }
-  return email.split('@')[0];
-}
 ---
 
 <Layout title="Proyectos | Editor MC361">
   <div class="min-h-screen bg-[#f8f5f4]">
-    <header class="bg-white border-b border-[#eadada] shadow-[0_4px_20px_-15px_rgba(0,0,0,0.1)]">
-      <div class="max-w-[1200px] mx-auto flex justify-between items-center px-6 h-16">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 text-[#8B0000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-          <span class="font-serif text-lg font-bold text-[#3b2022] tracking-wide">
-            Resistencia de Materiales
-          </span>
-        </div>
-        
-        <div class="flex items-center gap-5">
-          {session.role === 'admin' && (
-            <a href="/workspace-mc361/management/collaborators" class="text-[11px] font-bold uppercase tracking-widest text-[#8b6d6d] hover:text-[#8B0000] transition-colors">
-              Panel Admin
-            </a>
-          )}
-          {session.role === 'admin' && <div class="w-px h-4 bg-[#eadada]" />}
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-medium text-[#5c4343]">
-              {formatName(session.email)}
-            </span>
-            <button id="logout-btn" title="Cerrar sesión" class="text-[#a08484] hover:text-[#8B0000] transition-colors flex items-center justify-center bg-[#fdfafa] hover:bg-[#f8eaea] w-8 h-8 rounded-full border border-transparent hover:border-[#f1dddd]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
+    <WorkspaceHeader session={session} />
     <main>
       <DashboardComponent session={session} client:only="react" />
     </main>
   </div>
 
-  <script>
-    document.getElementById('logout-btn')?.addEventListener('click', () => {
-      document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      window.location.href = '/workspace-mc361/login';
-    });
-  </script>
 </Layout>

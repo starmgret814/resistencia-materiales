@@ -1,8 +1,10 @@
 'use client'
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bold,
+  ArrowLeft,
+  Pencil,
   Code2,
   Download,
   Eye,
@@ -26,14 +28,13 @@ import {
   X
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { workspaceFetch } from '@/lib/workspace-api'
+import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
 import Editor from '@monaco-editor/react'
-import ContentRenderer from '@/components/content-renderer'
-import { chapters } from '@/lib/course-data'
+import { chapters, type Chapter } from '@/lib/course-data'
+import { findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
 import {
-  slugify,
   starterDocument,
-  titleFromMarkdown,
   validateCourseDocument,
   type CourseDocument,
 } from '@/lib/content-schema'
@@ -41,6 +42,7 @@ import {
 const inputClass = 'w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15'
 const selectClass = 'appearance-none w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition hover:border-[#9c4d4d] focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15 bg-[url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%238b6d6d\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")] bg-[length:1.25rem_1.25rem] bg-[position:right_0.5rem_center] bg-no-repeat pr-10 cursor-pointer'
 const labelClass = 'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-[#7d6060]'
+const ContentRenderer = lazy(() => import('@/components/content-renderer'))
 
 export default function ContentEditor({ session, initialChapter, initialSlug }: { session?: any, initialChapter: string, initialSlug: string }) {
   const [document, setDocument] = useState<CourseDocument>(() => ({ ...structuredClone(starterDocument), chapterId: initialChapter, slug: initialSlug }))
@@ -50,6 +52,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const [assignedChapters, setAssignedChapters] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [titleInput, setTitleInput] = useState('')
+  const [isRenaming, setIsRenaming] = useState(false)
+  const titleEditCancelled = useRef(false)
+  const titleSaveInFlight = useRef(false)
   
   // CRUD de subtemas
   const [isCreatingNewSection, setIsCreatingNewSection] = useState(false)
@@ -58,6 +65,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [isCreatingSub, setIsCreatingSub] = useState(false)
   
   const [isLoaded, setIsLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -86,7 +95,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
     try {
       setIsCreatingSub(true);
-      const res = await fetch('/api/subchapters', {
+      const res = await workspaceFetch('/api/subchapters', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber: document.chapterId, newSection })
@@ -105,63 +114,87 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     }
   }
   
-  // Lista de todos los borradores del usuario actual
-  const [myDrafts, setMyDrafts] = useState<any[]>([])
-
-  const fetchMyDrafts = async () => {
-    if (!session?.email) return;
-    try {
-      // Un admin ve todo (limitamos a 50 para no reventar lectura), el editor ve solo lo suyo
-      const q = session.role === 'admin' 
-        ? query(collection(db, 'drafts'))
-        : query(collection(db, 'drafts'), where("authorEmail", "==", session.email));
-      
-      const snap = await getDocs(q);
-      const drafts: any[] = [];
-      snap.forEach(d => drafts.push({ id: d.id, ...d.data() }));
-      setMyDrafts(drafts);
-    } catch (e) {
-      console.error("Error obteniendo borradores", e);
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    setIsLoaded(false);
+    setLoadError(null);
+    async function loadDraft() {
+      try {
+        const params = new URLSearchParams({ chapter: initialChapter, slug: initialSlug });
+        // The verified session cookie lets content load without waiting for browser Firebase initialization.
+        const response = await fetch(`/api/editor-document?${params}`, { signal: controller.signal, cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No se pudo cargar el contenido.');
+        if (active) { setDocument(data.document); setIsLoaded(true); }
+      } catch (error) {
+        if (active) setLoadError(controller.signal.aborted
+          ? 'La carga tardó demasiado. Vuelve a intentar.'
+          : error instanceof Error ? error.message : 'No se pudo cargar el contenido.');
+      } finally {
+        clearTimeout(timeout);
+      }
     }
+    void loadDraft();
+    return () => { active = false; clearTimeout(timeout); controller.abort(); };
+  }, [initialChapter, initialSlug, loadAttempt])
+
+  const loadSubtopicTitle = async (chapterId: string, slug: string) => {
+    const structure = await getDoc(doc(db, 'course', 'chapters'));
+    const list = structure.exists() && Array.isArray(structure.data().list)
+      ? structure.data().list as Chapter[]
+      : chapters;
+    return findSubtopicTitle(list, chapterId, slug);
   }
 
-  useEffect(() => {
-    if (session?.email && initialChapter && initialSlug) {
-      loadDraft(initialChapter, initialSlug);
+  const renameSubtopic = async () => {
+    if (titleEditCancelled.current || titleSaveInFlight.current) return;
+    const title = titleInput.trim();
+    if (!title || title === document.title) {
+      setIsEditingTitle(false);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.email, initialChapter, initialSlug])
-
-  const loadDraft = async (chapterId: string, slug: string) => {
-    if (!session?.email) return;
+    titleSaveInFlight.current = true;
     try {
-      const draftId = `${chapterId}_${slug}`;
-      const snap = await getDoc(doc(db, 'drafts', draftId));
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.authorEmail === session.email || session?.role === 'admin') {
-          setDocument(data as CourseDocument);
-        }
-      } else {
-        // Si no hay borrador en la nube, verificamos si ya existe el archivo MDX real en el sistema
-        const mdxRes = await fetch(`/api/mdx?chapter=${chapterId}&slug=${slug}`);
-        if (mdxRes.ok) {
-          const mdxData = await mdxRes.json();
-          setDocument({ 
-            ...structuredClone(starterDocument), 
-            chapterId, 
-            slug,
-            contentMarkdown: mdxData.content 
-          });
-        } else {
-          // Si tampoco existe MDX, empezamos de cero
-          setDocument({ ...structuredClone(starterDocument), chapterId, slug });
-        }
+      setIsRenaming(true);
+      const structureRef = doc(db, 'course', 'chapters');
+      const structure = await getDoc(structureRef);
+      const list: Chapter[] = structure.exists() && Array.isArray(structure.data().list)
+        ? structure.data().list : chapters;
+      if (!findSubtopicTitle(list, document.chapterId, document.slug)) {
+        throw new Error('No se encontró el subtema en el listado de capítulos.');
       }
-    } catch (e) {
-      console.error("Error cargando borrador", e);
+      const updatedChapters = list.map(chapter => chapter.number === document.chapterId ? {
+        ...chapter,
+        sections: chapter.sections.map(section =>
+          (section.slug?.split('/').slice(1).join('/') || section.id) === document.slug
+            ? { ...section, title } : section),
+      } : chapter);
+      const draftRef = doc(db, 'drafts', `${document.chapterId}_${document.slug}`);
+      const draft = await getDoc(draftRef);
+      const batch = writeBatch(db);
+      batch.set(structureRef, { list: updatedChapters, updatedAt: new Date().toISOString() }, { merge: true });
+      if (draft.exists()) {
+        const renamed = withSubtopicTitle(draft.data() as CourseDocument, title);
+        batch.update(draftRef, { title: renamed.title, contentMarkdown: renamed.contentMarkdown });
+      }
+      await batch.commit();
+      // Preserve the content being edited; renaming does not save other unsaved changes.
+      setDocument(current => withSubtopicTitle(current, title));
+      setIsEditingTitle(false);
+      showToast('Nombre del subtema actualizado.', 'success');
+      void workspaceFetch('/api/subchapters', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chapterNumber: document.chapterId,
+          sections: updatedChapters.find(chapter => chapter.number === document.chapterId)!.sections }),
+      }).catch(error => console.error('No se pudo sincronizar el listado local.', error));
+    } catch (error) {
+      console.error(error);
+      showToast('No se pudo cambiar el nombre del subtema.', 'error');
     } finally {
-      setIsLoaded(true);
+      titleSaveInFlight.current = false;
+      setIsRenaming(false);
     }
   }
 
@@ -169,15 +202,17 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     if (!session?.email) return showToast('No tienes sesión activa.', 'error');
     try {
       setIsSaving(true);
+      const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
+      const currentDocument = withSubtopicTitle(document, currentTitle);
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
       await setDoc(draftRef, {
-        ...document,
+        ...currentDocument,
         authorEmail: session.email,
         status,
         updatedAt: new Date().toISOString()
       });
-      await fetchMyDrafts();
+      setDocument(currentDocument);
       if (!silent) showToast(status === 'draft' ? 'Borrador guardado exitosamente.' : 'Enviado para revisión del administrador.', 'success');
     } catch (e) {
       console.error(e);
@@ -191,15 +226,17 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     if (!session?.email || session.role !== 'admin') return showToast('No tienes permisos.', 'error');
     try {
       setIsSaving(true);
+      const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
+      const currentDocument = withSubtopicTitle(document, currentTitle);
       
       // 1. Guardar el archivo real en el backend (.mdx)
-      const res = await fetch('/api/publish', {
+      const res = await workspaceFetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chapterId: document.chapterId,
           slug: document.slug,
-          contentMarkdown: document.contentMarkdown
+          contentMarkdown: currentDocument.contentMarkdown
         })
       });
 
@@ -212,7 +249,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const draftId = `${document.chapterId}_${document.slug}`;
       const draftRef = doc(db, 'drafts', draftId);
       await setDoc(draftRef, {
-        ...document,
+        ...currentDocument,
         authorEmail: session.email,
         status: 'approved',
         updatedAt: new Date().toISOString()
@@ -244,11 +281,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   function updateMarkdown(contentMarkdown: string) {
     setDocument((current) => {
-      const title = titleFromMarkdown(contentMarkdown)
       return {
         ...current,
-        title,
-        slug: current.slug === 'nueva-pagina' ? slugify(title) : current.slug,
         contentMarkdown,
       }
     })
@@ -353,31 +387,24 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const toolClass = 'inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[#6f5050] hover:bg-[#f1dddd] hover:text-[#7f0303]'
 
-  // Formatear el correo de la UNI (ej: juan.perez.a@uni.pe -> Juan Perez A.)
-  const formatName = (email?: string) => {
-    if (!email) return 'Invitado';
-    const parts = email.split('@')[0].split('.');
-    if (parts.length >= 3) {
-      const nombre = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-      const apellido = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
-      const inicial = parts[2].charAt(0).toUpperCase();
-      return `${nombre} ${apellido} ${inicial}.`;
-    }
-    return email.split('@')[0];
-  }
-
   if (!isLoaded) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#f8f5f4]">
+      <div className="flex h-[calc(100dvh-4rem)] items-center justify-center bg-[#f8f5f4]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" />
-          <p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p>
+          {loadError ? <>
+            <p role="alert" className="px-4 text-center text-sm text-[#8B0000]">{loadError}</p>
+            <button type="button" onClick={() => setLoadAttempt(attempt => attempt + 1)} className="rounded-md bg-[#8B0000] px-4 py-2 text-sm font-semibold text-white">Reintentar</button>
+            <a href="/workspace-mc361/content/chapters" className="text-sm font-semibold text-[#6a2022] underline">Volver a capítulos</a>
+          </> : <>
+            <Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" />
+            <p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p>
+          </>}
         </div>
       </div>
     );
   }
 
-  return <div className="flex h-screen flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
+  return <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
     {toast && (
       <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
         {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />}
@@ -385,58 +412,47 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       </div>
     )}
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-    <header className="shrink-0 border-b border-[#ddcaca] bg-[#fbf7f4]/95 px-4 py-3 backdrop-blur sm:px-6">
-      <div className="mx-auto flex w-full max-w-[1800px] flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#7f0303]">
-            EDITOR MARKDOWN
-          </p>
-          <span className="h-4 w-px bg-[#ddcaca]" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#7f0303]">
-            {formatName(session?.email)} {session?.role === 'admin' ? '(Admin)' : ''}
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-4">
-            <a href="/workspace-mc361/content/chapters" className="text-xs font-semibold text-[#8b6d6d] hover:text-[#8B0000] hover:underline mr-4 flex items-center gap-1">
-              <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Volver a Contenido
-            </a>
-          </div>
 
-
-
-          <button
-            onClick={async () => {
-              const { auth } = await import('@/lib/firebase');
-              window.document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-              await auth.signOut();
-              window.location.href = '/workspace-mc361/login';
-            }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-transparent hover:bg-[#f8eaea] text-[#6a2022] text-sm font-semibold rounded-md transition-colors"
-            title="Cerrar Sesión"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-      </div>
-    </header>
+    <div className="mx-auto w-full max-w-[1800px] shrink-0 px-4 pt-3 sm:px-6">
+      <a href="/workspace-mc361/content/chapters" className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
+        <ArrowLeft className="size-4" aria-hidden="true" /> Volver a capítulos
+      </a>
+    </div>
 
     <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 gap-5 p-4 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
       {!previewExpanded && <section className="flex min-w-0 flex-col space-y-4 min-h-0">
         {/* Document Header Info */}
-        <div className="flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-[#ddcaca] shadow-sm">
-          <div>
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3 rounded-xl border border-[#ddcaca] shadow-sm">
+          <div className="min-w-0 flex-1 basis-64">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#8b6d6d]">Editando Subtema</p>
-            <h2 className="text-lg font-serif font-bold text-[#4b1719] mt-0.5">Capítulo {document.chapterId} · {document.slug}</h2>
+            {isEditingTitle ? (
+              <div className="mt-0.5 flex items-center gap-2 font-serif text-lg font-bold text-[#4b1719]">
+                <span className="shrink-0">Capítulo {document.chapterId} ·</span>
+                <input aria-label="Nombre del subtema" title="Enter para guardar · Escape para cancelar" autoFocus value={titleInput}
+                  onFocus={event => event.currentTarget.select()} onChange={event => setTitleInput(event.target.value)} readOnly={isRenaming}
+                  className="min-w-0 flex-1 border-b border-[#9c4d4d] bg-transparent py-0.5 outline-none focus:border-[#8B0000]"
+                  onBlur={() => { void renameSubtopic(); }}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter') { event.preventDefault(); void renameSubtopic(); }
+                    if (event.key === 'Escape' && !titleSaveInFlight.current) {
+                      event.preventDefault(); titleEditCancelled.current = true; setIsEditingTitle(false);
+                    }
+                  }} />
+                {isRenaming && <Loader2 className="size-4 shrink-0 animate-spin" aria-label="Guardando nombre" />}
+              </div>
+            ) : (
+              <div className="mt-0.5 flex items-start gap-2">
+                <h2 className="break-words text-lg font-serif font-bold text-[#4b1719]">Capítulo {document.chapterId} · {document.title}</h2>
+                <button type="button" disabled={isSaving} onClick={() => { titleEditCancelled.current = false; setTitleInput(document.title); setIsEditingTitle(true); }} className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[#6a2022] hover:bg-[#f1dddd] focus-visible:outline-2 focus-visible:outline-[#8B0000] disabled:opacity-50" title="Cambiar nombre del subtema" aria-label="Cambiar nombre del subtema">
+                  <Pencil className="size-4" aria-hidden="true" />
+                </button>
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
              <button
               onClick={() => saveDraft('draft')}
-              disabled={isSaving}
+              disabled={isSaving || isEditingTitle}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#d8c1c1] hover:bg-[#f1dddd] text-[#3b2022] text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
               title="Guardar progreso en la nube (borrador)"
             >
@@ -446,7 +462,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             {session?.role === 'admin' ? (
               <button
                 onClick={publishDraft}
-                disabled={isSaving}
+                disabled={isSaving || isEditingTitle}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#1c663b] hover:bg-[#15502e] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Publicar directamente en la web"
               >
@@ -461,7 +477,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   }
                   saveDraft('pending_approval');
                 }}
-                disabled={isSaving}
+                disabled={isSaving || isEditingTitle}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Enviar a revisión del administrador"
               >
@@ -612,7 +628,9 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]">
             <div className="mx-auto max-w-[760px]">
-              <ContentRenderer document={deferredDocument} />
+              <Suspense fallback={<p role="status" className="text-sm text-[#8b6d6d]">Cargando vista previa...</p>}>
+                <ContentRenderer document={deferredDocument} />
+              </Suspense>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
+import { memo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkDirective from 'remark-directive'
 import remarkGfm from 'remark-gfm'
@@ -133,4 +134,4 @@ export function ContentRenderer({ document }: { document: CourseDocument }) {
   </article>
 }
 
-export default ContentRenderer
+export default memo(ContentRenderer)

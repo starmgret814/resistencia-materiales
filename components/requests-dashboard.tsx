@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { chapters, type Chapter } from '@/lib/course-data';
+import { findSubtopicTitle } from '@/lib/course-titles';
 import { Loader2, FileText, ChevronRight, MessageSquare, CheckCircle2 } from 'lucide-react';
 
 interface DraftRequest {
@@ -25,11 +27,17 @@ export default function RequestsDashboard() {
     try {
       setLoading(true);
       const q = query(collection(db, 'drafts'), where("status", "==", "pending_approval"));
-      const snap = await getDocs(q);
+      const [snap, structure] = await Promise.all([
+        getDocs(q),
+        getDoc(doc(db, 'course', 'chapters')).catch(() => null),
+      ]);
+      const currentChapters: Chapter[] = structure?.exists() && Array.isArray(structure.data().list)
+        ? structure.data().list
+        : chapters;
       const reqs: DraftRequest[] = [];
       snap.forEach(d => {
         const data = d.data() as Omit<DraftRequest, 'id'>;
-        reqs.push({ id: d.id, ...data });
+        reqs.push({ id: d.id, ...data, title: findSubtopicTitle(currentChapters, data.chapterId, data.slug) || data.title || data.slug });
       });
       // Sort by newest first
       reqs.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
@@ -76,7 +84,7 @@ export default function RequestsDashboard() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-[#3b2022] mt-6">
+    <div className="max-w-6xl mx-auto p-6 text-[#3b2022]">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-serif font-bold text-[#4b1719]">Solicitudes de Revisión</h1>
@@ -114,7 +122,7 @@ export default function RequestsDashboard() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-[#3E3030] group-hover:text-[#8B0000] transition-colors">
-                      Capítulo {req.chapterId} · {req.slug}
+                      Capítulo {req.chapterId} · {req.title}
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-medium text-[#756565]">

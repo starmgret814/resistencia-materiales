@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, collection, getDocs, updateDoc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import { workspaceFetch } from '@/lib/workspace-api';
 import { Trash2, Shield, User as UserIcon, BookOpen, Plus, Loader2, Edit2, CheckCircle2, X } from 'lucide-react';
 import { chapters } from '@/lib/course-data';
 
@@ -94,7 +95,6 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
 
     try {
       setSaving(true);
-      const userRef = doc(db, 'users', newEmail.toLowerCase().trim());
       
       const newUserData: any = {
         role: newRole,
@@ -105,7 +105,12 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         newUserData.createdAt = new Date().toISOString();
       }
 
-      await setDoc(userRef, newUserData, { merge: true });
+      const response = await workspaceFetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmail, ...newUserData, isEditing }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error);
       
       setIsModalOpen(false);
       await fetchUsers();
@@ -120,7 +125,8 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
 
   const executeDeleteUser = async (email: string) => {
     try {
-      await deleteDoc(doc(db, 'users', email));
+      const response = await workspaceFetch(`/api/users?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error((await response.json()).error);
       setUsers(users.filter(u => u.email !== email));
       showToast("Usuario eliminado correctamente.", 'success');
     } catch (error) {
@@ -138,15 +144,15 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
   };
 
   return (
-    <div className="flex flex-col h-screen relative">
+    <div className="max-w-6xl mx-auto p-6 text-[#3b2022] relative">
       {toast && (
         <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
           {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />}
           <p className="font-semibold text-sm">{toast.message}</p>
         </div>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-4 px-8 py-5 border-b border-[#E5D7D4] bg-white">
-        <h2 className="text-2xl font-bold text-[#3E3030]">Gestión de Colaboradores</h2>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <h2 className="text-3xl font-serif font-bold text-[#4b1719]">Gestión de Colaboradores</h2>
         <button 
           onClick={handleOpenAddModal}
           className="flex items-center gap-2 px-4 py-2.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors shrink-0"
@@ -156,8 +162,8 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         </button>
       </div>
 
-      <div className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
+      <div className="">
+        <div className="w-full">
           
           <div className="bg-white rounded-xl border border-[#E5D7D4] shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-[#E5D7D4] bg-[#fbf7f4]">

@@ -1,0 +1,199 @@
+---
+interface Props {
+  session?: { email: string; role: string; assignedChapters?: string[] } | null;
+}
+
+const { session } = Astro.props;
+const initial = session?.email?.charAt(0).toUpperCase() || '?';
+const pathname = Astro.url.pathname;
+const isManagement = pathname.startsWith('/workspace-mc361/management');
+const links = [
+    { label: 'Colaboradores', href: '/workspace-mc361/management/collaborators', active: pathname.endsWith('/collaborators') },
+    { label: 'Solicitudes', href: '/workspace-mc361/management/requests', active: pathname.replace(/\/$/, '').endsWith('/requests') },
+];
+---
+
+<header class="sticky top-0 z-40 h-16 shrink-0 border-b border-[#eadada] bg-white shadow-sm">
+  <nav aria-label="Navegación del espacio de trabajo" class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+    <a href="/workspace-mc361/content/chapters" data-astro-reload class="flex min-w-0 items-center gap-2 rounded-md text-[#3b2022] hover:text-[#8B0000] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
+      <svg class="size-5 shrink-0 text-[#8B0000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      </svg>
+      <span class="font-serif text-sm font-bold leading-tight sm:text-lg">Resistencia de Materiales</span>
+    </a>
+    <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      {isManagement && (
+        <a href="/workspace-mc361/content/chapters" data-astro-reload class="inline-flex items-center gap-1 rounded-md px-1 py-2 text-xs font-semibold text-[#6a2022] hover:bg-[#f8eaea] sm:px-2">
+          <span aria-hidden="true">←</span><span class="sm:hidden">Capítulos</span><span class="hidden sm:inline">Volver a capítulos</span>
+        </a>
+      )}
+      <a href="/" data-astro-reload class="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] px-2 py-2 text-xs font-semibold text-[#6a2022] hover:bg-[#f8eaea] sm:px-3">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a16 16 0 0 1 0 20 16 16 0 0 1 0-20" />
+        </svg>
+        <span class="sm:hidden">Ver web</span><span class="hidden sm:inline">Ver página pública</span>
+      </a>
+      <details data-workspace-account data-email={session?.email} data-role={session?.role} data-chapters={JSON.stringify([...(session?.assignedChapters || [])].sort())} class="relative">
+        <summary aria-label="Opciones de tu cuenta" class="flex size-9 cursor-pointer list-none items-center justify-center overflow-hidden rounded-full border border-[#d5baba] bg-[#f1dddd] text-sm font-bold text-[#6a2022] shadow-sm hover:ring-2 hover:ring-[#eadada] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B0000] [&::-webkit-details-marker]:hidden">
+          <span data-avatar-initial>{initial}</span>
+          <img data-avatar-photo hidden alt="" referrerpolicy="no-referrer" class="size-full object-cover" />
+        </summary>
+        <div class="absolute right-0 top-full z-50 w-56 pt-2">
+          <div class="rounded-xl border border-[#eadada] bg-white p-1.5 shadow-lg">
+            {session?.role === 'admin' && (
+              <>
+                <a href="/workspace-mc361/management/collaborators" data-astro-reload class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-[#6a2022] hover:bg-[#f8eaea]">
+                  <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                  Panel de gestión
+                </a>
+                <div class="mx-2 my-1 border-t border-[#eadada]" />
+              </>
+            )}
+            <button type="button" data-workspace-logout class="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#6a2022] hover:bg-[#f8eaea] focus-visible:bg-[#f8eaea] disabled:opacity-50">
+              <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </details>
+    </div>
+  </nav>
+</header>
+{isManagement && session?.role === 'admin' && (
+  <div class="border-b border-[#eadada] bg-white">
+    <nav aria-label="Secciones de administración" class="mx-auto flex h-12 max-w-6xl items-center gap-1 overflow-x-auto px-4 sm:px-6">
+      {links.map((link) => (
+        <a href={link.href} data-astro-reload aria-current={link.active ? 'page' : undefined} class:list={['shrink-0 rounded-md px-3 py-2 text-sm font-semibold transition-colors', link.active ? 'bg-[#f8eaea] text-[#8B0000]' : 'text-[#8b6d6d] hover:bg-[#f8eaea] hover:text-[#8B0000]']}>
+          {link.label}
+        </a>
+      ))}
+      <span class="ml-auto hidden shrink-0 text-xs text-[#967070] sm:block">Administración</span>
+    </nav>
+  </div>
+)}
+
+<script>
+  let unsubscribeAvatar: (() => void) | undefined;
+  let unsubscribePermissions: (() => void) | undefined;
+
+  function bindAccount() {
+    const account = document.querySelector<HTMLDetailsElement>('[data-workspace-account]');
+    if (!account || account.dataset.bound) return;
+    unsubscribeAvatar?.();
+    unsubscribePermissions?.();
+    account.dataset.bound = 'true';
+    const summary = account.querySelector('summary')!;
+    account.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') account.open = true;
+    });
+    account.addEventListener('pointerleave', () => {
+      if (!account.contains(document.activeElement)) account.open = false;
+    });
+    summary.addEventListener('focus', () => {
+      if (summary.matches(':focus-visible')) account.open = true;
+    });
+    account.addEventListener('focusout', (event) => {
+      if (!account.contains(event.relatedTarget as Node | null)) account.open = false;
+    });
+    account.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        summary.focus();
+        account.open = false;
+      }
+    });
+
+    const photo = account.querySelector<HTMLImageElement>('[data-avatar-photo]')!;
+    const initial = account.querySelector<HTMLElement>('[data-avatar-initial]')!;
+    photo.addEventListener('load', () => {
+      photo.hidden = false;
+      initial.hidden = true;
+    });
+    photo.addEventListener('error', () => {
+      photo.hidden = true;
+      initial.hidden = false;
+    });
+    void Promise.all([import('@/lib/firebase'), import('firebase/auth'), import('firebase/firestore')]).then(([{ auth, db }, { onIdTokenChanged }, { doc, onSnapshot }]) => {
+      if (!account.isConnected) return;
+      let updatingPermissions = false;
+      unsubscribeAvatar = onIdTokenChanged(auth, (user) => {
+        unsubscribePermissions?.();
+        if (user && user.email === account.dataset.email && user.photoURL?.startsWith('https://')) {
+          photo.src = user.photoURL;
+        } else {
+          photo.removeAttribute('src');
+          photo.hidden = true;
+          initial.hidden = false;
+        }
+        if (!user || user.email !== account.dataset.email) return;
+        // Refresh the cryptographically verified cookie when Firebase renews its token.
+        void user.getIdToken().then((idToken) => fetch('/api/auth/signin', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }),
+        })).catch(() => {});
+        unsubscribePermissions = onSnapshot(doc(db, 'users', user.email!), { includeMetadataChanges: true }, async (snapshot) => {
+          if (snapshot.metadata.fromCache || snapshot.metadata.hasPendingWrites || updatingPermissions || !account.isConnected) return;
+          const permissions = snapshot.data();
+          const chapters = JSON.stringify([...(permissions?.assignedChapters || [])].sort());
+          if (snapshot.exists() && (permissions?.role || 'editor') === account.dataset.role && chapters === account.dataset.chapters) return;
+          updatingPermissions = true;
+          try {
+          const response = await fetch('/api/auth/signin', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken: await user.getIdToken() }),
+          });
+          if (response.status === 401 || response.status === 403) {
+            await fetch('/api/auth/signout', { method: 'POST' });
+            await auth.signOut();
+            window.location.href = '/workspace-mc361/login';
+          } else if (response.ok) {
+            window.location.reload();
+          } else {
+            updatingPermissions = false;
+          }
+          } catch {
+            updatingPermissions = false;
+          }
+        }, (error) => {
+          // Server and Firestore authorization must still enforce permissions if the listener fails.
+          console.error('No se pudieron observar los permisos actuales.', error);
+        });
+      });
+    }).catch(() => {
+      // The account menu and initial remain usable if Firebase cannot load.
+    });
+  }
+
+  function bindLogout() {
+    const button = document.querySelector<HTMLButtonElement>('[data-workspace-logout]');
+    if (!button || button.dataset.bound) return;
+    button.dataset.bound = 'true';
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/auth/signout', { method: 'POST' });
+        if (!response.ok) throw new Error('No se pudo cerrar la sesión.');
+        const { auth } = await import('@/lib/firebase');
+        await auth.signOut();
+        window.location.href = '/workspace-mc361/login';
+      } catch {
+        button.disabled = false;
+        window.alert('No se pudo cerrar la sesión. Inténtalo de nuevo.');
+      }
+    });
+  }
+  bindLogout();
+  bindAccount();
+  document.addEventListener('astro:page-load', bindLogout);
+  document.addEventListener('astro:page-load', bindAccount);
+  document.addEventListener('astro:before-swap', () => {
+    unsubscribeAvatar?.();
+    unsubscribePermissions?.();
+  });
+  document.addEventListener('pointerdown', (event) => {
+    const account = document.querySelector<HTMLDetailsElement>('[data-workspace-account]');
+    if (account && !account.contains(event.target as Node)) account.open = false;
+  });
+</script>

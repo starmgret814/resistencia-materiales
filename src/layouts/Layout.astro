@@ -8,10 +8,11 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const isWorkspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathname.startsWith('/workspace-mc361/');
 ---
 
 <!doctype html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class:list={['scroll-smooth', isWorkspace && 'light']}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -27,12 +28,12 @@ const { title, description } = Astro.props;
     />
     <script is:inline>
       function applyTheme() {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        const workspace = window.location.pathname === '/workspace-mc361' || window.location.pathname.startsWith('/workspace-mc361/');
+        let theme;
+        try { theme = localStorage.getItem('theme'); } catch {}
+        const dark = !workspace && (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches));
+        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.classList.toggle('light', !dark);
       }
       applyTheme();
       document.addEventListener('astro:after-swap', applyTheme);
