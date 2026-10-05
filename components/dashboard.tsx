@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { db } from '@/lib/firebase'
 import { workspaceFetch } from '@/lib/workspace-api'
-import { doc, getDoc, setDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore'
+import { doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore'
 import { withSubtopicTitle } from '@/lib/course-titles'
 import type { CourseDocument } from '@/lib/content-schema'
 import { useRef } from 'react'
@@ -289,10 +289,17 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const executeDelete = async (chapterNumber: string, sectionIndex: number) => {
+    if (session?.role !== 'admin') {
+      showToast('Solo los administradores pueden eliminar subtemas.', 'error');
+      setDeleteConfirm(null);
+      return;
+    }
+
     setIsProcessing(true);
     const chData = localChapters.find(c => c.number === chapterNumber);
     if (!chData) return;
     
+    const sectionToDelete = chData.sections[sectionIndex];
     const newSections = [...chData.sections];
     newSections.splice(sectionIndex, 1);
     
@@ -310,15 +317,22 @@ export default function Dashboard({ session }: { session: any }) {
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
+      // Si existe borrador o publicación en Firestore, limpiarlo
+      const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
+      if (rawSlug) {
+        await deleteDoc(doc(db, 'drafts', `${chapterNumber}_${rawSlug}`)).catch(() => null);
+      }
+
       workspaceFetch('/api/subchapters', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chapterNumber, sections: newSections })
       }).catch(() => {});
 
-      showToast('Subtema eliminado', 'success');
-    } catch (e) {
-      showToast('Error eliminando', 'error');
+      showToast('Subtema eliminado exitosamente', 'success');
+    } catch (e: any) {
+      console.error(e);
+      showToast('Error eliminando subtema: ' + (e.message || ''), 'error');
     } finally {
       setIsProcessing(false);
       setDeleteConfirm(null);
@@ -538,9 +552,11 @@ export default function Dashboard({ session }: { session: any }) {
                            <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
                              <Pencil className="w-4 h-4" />
                            </button>
-                           <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
-                             <Trash2 className="w-4 h-4" />
-                           </button>
+                           {session?.role === 'admin' && (
+                             <button onClick={() => setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title })} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Eliminar">
+                               <Trash2 className="w-4 h-4" />
+                             </button>
+                           )}
                         </div>
                         <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
                           <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">

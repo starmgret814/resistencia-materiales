@@ -144,6 +144,10 @@ export const PUT: APIRoute = async ({ request, cookies, locals }) => {
       return new Response(JSON.stringify({ error: 'Capítulo no encontrado' }), { status: 404 });
     }
 
+    if (sections.length < chapters[chapterIndex].sections.length && locals.session.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo los administradores pueden eliminar subtemas del curso.' }), { status: 403 });
+    }
+
     chapters[chapterIndex].sections = sections;
 
     await saveChapters(chapters, chapterNumber, sections);

@@ -73,7 +73,8 @@ service cloud.firestore {
           || request.resource.data.list[index] == resource.data.list[index]
           || (request.resource.data.list[index].number == resource.data.list[index].number
             && request.resource.data.list[index].diff(resource.data.list[index]).affectedKeys().hasOnly(['sections'])
-            && canEditChapter(resource.data.list[index].number));
+            && canEditChapter(resource.data.list[index].number)
+            && request.resource.data.list[index].sections.size() >= resource.data.list[index].sections.size());
       }
       allow read: if registered();
       allow create, delete: if admin();
