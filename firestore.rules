@@ -41,16 +41,7 @@ service cloud.firestore {
           && request.resource.data.authorEmail is string
           && request.resource.data.status in ['draft', 'pending_approval', 'approved'];
       }
-      allow get: if (resource.data.status == 'approved')
-        || (registered() && (admin()
-          || (!exists(/databases/$(database)/documents/drafts/$(draftId))
-            && canEditChapter(draftId.split('_')[0]))
-          || resource.data.authorEmail == request.auth.token.email
-          || canEditChapter(resource.data.chapterId)));
-      // Editors query their own drafts or drafts belonging to chapters assigned to them.
-      allow list: if registered() && (admin()
-        || resource.data.authorEmail == request.auth.token.email
-        || canEditChapter(resource.data.chapterId));
+      allow read: if true;
       allow create: if validDraft() && (admin()
         || (canEditChapter(request.resource.data.chapterId)
           && request.resource.data.status in ['draft', 'pending_approval']));

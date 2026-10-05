@@ -1,8 +1,11 @@
 ---
+import { getLiveChapters } from '@/lib/course-service';
 import { allSections } from '@/lib/course-data';
 
+const liveChapters = await getLiveChapters();
+const firstLive = liveChapters.flatMap(c => c.sections).find(s => Boolean(s.slug));
 const first = allSections.find((s) => s.slug !== null);
-const targetUrl = first?.slug ? `/curso/${first.slug}` : '/curso/01-esfuerzos-falla/subtema-inicial';
+const targetUrl = firstLive?.slug ? `/curso/${firstLive.slug}` : (first?.slug ? `/curso/${first.slug}` : '/curso/01-esfuerzos-falla/subtema-inicial');
 
 return Astro.redirect(targetUrl);
 ---
