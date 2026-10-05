@@ -22,15 +22,24 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const section = chData.sections.find((s: any) => {
-      const sSlug = s.slug ? s.slug.split('/')[1] : s.id;
-      return sSlug === docSlug;
+      if (!s.slug) return s.id === docSlug;
+      const parts = s.slug.split('/');
+      const shortSlug = parts.length > 1 ? parts[1] : parts[0];
+      return s.slug === docSlug || shortSlug === docSlug || s.id === docSlug;
     });
 
     if (!section || !section.slug) {
       return new Response(JSON.stringify({ error: 'Subtema no encontrado' }), { status: 404 });
     }
 
-    const filePath = path.join(process.cwd(), 'src', 'content', 'resistencia', section.slug, 'index.mdx');
+    const chapterFolder = chData.sections.find((s: any) => s.slug?.includes('/'))?.slug?.split('/')[0] 
+      || `${chData.number.padStart(2, '0')}-capitulo`;
+
+    const fullSectionSlug = section.slug.includes('/')
+      ? section.slug
+      : `${chapterFolder}/${section.slug}`;
+
+    const filePath = path.join(process.cwd(), 'src', 'content', 'resistencia', fullSectionSlug, 'index.mdx');
 
     try {
       const fileContent = await fs.readFile(filePath, 'utf-8');

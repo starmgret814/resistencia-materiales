@@ -5,7 +5,7 @@ export const onRequest = defineMiddleware(async ({ url, request, cookies, redire
   const pathname = url.pathname.replace(/\/+$/, '');
   const workspace = pathname.startsWith('/workspace-mc361');
   const login = pathname === '/workspace-mc361/login';
-  const protectedApi = ['/api/publish', '/api/subchapters', '/api/users'].includes(pathname);
+  const protectedApi = ['/api/publish', '/api/subchapters', '/api/users', '/api/reset-db'].includes(pathname);
   if ((!workspace || login) && !protectedApi) return next();
   try {
     const bearer = request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
@@ -14,7 +14,7 @@ export const onRequest = defineMiddleware(async ({ url, request, cookies, redire
     const session = await verifyWorkspaceSession(token);
     locals.session = session;
     setWorkspaceSession(cookies, session, token);
-    const adminOnly = pathname.startsWith('/workspace-mc361/management') || ['/api/publish', '/api/users'].includes(pathname);
+    const adminOnly = pathname.startsWith('/workspace-mc361/management') || ['/api/publish', '/api/users', '/api/reset-db'].includes(pathname);
     if (adminOnly && session.role !== 'admin') {
       return protectedApi ? Response.json({ error: 'No tienes permisos de administrador.' }, { status: 403 }) : redirect('/workspace-mc361/content/chapters');
     }

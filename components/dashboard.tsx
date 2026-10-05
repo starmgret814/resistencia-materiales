@@ -7,7 +7,7 @@ import { doc, getDoc, setDoc, collection, query, where, getDocs, writeBatch } fr
 import { withSubtopicTitle } from '@/lib/course-titles'
 import type { CourseDocument } from '@/lib/content-schema'
 import { useRef } from 'react'
-import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
+import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check, RotateCcw } from 'lucide-react'
 import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
 
 export default function Dashboard({ session }: { session: any }) {
@@ -317,6 +317,28 @@ export default function Dashboard({ session }: { session: any }) {
 
   // Filtrar capítulos que el usuario puede ver
   const visibleChapters = localChapters.filter(c => session.role === 'admin' || assignedChapters.includes(c.number))
+  const handleResetDb = async () => {
+    if (!confirm('¿Estás seguro de que deseas restablecer todos los subtemas y borradores a 0? Esta acción borrará borradores y subtemas extras.')) return;
+    try {
+      setIsProcessing(true);
+      const res = await workspaceFetch('/api/reset-db', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('mc361_local_chapters');
+        }
+        showToast('Base de datos y subtemas restablecidos a 0.', 'success');
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        showToast(data.error || 'Error al restablecer', 'error');
+      }
+    } catch (e: any) {
+      showToast('Error de conexión', 'error');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const allChaptersExpanded = visibleChapters.length > 0 && visibleChapters.every((chapter) => expandedChapters.includes(chapter.number))
 
   if (isLoading) return <div className="p-10 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#8B0000] border-t-transparent rounded-full" /></div>
@@ -335,6 +357,18 @@ export default function Dashboard({ session }: { session: any }) {
           <p className="text-sm text-[#8b6d6d] mt-1">Abre un capítulo para gestionar sus subtemas. Recordaremos los que dejes abiertos.</p>
         </div>
         <div className="flex items-center gap-2">
+          {session?.role === 'admin' && (
+            <button
+              type="button"
+              onClick={handleResetDb}
+              disabled={isProcessing}
+              className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-3 py-2 text-xs font-semibold text-[#8B0000] hover:bg-[#f8eaea] disabled:opacity-40 transition-colors"
+              title="Restablecer todos los subtemas y borradores a 0"
+            >
+              <RotateCcw className="size-4" aria-hidden="true" />
+              Restablecer a 0
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setExpandedChapters(allChaptersExpanded ? [] : visibleChapters.map((chapter) => chapter.number))}

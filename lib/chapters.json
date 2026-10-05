@@ -16,8 +16,8 @@
     "sections": [
       {
         "id": "2.1",
-        "slug": "02-deformaciones-ley-hooke/subtema-inicial",
-        "title": "XD"
+        "title": "Subtema inicial",
+        "slug": "02-deformaciones-ley-hooke/subtema-inicial"
       }
     ]
   },
@@ -70,9 +70,9 @@
     "title": "Flexión y cortante en vigas",
     "sections": [
       {
-        "slug": "07-flexion-cortante/subtema-inicial",
         "id": "7.1",
-        "title": "XD"
+        "title": "Subtema inicial",
+        "slug": "07-flexion-cortante/subtema-inicial"
       }
     ]
   },

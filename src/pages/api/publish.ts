@@ -61,16 +61,27 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const section = chData.sections.find((s: any) => {
-      const sSlug = s.slug ? s.slug.split('/')[1] : s.id;
-      return sSlug === slug;
+      if (!s.slug) return s.id === slug;
+      const parts = s.slug.split('/');
+      const shortSlug = parts.length > 1 ? parts[1] : parts[0];
+      return s.slug === slug || shortSlug === slug || s.id === slug;
     });
 
-    if (!section || !section.slug) {
-      return new Response(JSON.stringify({ error: 'Subtema no encontrado' }), { status: 404 });
+    const chapterFolder = chData.sections.find((s: any) => s.slug?.includes('/'))?.slug?.split('/')[0] 
+      || `${chData.number.padStart(2, '0')}-capitulo`;
+
+    let fullSectionSlug: string;
+    if (section && section.slug) {
+      fullSectionSlug = section.slug.includes('/')
+        ? section.slug
+        : `${chapterFolder}/${section.slug}`;
+    } else {
+      const cleanSlug = slug.includes('/') ? slug.split('/')[1] : slug;
+      fullSectionSlug = `${chapterFolder}/${cleanSlug}`;
     }
 
     // El path relativo dentro de src/
-    const relativePath = `src/content/resistencia/${section.slug}/index.mdx`;
+    const relativePath = `src/content/resistencia/${fullSectionSlug}/index.mdx`;
 
     const githubToken = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
     const githubRepo = process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;

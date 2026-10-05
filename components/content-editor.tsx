@@ -420,7 +420,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
     <div className="mx-auto w-full max-w-[1800px] shrink-0 px-4 pt-3 sm:px-6">
-      <a href="/workspace-mc361/content/chapters" className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
+      <a href="/workspace-mc361/content/chapters" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
         <ArrowLeft className="size-4" aria-hidden="true" /> Volver a capítulos
       </a>
     </div>
@@ -519,6 +519,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           </div>
           <div className="relative flex-1 min-h-0">
             <Editor
+              key={`${document.chapterId}_${document.slug}`}
               height="100%"
               defaultLanguage="markdown"
               value={document.contentMarkdown}
@@ -585,8 +586,13 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
               onMount={(editor, monaco) => {
                 editorRef.current = editor
                 monaco.editor.setTheme('resistenciaTheme')
+                setTimeout(() => {
+                  try { editor.layout(); } catch {}
+                }, 50)
               }}
               options={{
+                automaticLayout: true,
+                lineNumbers: 'on',
                 wordWrap: 'on',
                 minimap: { enabled: false },
                 fontSize: 14.5,

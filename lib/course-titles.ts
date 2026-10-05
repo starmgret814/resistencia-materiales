@@ -2,8 +2,15 @@ import type { Chapter } from './course-data'
 import type { CourseDocument } from './content-schema'
 
 export function findSubtopicTitle(chapters: Chapter[], chapterId: string, slug: string): string | undefined {
-  return chapters.find((chapter) => chapter.number === chapterId)?.sections
-    .find((section) => (section.slug?.split('/').slice(1).join('/') || section.id) === slug)?.title
+  const chapter = chapters.find((c) => c.number === chapterId);
+  if (!chapter) return undefined;
+  const section = chapter.sections.find((s) => {
+    if (!s.slug) return s.id === slug;
+    const parts = s.slug.split('/');
+    const shortSlug = parts.length > 1 ? parts[1] : parts[0];
+    return s.slug === slug || shortSlug === slug || s.id === slug;
+  });
+  return section?.title;
 }
 
 /** Rename the page heading while preserving the body and fenced code examples. */
