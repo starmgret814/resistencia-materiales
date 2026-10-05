@@ -106,6 +106,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
 
         // Hacer el commit en GitHub
+        const subtopicTitle = section?.title || slug;
         const commitRes = await fetch(getUrl, {
           method: 'PUT',
           headers: {
@@ -113,7 +114,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            message: `Actualizado: ${section.title} desde el Editor Admin`,
+            message: `Actualizado: ${subtopicTitle} desde el Editor Admin`,
             content: Buffer.from(contentMarkdown).toString('base64'),
             sha: sha
           })

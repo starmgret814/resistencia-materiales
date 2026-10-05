@@ -10,6 +10,8 @@ import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check, RotateCcw } from 'lucide-react'
 import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
 
+const RESET_VERSION = 'v2_clean_baseline_0';
+
 export default function Dashboard({ session }: { session: any }) {
   const expansionStorageKey = `mc361_expanded_chapters:${session?.email || 'guest'}`
   const [expandedChapters, setExpandedChapters] = useState<string[]>(() => {
@@ -41,15 +43,17 @@ export default function Dashboard({ session }: { session: any }) {
   const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
     if (typeof window !== 'undefined') {
       try {
+        const storedVersion = localStorage.getItem('mc361_clean_version');
+        if (storedVersion !== RESET_VERSION) {
+          localStorage.removeItem('mc361_local_chapters');
+          localStorage.setItem('mc361_clean_version', RESET_VERSION);
+          return initialChapters;
+        }
         const cached = localStorage.getItem('mc361_local_chapters');
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            const countCached = parsed.reduce((acc: number, c: any) => acc + (c.sections?.length || 0), 0);
-            const countInitial = initialChapters.reduce((acc: number, c: any) => acc + (c.sections?.length || 0), 0);
-            if (countCached >= countInitial) {
-              return parsed;
-            }
+            return parsed;
           }
         }
       } catch {}
@@ -87,8 +91,29 @@ export default function Dashboard({ session }: { session: any }) {
       if (!session?.email) { setIsLoading(false); return }
       
       try {
-        // Permissions already come from the server's current, verified user record.
-        // Load the independent course and draft queries concurrently.
+        const storedVersion = typeof window !== 'undefined' ? localStorage.getItem('mc361_clean_version') : null;
+        if (storedVersion !== RESET_VERSION && session.role === 'admin') {
+          try {
+            await setDoc(doc(db, 'course', 'chapters'), {
+              list: initialChapters,
+              updatedAt: new Date().toISOString(),
+              version: RESET_VERSION
+            });
+            const allDrafts = await getDocs(collection(db, 'drafts'));
+            const batch = writeBatch(db);
+            allDrafts.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            localStorage.setItem('mc361_clean_version', RESET_VERSION);
+            localStorage.removeItem('mc361_local_chapters');
+            setLocalChapters(initialChapters);
+            setDocumentsStatus({});
+            setIsLoading(false);
+            return;
+          } catch (e) {
+            console.error('Error auto-resetting Firestore:', e);
+          }
+        }
+
         const q = session.role === 'admin' 
           ? query(collection(db, 'drafts'))
           : query(collection(db, 'drafts'), where("authorEmail", "==", session.email))
