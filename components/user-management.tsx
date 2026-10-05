@@ -55,8 +55,13 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         usersList.push({ email: doc.id, ...doc.data() } as Collaborator);
       });
 
-      // Ordenar por fecha y hora: el más antiguo primero, el más reciente abajo
+      // Ordenar: Admins siempre anclados al principio, y los demás por fecha
       usersList.sort((a, b) => {
+        const aIsAdmin = a.role === 'admin';
+        const bIsAdmin = b.role === 'admin';
+        if (aIsAdmin && !bIsAdmin) return -1;
+        if (!aIsAdmin && bIsAdmin) return 1;
+
         const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         if (timeA !== timeB) {

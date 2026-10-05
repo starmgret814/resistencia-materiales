@@ -1,6 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import LoginForm from '@/components/login-form';
+
+if (Astro.locals.session) {
+  return Astro.redirect('/workspace-mc361/content/chapters');
+}
 ---
 
 <Layout title="Iniciar Sesión - Resistencia de Materiales">

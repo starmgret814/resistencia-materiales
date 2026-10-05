@@ -6,7 +6,25 @@ export const onRequest = defineMiddleware(async ({ url, request, cookies, redire
   const workspace = pathname.startsWith('/workspace-mc361');
   const login = pathname === '/workspace-mc361/login';
   const protectedApi = ['/api/publish', '/api/subchapters', '/api/users', '/api/reset-db'].includes(pathname);
-  if ((!workspace || login) && !protectedApi) return next();
+
+  if (login) {
+    const bearer = request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
+    const token = bearer || cookies.get('firebase_id_token')?.value;
+    if (token) {
+      try {
+        const session = await verifyWorkspaceSession(token);
+        if (session) {
+          locals.session = session;
+          return redirect('/workspace-mc361/content/chapters');
+        }
+      } catch {
+        // Token inválido o expirado, permitir acceso a login
+      }
+    }
+    return next();
+  }
+
+  if (!workspace && !protectedApi) return next();
   try {
     const bearer = request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
     const token = bearer || cookies.get('firebase_id_token')?.value;

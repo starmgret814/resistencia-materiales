@@ -52,7 +52,6 @@ const links = [
       <details data-workspace-account data-email={session?.email} data-role={session?.role} data-chapters={JSON.stringify([...(session?.assignedChapters || [])].sort())} class="relative">
         <summary aria-label="Opciones de tu cuenta" class="flex size-9 cursor-pointer list-none items-center justify-center overflow-hidden rounded-full border border-[#d5baba] bg-[#f1dddd] text-sm font-bold text-[#6a2022] shadow-sm hover:ring-2 hover:ring-[#eadada] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B0000] [&::-webkit-details-marker]:hidden">
           <span data-avatar-initial>{initial}</span>
-          <img data-avatar-photo hidden alt="" referrerpolicy="no-referrer" class="size-full object-cover" />
         </summary>
         <div class="absolute right-0 top-full z-50 w-56 pt-2">
           <div class="rounded-xl border border-[#eadada] bg-white p-1.5 shadow-lg">
@@ -123,28 +122,11 @@ const links = [
       }
     });
 
-    const photo = account.querySelector<HTMLImageElement>('[data-avatar-photo]')!;
-    const initial = account.querySelector<HTMLElement>('[data-avatar-initial]')!;
-    photo.addEventListener('load', () => {
-      photo.hidden = false;
-      initial.hidden = true;
-    });
-    photo.addEventListener('error', () => {
-      photo.hidden = true;
-      initial.hidden = false;
-    });
     void Promise.all([import('@/lib/firebase'), import('firebase/auth'), import('firebase/firestore')]).then(([{ auth, db }, { onIdTokenChanged }, { doc, onSnapshot }]) => {
       if (!account.isConnected) return;
       let updatingPermissions = false;
       unsubscribeAvatar = onIdTokenChanged(auth, (user) => {
         unsubscribePermissions?.();
-        if (user && user.email === account.dataset.email && user.photoURL?.startsWith('https://')) {
-          photo.src = user.photoURL;
-        } else {
-          photo.removeAttribute('src');
-          photo.hidden = true;
-          initial.hidden = false;
-        }
         if (!user || user.email !== account.dataset.email) return;
         // Refresh the cryptographically verified cookie when Firebase renews its token.
         void user.getIdToken().then((idToken) => fetch('/api/auth/signin', {
