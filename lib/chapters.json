@@ -2,7 +2,13 @@
   {
     "number": "01",
     "title": "Esfuerzos, falla y factor de seguridad",
-    "sections": []
+    "sections": [
+      {
+        "id": "1.1",
+        "title": "Subtema Inicial",
+        "slug": "01-capitulo/subtema-inicial"
+      }
+    ]
   },
   {
     "number": "02",
