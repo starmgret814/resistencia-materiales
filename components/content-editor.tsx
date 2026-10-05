@@ -154,23 +154,36 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         const data = snap.data();
         setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
       } else {
-        const params = new URLSearchParams({ chapter: chapterId, slug });
-        const mdxRes = await fetch(`/api/mdx?${params}`).catch(() => null);
-        if (mdxRes && mdxRes.ok) {
-          const mdxData = await mdxRes.json();
+        // Si no hay borrador activo, verificar si ya existe una versión publicada oficial
+        const pubSnap = await getDoc(doc(db, 'published_subtopics', draftId)).catch(() => null);
+        if (pubSnap && pubSnap.exists() && pubSnap.data()?.contentMarkdown) {
+          const pubData = pubSnap.data();
           setDocument(withSubtopicTitle({
-            ...structuredClone(starterDocument), chapterId, slug,
-            contentMarkdown: mdxData.content,
-          }, currentTitle));
-        } else {
-          const initialTitle = currentTitle || 'Subtema';
-          setDocument({
             schemaVersion: 2,
-            title: initialTitle,
+            title: pubData.title || currentTitle || 'Subtema',
             chapterId,
             slug,
-            contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
-          });
+            contentMarkdown: pubData.contentMarkdown,
+          }, currentTitle));
+        } else {
+          const params = new URLSearchParams({ chapter: chapterId, slug });
+          const mdxRes = await fetch(`/api/mdx?${params}`).catch(() => null);
+          if (mdxRes && mdxRes.ok) {
+            const mdxData = await mdxRes.json();
+            setDocument(withSubtopicTitle({
+              ...structuredClone(starterDocument), chapterId, slug,
+              contentMarkdown: mdxData.content,
+            }, currentTitle));
+          } else {
+            const initialTitle = currentTitle || 'Subtema';
+            setDocument({
+              schemaVersion: 2,
+              title: initialTitle,
+              chapterId,
+              slug,
+              contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
+            });
+          }
         }
       }
     } catch (error) {
@@ -225,11 +238,17 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       } : chapter);
       const draftRef = doc(db, 'drafts', `${document.chapterId}_${document.slug}`);
       const draft = await getDoc(draftRef);
+      const pubRef = doc(db, 'published_subtopics', `${document.chapterId}_${document.slug}`);
+      const pubDoc = await getDoc(pubRef);
       const batch = writeBatch(db);
       batch.set(structureRef, { list: updatedChapters, updatedAt: new Date().toISOString() }, { merge: true });
       if (draft.exists()) {
         const renamed = withSubtopicTitle(draft.data() as CourseDocument, title);
         batch.update(draftRef, { title: renamed.title, contentMarkdown: renamed.contentMarkdown });
+      }
+      if (pubDoc.exists()) {
+        const renamedPub = withSubtopicTitle(pubDoc.data() as CourseDocument, title);
+        batch.update(pubRef, { title: renamedPub.title, contentMarkdown: renamedPub.contentMarkdown });
       }
       await batch.commit();
       // Preserve the content being edited; renaming does not save other unsaved changes.
@@ -295,8 +314,19 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
       const currentDocument = withSubtopicTitle(document, currentTitle);
       
-      // 1. Actualizar el estado en Firebase a 'approved' (Single Source of Truth para la web pública)
+      // 1. Guardar en 'published_subtopics' (Copia oficial de producción para los estudiantes)
       const draftId = `${document.chapterId}_${document.slug}`;
+      const nowIso = new Date().toISOString();
+      await setDoc(doc(db, 'published_subtopics', draftId), {
+        chapterId: document.chapterId,
+        slug: document.slug,
+        title: currentTitle || document.title,
+        contentMarkdown: currentDocument.contentMarkdown,
+        publishedAt: nowIso,
+        publishedBy: session.email,
+      }, { merge: true });
+
+      // 2. Actualizar el estado en 'drafts' a 'approved' preservando al autor original
       const draftRef = doc(db, 'drafts', draftId);
       const existingSnap = await getDoc(draftRef).catch(() => null);
       const originalAuthor = existingSnap?.exists() ? existingSnap.data()?.authorEmail : session.email;
@@ -306,7 +336,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         authorEmail: originalAuthor || session.email,
         lastEditedBy: session.email,
         status: 'approved',
-        updatedAt: new Date().toISOString()
+        updatedAt: nowIso
       }, { merge: true });
 
       // 2. Sincronización secundaria en segundo plano con GitHub (respaldo en el repositorio)

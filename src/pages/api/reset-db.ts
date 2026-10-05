@@ -30,7 +30,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await deleteDoc(d.ref);
     }
 
-    // 2. Clear requests collection if any
+    // 2. Clear published_subtopics collection
+    try {
+      const pubSnap = await getDocs(collection(db, 'published_subtopics'));
+      for (const p of pubSnap.docs) {
+        await deleteDoc(p.ref);
+      }
+    } catch {}
+
+    // 3. Clear requests collection if any
     try {
       const reqSnap = await getDocs(collection(db, 'requests'));
       for (const r of reqSnap.docs) {

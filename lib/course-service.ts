@@ -26,8 +26,26 @@ export interface ApprovedSubtopicContent {
 export async function getApprovedSubtopic(chapterNumber: string, slug: string): Promise<ApprovedSubtopicContent | null> {
   try {
     const cleanSlug = slug.includes('/') ? slug.split('/').pop()! : slug;
-    const draftId = `${chapterNumber}_${cleanSlug}`;
-    const snap = await getDoc(doc(db, 'drafts', draftId));
+    const docId = `${chapterNumber}_${cleanSlug}`;
+    
+    // 1. Consultar la versión de producción aprobada
+    const pubSnap = await getDoc(doc(db, 'published_subtopics', docId));
+    if (pubSnap.exists()) {
+      const data = pubSnap.data();
+      if (data.contentMarkdown) {
+        return {
+          title: data.title,
+          chapterId: data.chapterId,
+          slug: data.slug,
+          contentMarkdown: data.contentMarkdown,
+          updatedAt: data.publishedAt || data.updatedAt,
+          authorEmail: data.authorEmail,
+        };
+      }
+    }
+
+    // 2. Respaldo: Consultar en drafts si está marcado como 'approved'
+    const snap = await getDoc(doc(db, 'drafts', docId));
     if (snap.exists()) {
       const data = snap.data();
       if (data.status === 'approved' && data.contentMarkdown) {
@@ -42,7 +60,7 @@ export async function getApprovedSubtopic(chapterNumber: string, slug: string): 
       }
     }
   } catch (err) {
-    console.warn(`No se pudo cargar contenido aprobado de Firestore para ${chapterNumber}_${slug}:`, err);
+    console.warn(`No se pudo cargar contenido publicado de Firestore para ${chapterNumber}_${slug}:`, err);
   }
   return null;
 }

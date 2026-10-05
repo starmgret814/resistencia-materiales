@@ -321,6 +321,7 @@ export default function Dashboard({ session }: { session: any }) {
       const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
       if (rawSlug) {
         await deleteDoc(doc(db, 'drafts', `${chapterNumber}_${rawSlug}`)).catch(() => null);
+        await deleteDoc(doc(db, 'published_subtopics', `${chapterNumber}_${rawSlug}`)).catch(() => null);
       }
 
       workspaceFetch('/api/subchapters', {
@@ -357,6 +358,8 @@ export default function Dashboard({ session }: { session: any }) {
       const slug = section.slug?.split('/').slice(1).join('/') || section.id;
       const draftRef = doc(db, 'drafts', `${chapterNumber}_${slug}`);
       const draft = await getDoc(draftRef);
+      const pubRef = doc(db, 'published_subtopics', `${chapterNumber}_${slug}`);
+      const pubDoc = await getDoc(pubRef);
       const batch = writeBatch(db);
       batch.set(doc(db, 'course', 'chapters'), {
         list: updatedChapters,
@@ -365,6 +368,10 @@ export default function Dashboard({ session }: { session: any }) {
       if (draft.exists()) {
         const renamed = withSubtopicTitle(draft.data() as CourseDocument, section.title);
         batch.update(draftRef, { title: renamed.title, contentMarkdown: renamed.contentMarkdown });
+      }
+      if (pubDoc.exists()) {
+        const renamedPub = withSubtopicTitle(pubDoc.data() as CourseDocument, section.title);
+        batch.update(pubRef, { title: renamedPub.title, contentMarkdown: renamedPub.contentMarkdown });
       }
       await batch.commit();
       setLocalChapters(updatedChapters);
@@ -400,8 +407,10 @@ export default function Dashboard({ session }: { session: any }) {
         version: RESET_VERSION
       });
       const allDrafts = await getDocs(collection(db, 'drafts'));
+      const allPublished = await getDocs(collection(db, 'published_subtopics'));
       const batch = writeBatch(db);
       allDrafts.docs.forEach(d => batch.delete(d.ref));
+      allPublished.docs.forEach(d => batch.delete(d.ref));
       await batch.commit();
 
       if (typeof window !== 'undefined') {
