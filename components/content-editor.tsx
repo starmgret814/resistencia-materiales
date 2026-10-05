@@ -166,40 +166,27 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             contentMarkdown: pubData.contentMarkdown,
           }, currentTitle));
         } else {
-          const params = new URLSearchParams({ chapter: chapterId, slug });
-          const mdxRes = await fetch(`/api/mdx?${params}`).catch(() => null);
-          if (mdxRes && mdxRes.ok) {
-            const mdxData = await mdxRes.json();
-            setDocument(withSubtopicTitle({
-              ...structuredClone(starterDocument), chapterId, slug,
-              contentMarkdown: mdxData.content,
-            }, currentTitle));
-          } else {
-            const initialTitle = currentTitle || 'Subtema';
-            setDocument({
-              schemaVersion: 2,
-              title: initialTitle,
-              chapterId,
-              slug,
-              contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
-            });
-          }
+          // No hay borrador ni versión publicada en Firestore -> Subtema nuevo en blanco
+          const initialTitle = currentTitle || 'Subtema';
+          setDocument({
+            schemaVersion: 2,
+            title: initialTitle,
+            chapterId,
+            slug,
+            contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
+          });
         }
       }
     } catch (error) {
       console.error('Error cargando borrador', error);
-      // Fallback a leer el archivo MDX real si Firebase da error de permisos
-      try {
-        const params = new URLSearchParams({ chapter: chapterId, slug });
-        const mdxRes = await fetch(`/api/mdx?${params}`);
-        if (mdxRes.ok) {
-          const mdxData = await mdxRes.json();
-          setDocument(prev => ({
-            ...prev,
-            contentMarkdown: mdxData.content,
-          }));
-        }
-      } catch {}
+      const initialTitle = findSubtopicTitle(chapters, chapterId, slug) || 'Subtema';
+      setDocument({
+        schemaVersion: 2,
+        title: initialTitle,
+        chapterId,
+        slug,
+        contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
+      });
     } finally {
       setIsLoaded(true);
     }

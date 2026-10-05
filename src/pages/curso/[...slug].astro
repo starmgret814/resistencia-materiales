@@ -4,7 +4,6 @@ import TextbookLayout from '@/components/textbook-layout';
 import ContentRenderer from '@/components/content-renderer';
 import { findSectionBySlug } from '@/lib/course-data';
 import { getLiveChapters, getApprovedSubtopic } from '@/lib/course-service';
-import { mdxComponents } from '@/components/mdx-components';
 import { ContentProvider } from '@/lib/content-context';
 
 const { slug } = Astro.params;
@@ -37,11 +36,10 @@ if (!sectionData) {
 
 const { section, previous, next } = sectionData;
 
-// 2. Intentar cargar el contenido aprobado directamente de Firestore (Single Source of Truth)
+// 2. Cargar el contenido aprobado exclusivamente desde Firestore (Single Source of Truth)
 const rawSlug = section.slug?.includes('/') ? section.slug.split('/').pop()! : (section.slug || section.id);
 const approvedDoc = await getApprovedSubtopic(section.chapterNumber, rawSlug);
 
-let Content = null;
 let mappedHeadings: { level: number; id: string; text: string }[] = [];
 
 if (approvedDoc && approvedDoc.contentMarkdown) {
@@ -54,25 +52,6 @@ if (approvedDoc && approvedDoc.contentMarkdown) {
       id: match[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       text: match[2].trim(),
     });
-  }
-} else {
-  // Respaldo secundario: Si no está en Firestore todavía, buscar archivo estático .mdx en disco
-  const mdxFiles = import.meta.glob('/src/content/resistencia/**/*.{mdx,md}', { eager: true });
-  const exactPathMdx = `/src/content/resistencia/${slug}/index.mdx`;
-  const exactPathMd = `/src/content/resistencia/${slug}/index.md`;
-  const fallbackPathMdx = `/src/content/resistencia/${slug}.mdx`;
-  const fallbackPathMd = `/src/content/resistencia/${slug}.md`;
-
-  const targetModule = (mdxFiles[exactPathMdx] || mdxFiles[exactPathMd] || mdxFiles[fallbackPathMdx] || mdxFiles[fallbackPathMd]) as any;
-
-  if (targetModule) {
-    Content = targetModule.default;
-    const headings = targetModule.getHeadings?.() || [];
-    mappedHeadings = headings.map((h: any) => ({
-      level: h.depth,
-      id: h.slug,
-      text: h.text,
-    }));
   }
 }
 ---
@@ -101,8 +80,6 @@ if (approvedDoc && approvedDoc.contentMarkdown) {
             contentMarkdown: approvedDoc.contentMarkdown,
           }}
         />
-      ) : Content ? (
-        <Content components={{ ...mdxComponents, Image: (props: any) => mdxComponents.Image({ ...props, slug: slug as string }) }} />
       ) : (
         <div class="flex min-h-[40vh] items-center justify-center rounded-xl border border-dashed border-[#d9aaaa] bg-[#faf0ef] p-10 text-center text-[#765e5e]">
           <div>
