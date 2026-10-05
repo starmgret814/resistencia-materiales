@@ -51,12 +51,27 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const validation = useMemo(() => validateCourseDocument(document), [document])
 
   const [assignedChapters, setAssignedChapters] = useState<string[]>([])
+  const [courseChapters, setCourseChapters] = useState<Chapter[]>(chapters)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const [isRenaming, setIsRenaming] = useState(false)
   const titleEditCancelled = useRef(false)
   const titleSaveInFlight = useRef(false)
+
+  const currentChapter = useMemo(() => {
+    return courseChapters.find((c) => c.number === document.chapterId)
+  }, [courseChapters, document.chapterId])
+
+  const currentSection = useMemo(() => {
+    if (!currentChapter) return null
+    return currentChapter.sections.find((s) => {
+      if (!s.slug) return s.id === document.slug
+      const parts = s.slug.split('/')
+      const shortSlug = parts.length > 1 ? parts[1] : parts[0]
+      return s.slug === document.slug || shortSlug === document.slug || s.id === document.slug
+    })
+  }, [currentChapter, document.slug])
   
   // CRUD de subtemas
   const [isCreatingNewSection, setIsCreatingNewSection] = useState(false)
@@ -123,10 +138,15 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     if (!session?.email) return;
     try {
       const draftId = `${chapterId}_${slug}`;
-      const [currentTitle, snap] = await Promise.all([
-        loadSubtopicTitle(chapterId, slug),
+      const [structureSnap, snap] = await Promise.all([
+        getDoc(doc(db, 'course', 'chapters')).catch(() => null),
         getDoc(doc(db, 'drafts', draftId)),
       ]);
+      const list: Chapter[] = structureSnap?.exists() && Array.isArray(structureSnap.data().list)
+        ? structureSnap.data().list as Chapter[]
+        : chapters;
+      setCourseChapters(list);
+      const currentTitle = findSubtopicTitle(list, chapterId, slug);
       if (snap.exists()) {
         const data = snap.data();
         setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
@@ -204,6 +224,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       await batch.commit();
       // Preserve the content being edited; renaming does not save other unsaved changes.
       setDocument(current => withSubtopicTitle(current, title));
+      setCourseChapters(updatedChapters);
       setIsEditingTitle(false);
       showToast('Nombre del subtema actualizado.', 'success');
       void workspaceFetch('/api/subchapters', {
@@ -433,44 +454,71 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     )}
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
-    <div className="mx-auto w-full max-w-[1800px] shrink-0 px-4 pt-3 sm:px-6">
-      {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('from') === 'requests' ? (
-        <a href="/workspace-mc361/management/requests" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
-          <ArrowLeft className="size-4" aria-hidden="true" /> Volver a solicitudes de revisión
-        </a>
-      ) : (
-        <a href="/workspace-mc361/content/chapters" data-astro-reload className="inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold text-[#6a2022] hover:bg-[#eadada] focus-visible:outline-2 focus-visible:outline-[#8B0000]">
-          <ArrowLeft className="size-4" aria-hidden="true" /> Volver a capítulos
-        </a>
-      )}
-    </div>
-
     <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 gap-5 p-4 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
       {!previewExpanded && <section className="flex min-w-0 flex-col space-y-4 min-h-0">
         {/* Document Header Info */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3 rounded-xl border border-[#ddcaca] shadow-sm">
           <div className="min-w-0 flex-1 basis-64">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#8b6d6d]">Editando Subtema</p>
+            <div className="flex items-center gap-1.5 text-xs text-[#8b6d6d]">
+              <span className="font-semibold uppercase tracking-wider text-[10px] text-[#9c4d4d]">
+                Capítulo {document.chapterId}
+              </span>
+              {currentChapter?.title && (
+                <>
+                  <span className="text-[#c5a8a8]">·</span>
+                  <span className="font-medium text-[#7d6060] truncate max-w-[280px] sm:max-w-md">
+                    {currentChapter.title}
+                  </span>
+                </>
+              )}
+            </div>
             {isEditingTitle ? (
-              <div className="mt-0.5 flex items-center gap-2 font-serif text-lg font-bold text-[#4b1719]">
-                <span className="shrink-0">Capítulo {document.chapterId} ·</span>
-                <input aria-label="Nombre del subtema" title="Enter para guardar · Escape para cancelar" autoFocus value={titleInput}
-                  onFocus={event => event.currentTarget.select()} onChange={event => setTitleInput(event.target.value)} readOnly={isRenaming}
-                  className="min-w-0 flex-1 border-b border-[#9c4d4d] bg-transparent py-0.5 outline-none focus:border-[#8B0000]"
+              <div className="mt-1 flex items-center gap-2">
+                {currentSection?.id && (
+                  <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-[#8B0000]/10 px-2 py-0.5 font-mono text-xs font-bold text-[#8B0000] border border-[#8B0000]/20">
+                    {currentSection.id}
+                  </span>
+                )}
+                <input
+                  aria-label="Nombre del subtema"
+                  title="Enter para guardar · Escape para cancelar"
+                  autoFocus
+                  value={titleInput}
+                  onFocus={event => event.currentTarget.select()}
+                  onChange={event => setTitleInput(event.target.value)}
+                  readOnly={isRenaming}
+                  className="min-w-0 flex-1 border-b-2 border-[#8B0000] bg-transparent py-0.5 font-serif text-lg font-bold text-[#4b1719] outline-none"
                   onBlur={() => { void renameSubtopic(); }}
                   onKeyDown={event => {
                     if (event.key === 'Enter') { event.preventDefault(); void renameSubtopic(); }
                     if (event.key === 'Escape' && !titleSaveInFlight.current) {
                       event.preventDefault(); titleEditCancelled.current = true; setIsEditingTitle(false);
                     }
-                  }} />
-                {isRenaming && <Loader2 className="size-4 shrink-0 animate-spin" aria-label="Guardando nombre" />}
+                  }}
+                />
+                {isRenaming && <Loader2 className="size-4 shrink-0 animate-spin text-[#8B0000]" aria-label="Guardando nombre" />}
               </div>
             ) : (
-              <div className="mt-0.5 flex items-start gap-2">
-                <h2 className="break-words text-lg font-serif font-bold text-[#4b1719]">Capítulo {document.chapterId} · {document.title}</h2>
-                <button type="button" disabled={isSaving} onClick={() => { titleEditCancelled.current = false; setTitleInput(document.title); setIsEditingTitle(true); }} className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[#6a2022] hover:bg-[#f1dddd] focus-visible:outline-2 focus-visible:outline-[#8B0000] disabled:opacity-50" title="Cambiar nombre del subtema" aria-label="Cambiar nombre del subtema">
-                  <Pencil className="size-4" aria-hidden="true" />
+              <div className="mt-1 flex items-center gap-2.5">
+                {currentSection?.id && (
+                  <span className="inline-flex shrink-0 items-center justify-center rounded-md bg-[#8B0000]/10 px-2 py-0.5 font-mono text-xs font-bold text-[#8B0000] border border-[#8B0000]/20">
+                    {currentSection.id}
+                  </span>
+                )}
+                <h2 className="break-words font-serif text-lg font-bold text-[#4b1719]">{document.title}</h2>
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => {
+                    titleEditCancelled.current = false;
+                    setTitleInput(document.title);
+                    setIsEditingTitle(true);
+                  }}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-[#6a2022] hover:bg-[#f1dddd] focus-visible:outline-2 focus-visible:outline-[#8B0000] disabled:opacity-50 transition-colors"
+                  title="Cambiar nombre del subtema"
+                  aria-label="Cambiar nombre del subtema"
+                >
+                  <Pencil className="size-3.5" aria-hidden="true" />
                 </button>
               </div>
             )}

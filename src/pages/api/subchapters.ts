@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import defaultChapters from '@/lib/chapters.json';
 import { canEditChapter } from '@/lib/server-session';
+import { commitToGitHubWithRetry } from '@/lib/github-sync';
 
 async function getChapters(): Promise<any[]> {
   try {
@@ -14,7 +15,7 @@ async function getChapters(): Promise<any[]> {
   }
 }
 
-async function saveChapters(chapters: any[]) {
+async function saveChapters(chapters: any[], chapterNumber?: string, sections?: any[]) {
   const isVercel = Boolean(process.env.VERCEL);
   // Si estamos en entorno local, escribir en disco local
   if (!isVercel) {
@@ -24,6 +25,41 @@ async function saveChapters(chapters: any[]) {
       await fs.writeFile(filePath, contentStr, 'utf-8');
     } catch (e) {
       console.error("Error guardando localmente chapters.json:", e);
+    }
+  }
+
+  // Sincronizar con GitHub si las credenciales están configuradas
+  const githubToken = process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
+  const githubRepo = process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
+  if (githubToken && githubRepo) {
+    try {
+      await commitToGitHubWithRetry({
+        filePath: 'lib/chapters.json',
+        message: chapterNumber
+          ? `Actualizar estructura del Capítulo ${chapterNumber} en lib/chapters.json`
+          : 'Actualizar estructura de capítulos en lib/chapters.json',
+        getContent: (existingContent) => {
+          let repoChapters: any[] = chapters;
+          if (existingContent) {
+            try {
+              repoChapters = JSON.parse(existingContent);
+              if (chapterNumber && Array.isArray(sections)) {
+                const chIdx = repoChapters.findIndex((c: any) => c.number === chapterNumber);
+                if (chIdx !== -1) {
+                  repoChapters[chIdx].sections = sections;
+                } else {
+                  repoChapters.push({ number: chapterNumber, title: `Capítulo ${chapterNumber}`, sections });
+                }
+              }
+            } catch {
+              repoChapters = chapters;
+            }
+          }
+          return JSON.stringify(repoChapters, null, 2);
+        }
+      });
+    } catch (err) {
+      console.error('Error sincronizando chapters.json con GitHub desde subchapters API:', err);
     }
   }
 }
@@ -77,7 +113,7 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
 
     targetChapter.sections.push(newSection);
 
-    await saveChapters(chapters);
+    await saveChapters(chapters, chapterNumber, targetChapter.sections);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {
@@ -110,7 +146,7 @@ export const PUT: APIRoute = async ({ request, cookies, locals }) => {
 
     chapters[chapterIndex].sections = sections;
 
-    await saveChapters(chapters);
+    await saveChapters(chapters, chapterNumber, sections);
 
     return new Response(JSON.stringify({ success: true, chapters }), { status: 200 });
   } catch (error: any) {

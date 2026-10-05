@@ -2,16 +2,14 @@ import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
 import staticChapters from '@/lib/chapters.json';
+import { commitToGitHubWithRetry } from '@/lib/github-sync';
 
 /**
- * Load chapters from Firestore first (where dynamically-created subtemas live),
+ * Load chapters from Firestore first (where dynamically-created and reordered subtemas live),
  * falling back to the static chapters.json bundled at build time.
  */
 async function loadChapters(): Promise<any[]> {
   try {
-    // Use the client-side Firebase SDK via dynamic import to read course/chapters
-    // We use a lightweight fetch to the Firestore REST API to avoid importing
-    // the full client SDK in a server context.
     const { initializeApp: initClientApp, getApps: getClientApps, getApp: getClientApp } = await import('firebase/app');
     const { getFirestore, doc, getDoc } = await import('firebase/firestore');
 
@@ -52,7 +50,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({ error: 'Faltan datos requeridos' }), { status: 400 });
     }
 
-    // Load chapters from Firestore (includes dynamically-created subtemas)
+    // Load chapters from Firestore (includes dynamically-created and reordered subtemas)
     const chapters = await loadChapters();
 
     const chData = chapters.find((c: any) => c.number === chapterId);
@@ -89,108 +87,93 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const isVercel = Boolean(process.env.VERCEL);
 
     if (githubToken && githubRepo) {
-      // 1. Integración con GitHub (Requerido en producción Vercel)
-      try {
-        const headers = {
-          'Authorization': `Bearer ${githubToken.trim()}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'resistencia-materiales-app'
-        };
+      // 1. Integración con GitHub con reintento automático en caso de conflicto 409
+      // 1.1 Commit del archivo MDX
+      const mdxCommit = await commitToGitHubWithRetry({
+        filePath: relativePath,
+        message: `Actualizado: ${subtopicTitle} desde el Editor Admin`,
+        getContent: () => contentMarkdown
+      });
 
-        // 1.1 Commit del archivo MDX
-        const getUrl = `https://api.github.com/repos/${githubRepo}/contents/${relativePath}`;
-        const getRes = await fetch(getUrl, { headers });
+      if (!mdxCommit.success) {
+        console.error("Error en GitHub API al guardar MDX:", mdxCommit.error);
+        return new Response(
+          JSON.stringify({ error: `Fallo la conexión con GitHub: ${mdxCommit.error}` }),
+          { status: 500 }
+        );
+      }
 
-        let sha: string | undefined = undefined;
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-        }
-
-        const commitRes = await fetch(getUrl, {
-          method: 'PUT',
-          headers: {
-            ...headers,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Actualizado: ${subtopicTitle} desde el Editor Admin`,
-            content: Buffer.from(contentMarkdown).toString('base64'),
-            sha: sha
-          })
-        });
-
-        if (!commitRes.ok) {
-          const errData = await commitRes.json();
-          console.error("Error en GitHub API:", errData);
-          return new Response(
-            JSON.stringify({ error: `Error en GitHub API: ${errData.message || JSON.stringify(errData)}` }),
-            { status: commitRes.status }
-          );
-        }
-
-        // 1.2 Actualizar lib/chapters.json en GitHub para que el subtema aparezca en la web pública
-        try {
-          const chaptersUrl = `https://api.github.com/repos/${githubRepo}/contents/lib/chapters.json`;
-          const chaptersRes = await fetch(chaptersUrl, { headers });
-          if (chaptersRes.ok) {
-            const chaptersFileData = await chaptersRes.json();
-            const currentRepoChapters = JSON.parse(Buffer.from(chaptersFileData.content, 'base64').toString('utf-8'));
-            
-            const targetCh = currentRepoChapters.find((c: any) => c.number === chapterId);
-            if (targetCh) {
-              const secIdx = targetCh.sections.findIndex((s: any) => {
-                const sSlug = s.slug ? (s.slug.includes('/') ? s.slug.split('/')[1] : s.slug) : s.id;
-                return sSlug === slug || s.slug === fullSectionSlug;
-              });
-
-              if (secIdx !== -1) {
-                targetCh.sections[secIdx].title = subtopicTitle;
-                targetCh.sections[secIdx].slug = fullSectionSlug;
-              } else {
-                const existingNums = targetCh.sections.map((s: any) => {
-                  const parts = s.id ? s.id.split('.') : [];
-                  const num = parseInt(parts[1], 10);
-                  return isNaN(num) ? 0 : num;
-                });
-                const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
-                const newId = `${parseInt(chapterId, 10)}.${maxNum + 1}`;
-                
-                targetCh.sections.push({
-                  id: newId,
-                  title: subtopicTitle,
-                  slug: fullSectionSlug
-                });
-              }
-
-              // Hacer commit de lib/chapters.json en GitHub
-              await fetch(chaptersUrl, {
-                method: 'PUT',
-                headers: {
-                  ...headers,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  message: `Actualizar estructura del curso: ${subtopicTitle} en lib/chapters.json`,
-                  content: Buffer.from(JSON.stringify(currentRepoChapters, null, 2)).toString('base64'),
-                  sha: chaptersFileData.sha
-                })
-              });
-            }
+      // 1.2 Actualizar lib/chapters.json en GitHub con sincronización completa del orden de Firestore
+      const chaptersCommit = await commitToGitHubWithRetry({
+        filePath: 'lib/chapters.json',
+        message: `Actualizar estructura del curso: ${subtopicTitle} en lib/chapters.json`,
+        getContent: (existingContent) => {
+          let currentRepoChapters: any[] = [];
+          try {
+            currentRepoChapters = existingContent ? JSON.parse(existingContent) : structuredClone(staticChapters);
+          } catch {
+            currentRepoChapters = structuredClone(staticChapters);
           }
-        } catch (chaptersUpdateErr) {
-          console.error("Error sincronizando lib/chapters.json en GitHub:", chaptersUpdateErr);
-        }
 
-        // Si estamos en Vercel, no intentamos escribir en disco (es read-only)
-        if (isVercel) {
-          return new Response(JSON.stringify({ success: true, committedToGitHub: true }), { status: 200 });
+          let targetCh = currentRepoChapters.find((c: any) => c.number === chapterId);
+          if (!targetCh) {
+            targetCh = { number: chapterId, title: chData.title || `Capítulo ${chapterId}`, sections: [] };
+            currentRepoChapters.push(targetCh);
+          }
+
+          // Sincronizar el orden exacto y los IDs desde chData.sections (Firestore)
+          if (chData && Array.isArray(chData.sections)) {
+            targetCh.sections = chData.sections.map((fsSec: any) => {
+              const isCurrent = (
+                fsSec.slug === slug ||
+                fsSec.slug === fullSectionSlug ||
+                fsSec.id === slug ||
+                (fsSec.slug && slug && fsSec.slug.split('/').pop() === slug.split('/').pop())
+              );
+
+              const existingInRepo = targetCh.sections?.find((s: any) =>
+                s.id === fsSec.id ||
+                (s.slug && fsSec.slug && s.slug === fsSec.slug) ||
+                (s.slug && fsSec.slug && s.slug.split('/').pop() === fsSec.slug.split('/').pop())
+              );
+
+              return {
+                id: fsSec.id,
+                title: isCurrent ? subtopicTitle : (fsSec.title || existingInRepo?.title || ''),
+                slug: isCurrent ? fullSectionSlug : (fsSec.slug || existingInRepo?.slug || null)
+              };
+            });
+          }
+
+          // Si el subtema no estaba en la lista, agregarlo
+          const hasCurrent = targetCh.sections.some((s: any) =>
+            s.slug === fullSectionSlug ||
+            (s.slug && slug && s.slug.split('/').pop() === slug.split('/').pop())
+          );
+          if (!hasCurrent) {
+            const existingNums = targetCh.sections.map((s: any) => {
+              const parts = s.id ? s.id.split('.') : [];
+              const num = parseInt(parts[1], 10);
+              return isNaN(num) ? 0 : num;
+            });
+            const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
+            targetCh.sections.push({
+              id: `${parseInt(chapterId, 10)}.${maxNum + 1}`,
+              title: subtopicTitle,
+              slug: fullSectionSlug
+            });
+          }
+
+          return JSON.stringify(currentRepoChapters, null, 2);
         }
-      } catch (githubErr: any) {
-        console.error("Fallo la subida a Github:", githubErr);
-        if (isVercel) {
-          return new Response(JSON.stringify({ error: `Fallo la conexión con GitHub: ${githubErr.message}` }), { status: 500 });
-        }
+      });
+
+      if (!chaptersCommit.success) {
+        console.error("Error sincronizando lib/chapters.json en GitHub:", chaptersCommit.error);
+      }
+
+      if (isVercel) {
+        return new Response(JSON.stringify({ success: true, committedToGitHub: true }), { status: 200 });
       }
     } else if (isVercel) {
       return new Response(
@@ -209,33 +192,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await fs.mkdir(sectionDir, { recursive: true });
       await fs.writeFile(filePath, contentMarkdown, 'utf-8');
 
-      // Actualizar también localmente lib/chapters.json
+      // Actualizar también localmente lib/chapters.json respetando el orden de Firestore
       const localChaptersPath = path.join(process.cwd(), 'lib', 'chapters.json');
       const localContent = await fs.readFile(localChaptersPath, 'utf-8');
       const localChapters = JSON.parse(localContent);
-      const targetLocalCh = localChapters.find((c: any) => c.number === chapterId);
-      if (targetLocalCh) {
-        const secIdx = targetLocalCh.sections.findIndex((s: any) => {
-          const sSlug = s.slug ? (s.slug.includes('/') ? s.slug.split('/')[1] : s.slug) : s.id;
-          return sSlug === slug || s.slug === fullSectionSlug;
+      let targetLocalCh = localChapters.find((c: any) => c.number === chapterId);
+      if (targetLocalCh && chData && Array.isArray(chData.sections)) {
+        targetLocalCh.sections = chData.sections.map((fsSec: any) => {
+          const isCurrent = (
+            fsSec.slug === slug ||
+            fsSec.slug === fullSectionSlug ||
+            fsSec.id === slug ||
+            (fsSec.slug && slug && fsSec.slug.split('/').pop() === slug.split('/').pop())
+          );
+          const existingInRepo = targetLocalCh.sections?.find((s: any) =>
+            s.id === fsSec.id ||
+            (s.slug && fsSec.slug && s.slug === fsSec.slug) ||
+            (s.slug && fsSec.slug && s.slug.split('/').pop() === fsSec.slug.split('/').pop())
+          );
+          return {
+            id: fsSec.id,
+            title: isCurrent ? subtopicTitle : (fsSec.title || existingInRepo?.title || ''),
+            slug: isCurrent ? fullSectionSlug : (fsSec.slug || existingInRepo?.slug || null)
+          };
         });
-        if (secIdx !== -1) {
-          targetLocalCh.sections[secIdx].title = subtopicTitle;
-          targetLocalCh.sections[secIdx].slug = fullSectionSlug;
-        } else {
-          const existingNums = targetLocalCh.sections.map((s: any) => {
-            const parts = s.id ? s.id.split('.') : [];
-            const num = parseInt(parts[1], 10);
-            return isNaN(num) ? 0 : num;
-          });
-          const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
-          const newId = `${parseInt(chapterId, 10)}.${maxNum + 1}`;
-          targetLocalCh.sections.push({
-            id: newId,
-            title: subtopicTitle,
-            slug: fullSectionSlug
-          });
-        }
         await fs.writeFile(localChaptersPath, JSON.stringify(localChapters, null, 2), 'utf-8');
       }
     } catch (fsErr: any) {

@@ -10,6 +10,7 @@ interface DraftRequest {
   chapterId: string;
   slug: string;
   title: string;
+  sectionId?: string;
   authorEmail: string;
   updatedAt: string;
   status: string;
@@ -37,7 +38,19 @@ export default function RequestsDashboard() {
       const reqs: DraftRequest[] = [];
       snap.forEach(d => {
         const data = d.data() as Omit<DraftRequest, 'id'>;
-        reqs.push({ id: d.id, ...data, title: findSubtopicTitle(currentChapters, data.chapterId, data.slug) || data.title || data.slug });
+        const ch = currentChapters.find(c => c.number === data.chapterId);
+        const sec = ch?.sections.find(s => {
+          if (!s.slug) return s.id === data.slug;
+          const parts = s.slug.split('/');
+          const shortSlug = parts.length > 1 ? parts[1] : parts[0];
+          return s.slug === data.slug || shortSlug === data.slug || s.id === data.slug;
+        });
+        reqs.push({
+          id: d.id,
+          ...data,
+          title: sec?.title || findSubtopicTitle(currentChapters, data.chapterId, data.slug) || data.title || data.slug,
+          sectionId: sec?.id
+        });
       });
       // Sort by newest first
       reqs.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
@@ -121,8 +134,13 @@ export default function RequestsDashboard() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#3E3030] group-hover:text-[#8B0000] transition-colors">
-                      Capítulo {req.chapterId} · {req.title}
+                    <h4 className="flex items-center gap-2 font-semibold text-[#3E3030] group-hover:text-[#8B0000] transition-colors">
+                      {req.sectionId && (
+                        <span className="inline-flex shrink-0 items-center justify-center rounded bg-[#8B0000]/10 px-1.5 py-0.5 font-mono text-xs font-bold text-[#8B0000] border border-[#8B0000]/20">
+                          {req.sectionId}
+                        </span>
+                      )}
+                      <span>Capítulo {req.chapterId} · {req.title}</span>
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-medium text-[#756565]">
