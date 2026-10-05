@@ -90,35 +90,6 @@ export default function Dashboard({ session }: { session: any }) {
       
       try {
         const structureSnap = await getDoc(doc(db, 'course', 'chapters'));
-        const firestoreVersion = structureSnap.exists() ? structureSnap.data()?.version : null;
-
-        if (session.role === 'admin' && firestoreVersion !== RESET_VERSION) {
-          try {
-            await setDoc(doc(db, 'course', 'chapters'), {
-              list: initialChapters,
-              updatedAt: new Date().toISOString(),
-              version: RESET_VERSION
-            });
-
-            const allDrafts = await getDocs(collection(db, 'drafts'));
-            const batch = writeBatch(db);
-            allDrafts.docs.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('mc361_local_chapters');
-              localStorage.setItem('mc361_clean_version', RESET_VERSION);
-            }
-
-            setLocalChapters(initialChapters);
-            setDocumentsStatus({});
-            setIsLoading(false);
-            return;
-          } catch (e) {
-            console.error('Error auto-resetting Firestore:', e);
-          }
-        }
-
         const statusMap: Record<string, any> = {};
         const currentList: Chapter[] = (structureSnap.exists() && Array.isArray(structureSnap.data().list))
           ? structureSnap.data().list
@@ -321,7 +292,6 @@ export default function Dashboard({ session }: { session: any }) {
       const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
       if (rawSlug) {
         await deleteDoc(doc(db, 'drafts', `${chapterNumber}_${rawSlug}`)).catch(() => null);
-        await deleteDoc(doc(db, 'published_subtopics', `${chapterNumber}_${rawSlug}`)).catch(() => null);
       }
 
       workspaceFetch('/api/subchapters', {
@@ -358,8 +328,6 @@ export default function Dashboard({ session }: { session: any }) {
       const slug = section.slug?.split('/').slice(1).join('/') || section.id;
       const draftRef = doc(db, 'drafts', `${chapterNumber}_${slug}`);
       const draft = await getDoc(draftRef);
-      const pubRef = doc(db, 'published_subtopics', `${chapterNumber}_${slug}`);
-      const pubDoc = await getDoc(pubRef);
       const batch = writeBatch(db);
       batch.set(doc(db, 'course', 'chapters'), {
         list: updatedChapters,
@@ -367,11 +335,11 @@ export default function Dashboard({ session }: { session: any }) {
       }, { merge: true });
       if (draft.exists()) {
         const renamed = withSubtopicTitle(draft.data() as CourseDocument, section.title);
-        batch.update(draftRef, { title: renamed.title, contentMarkdown: renamed.contentMarkdown });
-      }
-      if (pubDoc.exists()) {
-        const renamedPub = withSubtopicTitle(pubDoc.data() as CourseDocument, section.title);
-        batch.update(pubRef, { title: renamedPub.title, contentMarkdown: renamedPub.contentMarkdown });
+        const updateData: any = { title: renamed.title, contentMarkdown: renamed.contentMarkdown };
+        if (draft.data()?.publishedContent) {
+          updateData.publishedTitle = section.title;
+        }
+        batch.update(draftRef, updateData);
       }
       await batch.commit();
       setLocalChapters(updatedChapters);
@@ -407,10 +375,8 @@ export default function Dashboard({ session }: { session: any }) {
         version: RESET_VERSION
       });
       const allDrafts = await getDocs(collection(db, 'drafts'));
-      const allPublished = await getDocs(collection(db, 'published_subtopics'));
       const batch = writeBatch(db);
       allDrafts.docs.forEach(d => batch.delete(d.ref));
-      allPublished.docs.forEach(d => batch.delete(d.ref));
       await batch.commit();
 
       if (typeof window !== 'undefined') {

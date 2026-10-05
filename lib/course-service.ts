@@ -28,34 +28,19 @@ export async function getApprovedSubtopic(chapterNumber: string, slug: string): 
     const cleanSlug = slug.includes('/') ? slug.split('/').pop()! : slug;
     const docId = `${chapterNumber}_${cleanSlug}`;
     
-    // 1. Consultar la versión de producción aprobada
-    const pubSnap = await getDoc(doc(db, 'published_subtopics', docId));
-    if (pubSnap.exists()) {
-      const data = pubSnap.data();
-      if (data.contentMarkdown) {
-        return {
-          title: data.title,
-          chapterId: data.chapterId,
-          slug: data.slug,
-          contentMarkdown: data.contentMarkdown,
-          updatedAt: data.publishedAt || data.updatedAt,
-          authorEmail: data.authorEmail,
-        };
-      }
-    }
-
-    // 2. Respaldo: Consultar en drafts si está marcado como 'approved'
+    // 1. Consultar en drafts (donde reside el contenido aprobado / publicado con permisos ya otorgados)
     const snap = await getDoc(doc(db, 'drafts', docId));
     if (snap.exists()) {
       const data = snap.data();
-      if (data.status === 'approved' && data.contentMarkdown) {
+      const publishedText = data.publishedContent || (data.status === 'approved' ? data.contentMarkdown : null);
+      if (publishedText) {
         return {
-          title: data.title,
+          title: data.publishedTitle || data.title,
           chapterId: data.chapterId,
           slug: data.slug,
-          contentMarkdown: data.contentMarkdown,
-          updatedAt: data.updatedAt,
-          authorEmail: data.authorEmail,
+          contentMarkdown: publishedText,
+          updatedAt: data.publishedAt || data.updatedAt,
+          authorEmail: data.publishedBy || data.authorEmail,
         };
       }
     }
