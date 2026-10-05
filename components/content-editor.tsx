@@ -65,8 +65,6 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [isCreatingSub, setIsCreatingSub] = useState(false)
   
   const [isLoaded, setIsLoaded] = useState(false)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [loadAttempt, setLoadAttempt] = useState(0)
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -115,30 +113,44 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   }
   
   useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    const timeout = setTimeout(() => controller.abort(), 20000);
-    setIsLoaded(false);
-    setLoadError(null);
-    async function loadDraft() {
-      try {
-        const params = new URLSearchParams({ chapter: initialChapter, slug: initialSlug });
-        // The verified session cookie lets content load without waiting for browser Firebase initialization.
-        const response = await fetch(`/api/editor-document?${params}`, { signal: controller.signal, cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'No se pudo cargar el contenido.');
-        if (active) { setDocument(data.document); setIsLoaded(true); }
-      } catch (error) {
-        if (active) setLoadError(controller.signal.aborted
-          ? 'La carga tardó demasiado. Vuelve a intentar.'
-          : error instanceof Error ? error.message : 'No se pudo cargar el contenido.');
-      } finally {
-        clearTimeout(timeout);
-      }
+    if (session?.email && initialChapter && initialSlug) {
+      loadDraft(initialChapter, initialSlug);
     }
-    void loadDraft();
-    return () => { active = false; clearTimeout(timeout); controller.abort(); };
-  }, [initialChapter, initialSlug, loadAttempt])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.email, initialChapter, initialSlug])
+
+  const loadDraft = async (chapterId: string, slug: string) => {
+    if (!session?.email) return;
+    try {
+      const draftId = `${chapterId}_${slug}`;
+      const [currentTitle, snap] = await Promise.all([
+        loadSubtopicTitle(chapterId, slug),
+        getDoc(doc(db, 'drafts', draftId)),
+      ]);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.authorEmail === session.email || session?.role === 'admin') {
+          setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
+        }
+      } else {
+        const params = new URLSearchParams({ chapter: chapterId, slug });
+        const mdxRes = await fetch(`/api/mdx?${params}`);
+        if (mdxRes.ok) {
+          const mdxData = await mdxRes.json();
+          setDocument(withSubtopicTitle({
+            ...structuredClone(starterDocument), chapterId, slug,
+            contentMarkdown: mdxData.content,
+          }, currentTitle));
+        } else {
+          setDocument(withSubtopicTitle({ ...structuredClone(starterDocument), chapterId, slug }, currentTitle));
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando borrador', error);
+    } finally {
+      setIsLoaded(true);
+    }
+  }
 
   const loadSubtopicTitle = async (chapterId: string, slug: string) => {
     const structure = await getDoc(doc(db, 'course', 'chapters'));
@@ -391,14 +403,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     return (
       <div className="flex h-[calc(100dvh-4rem)] items-center justify-center bg-[#f8f5f4]">
         <div className="flex flex-col items-center gap-3">
-          {loadError ? <>
-            <p role="alert" className="px-4 text-center text-sm text-[#8B0000]">{loadError}</p>
-            <button type="button" onClick={() => setLoadAttempt(attempt => attempt + 1)} className="rounded-md bg-[#8B0000] px-4 py-2 text-sm font-semibold text-white">Reintentar</button>
-            <a href="/workspace-mc361/content/chapters" className="text-sm font-semibold text-[#6a2022] underline">Volver a capítulos</a>
-          </> : <>
-            <Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" />
-            <p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p>
-          </>}
+          <Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" />
+          <p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p>
         </div>
       </div>
     );

@@ -5,7 +5,7 @@ export const onRequest = defineMiddleware(async ({ url, request, cookies, redire
   const pathname = url.pathname.replace(/\/+$/, '');
   const workspace = pathname.startsWith('/workspace-mc361');
   const login = pathname === '/workspace-mc361/login';
-  const protectedApi = ['/api/publish', '/api/subchapters', '/api/users', '/api/editor-document'].includes(pathname);
+  const protectedApi = ['/api/publish', '/api/subchapters', '/api/users'].includes(pathname);
   if ((!workspace || login) && !protectedApi) return next();
   try {
     const bearer = request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
