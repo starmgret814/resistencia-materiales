@@ -1,8 +1,6 @@
 ---
 export const prerender = true;
 import Layout from '@/src/layouts/Layout.astro';
-import { AlertTriangle } from 'lucide-react';
-import { CircleAlert } from 'lucide-react';
 ---
 
 
@@ -405,9 +403,13 @@ Explicación concisa de la respuesta correcta.
         <!-- 8. Qué evitar -->
         <section class="rounded-xl border-2 border-[#e7a3a3] dark:border-[#5a272b] bg-[#fdf5f5] dark:bg-[#201013] p-6 sm:p-8 shadow-sm">
           <div class="flex items-center gap-2.5 text-[#8B0000] dark:text-[#f87171]">
-            <span class="flex size-8 items-center justify-center rounded-full bg-[#f4d1d1] dark:bg-[#3f191d]">
-  <CircleAlert class="size-4" />
-</span>
+            <span class="flex size-8 items-center justify-center rounded-full bg-[#f4d1d1] dark:bg-[#3f191d] text-[#8B0000] dark:text-[#f87171]">
+              <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            </span>
             <h2 class="font-serif text-2xl font-bold text-[#6d1316] dark:text-[#fca5a5] m-0">Qué evitar</h2>
           </div>
           <ul class="mt-4 space-y-2.5 text-sm font-medium text-[#653335] dark:text-[#e4cccc]">
