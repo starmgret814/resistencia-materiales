@@ -29,9 +29,9 @@ function Header({ onMenu, onSearch }: { onMenu: () => void; onSearch: () => void
   const [dark, setDark] = useState(false)
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark') || 
-      localStorage.getItem('theme') === 'dark' ||
-      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    let theme;
+    try { theme = localStorage.getItem('theme'); } catch {}
+    const isDark = document.documentElement.classList.contains('dark') || theme === 'dark';
     setDark(isDark);
   }, []);
 
@@ -40,9 +40,11 @@ function Header({ onMenu, onSearch }: { onMenu: () => void; onSearch: () => void
     setDark(nextDark);
     if (nextDark) {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
       localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
       localStorage.setItem('theme', 'light');
     }
   };
@@ -80,11 +82,15 @@ function Sidebar({
   onClose,
   activeSlug,
   customChapters,
+  navigatingSlug,
+  onNavigate,
 }: {
   open: boolean
   onClose: () => void
   activeSlug: string | null
   customChapters?: Chapter[]
+  navigatingSlug?: string | null
+  onNavigate?: (slug: string) => void
 }) {
   const courseChapters = customChapters && customChapters.length > 0 ? customChapters : chapters
   const [expanded, setExpanded] = useState(() => {
@@ -123,13 +129,20 @@ function Sidebar({
                 {isExpanded && <div className="ml-8 border-l border-[#e5c6c4] dark:border-[#3d2224] pb-1 pl-3">
                   {chapter.sections.map((section) => {
                     const isActive = section.slug === activeSlug
+                    const isNavigating = navigatingSlug === section.slug
                     const href = section.slug ? `/curso/${section.slug}` : '#'
                     return (
                       <a
                         key={section.id}
                         href={href}
                         onClick={(e) => {
-                          if (!section.slug) e.preventDefault()
+                          if (!section.slug) {
+                            e.preventDefault()
+                            return
+                          }
+                          if (section.slug !== activeSlug) {
+                            onNavigate?.(section.slug)
+                          }
                           onClose()
                         }}
                         className={cn(
@@ -141,7 +154,11 @@ function Sidebar({
                               : 'cursor-default text-[#b8a0a0] dark:text-[#684f50]'
                         )}
                       >
-                        <span className="mr-1.5 text-[10px] text-[#b28a8a] dark:text-[#9c7878]">{section.id}</span>
+                        {isNavigating ? (
+                          <span className="inline-block animate-spin size-2.5 mr-1.5 border-2 border-[#8B0000] dark:border-[#fca5a5] border-t-transparent rounded-full align-middle" />
+                        ) : (
+                          <span className="mr-1.5 text-[10px] text-[#b28a8a] dark:text-[#9c7878]">{section.id}</span>
+                        )}
                         {section.title}
                       </a>
                     )
@@ -221,6 +238,11 @@ export default function TextbookLayout({
   children,
 }: TextbookLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [navigatingSlug, setNavigatingSlug] = useState<string | null>(null)
+
+  useEffect(() => {
+    setNavigatingSlug(null)
+  }, [activeSlug])
 
   return (
     <div className="min-h-screen bg-[#fbf7f4] dark:bg-[#140b0c] text-[#3b2022] dark:text-[#f3e6e4] transition-colors duration-200">
@@ -229,7 +251,14 @@ export default function TextbookLayout({
       }} />
       <CourseSearch />
       <div className="mx-auto flex max-w-[1600px]">
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} activeSlug={activeSlug} customChapters={customChapters} />
+        <Sidebar 
+          open={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          activeSlug={activeSlug} 
+          customChapters={customChapters}
+          navigatingSlug={navigatingSlug}
+          onNavigate={setNavigatingSlug}
+        />
         <main className="min-w-0 flex-1">
           <div className="flex justify-center">
             {/* ─── Content area ─── */}
@@ -252,14 +281,30 @@ export default function TextbookLayout({
               {(previous || next) && (
                 <div className="mt-16 grid gap-3 border-t border-[#dedbd3] dark:border-[#382022] pt-5 sm:grid-cols-2">
                   {previous ? (
-                    <a href={`/curso/${previous.slug}`} className="group rounded-lg p-3 text-left hover:bg-[#f8eaea] dark:hover:bg-[#2a1416] transition-colors">
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-[#967070] dark:text-[#ab8e8e]">← Anterior</p>
+                    <a 
+                      href={`/curso/${previous.slug}`} 
+                      onClick={() => setNavigatingSlug(previous.slug)}
+                      className="group rounded-lg p-3 text-left hover:bg-[#f8eaea] dark:hover:bg-[#2a1416] transition-colors"
+                    >
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-[#967070] dark:text-[#ab8e8e] flex items-center gap-1">
+                        {navigatingSlug === previous.slug ? (
+                          <span className="inline-block animate-spin size-2.5 border-2 border-[#8B0000] dark:border-[#fca5a5] border-t-transparent rounded-full" />
+                        ) : '←'} Anterior
+                      </p>
                       <p className="mt-1 font-serif text-sm font-semibold text-[#604747] dark:text-[#dfc2c0] group-hover:text-[#7f0303] dark:group-hover:text-[#f87171]">{previous.title}</p>
                     </a>
                   ) : <div />}
                   {next ? (
-                    <a href={`/curso/${next.slug}`} className="group rounded-lg p-3 text-right hover:bg-[#f8eaea] dark:hover:bg-[#2a1416] transition-colors">
-                      <p className="text-[10px] uppercase tracking-[0.14em] text-[#967070] dark:text-[#ab8e8e]">Siguiente →</p>
+                    <a 
+                      href={`/curso/${next.slug}`} 
+                      onClick={() => setNavigatingSlug(next.slug)}
+                      className="group rounded-lg p-3 text-right hover:bg-[#f8eaea] dark:hover:bg-[#2a1416] transition-colors"
+                    >
+                      <p className="text-[10px] uppercase tracking-[0.14em] text-[#967070] dark:text-[#ab8e8e] flex items-center justify-end gap-1">
+                        Siguiente {navigatingSlug === next.slug ? (
+                          <span className="inline-block animate-spin size-2.5 border-2 border-[#8B0000] dark:border-[#fca5a5] border-t-transparent rounded-full" />
+                        ) : '→'}
+                      </p>
                       <p className="mt-1 font-serif text-sm font-semibold text-[#604747] dark:text-[#dfc2c0] group-hover:text-[#7f0303] dark:group-hover:text-[#f87171]">{next.title}</p>
                     </a>
                   ) : <div />}

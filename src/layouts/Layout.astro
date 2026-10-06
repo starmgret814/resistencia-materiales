@@ -12,7 +12,7 @@ const isWorkspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathn
 ---
 
 <!doctype html>
-<html lang="es" class:list={['scroll-smooth', isWorkspace && 'light']}>
+<html lang="es" class:list={['scroll-smooth', 'light']}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,7 +23,7 @@ const isWorkspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathn
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
-      integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71bZBTIQHQ"
+      integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn"
       crossorigin="anonymous"
     />
     <script is:inline>
@@ -31,7 +31,8 @@ const isWorkspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathn
         const workspace = window.location.pathname === '/workspace-mc361' || window.location.pathname.startsWith('/workspace-mc361/');
         let theme;
         try { theme = localStorage.getItem('theme'); } catch {}
-        const dark = !workspace && (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches));
+        // Tema predeterminado: SIEMPRE CLARO salvo que el usuario haya guardado explícitamente 'dark'
+        const dark = !workspace && theme === 'dark';
         document.documentElement.classList.toggle('dark', dark);
         document.documentElement.classList.toggle('light', !dark);
       }
@@ -40,6 +41,78 @@ const isWorkspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathn
     </script>
   </head>
   <body class="bg-[#faf5f3] dark:bg-[#140b0c] text-[#4d3838] dark:text-[#f2e1df] antialiased min-h-screen selection:bg-[#dfc4c4] dark:selection:bg-[#522024] selection:text-[#4b1719] dark:selection:text-[#fee2e2]">
+    <!-- Barra de progreso superior al navegar (Top Progress Bar) -->
+    <div id="navigation-progress" class="fixed top-0 left-0 right-0 h-[3px] z-[99999] pointer-events-none opacity-0 transition-opacity duration-150">
+      <div id="navigation-progress-bar" class="h-full bg-gradient-to-r from-[#8B0000] via-[#c92a2a] to-[#ff6b6b] shadow-[0_0_12px_rgba(201,42,42,0.8)] transition-all ease-out duration-300 w-0"></div>
+    </div>
+    
+    <script is:inline>
+      let progressTimer;
+      let safetyTimer;
+      function startNavProgress() {
+        const container = document.getElementById('navigation-progress');
+        const bar = document.getElementById('navigation-progress-bar');
+        if (!container || !bar) return;
+        clearTimeout(progressTimer);
+        clearTimeout(safetyTimer);
+        container.style.opacity = '1';
+        bar.style.transition = 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+        bar.style.width = '35%';
+        progressTimer = setTimeout(() => {
+          bar.style.transition = 'width 1200ms cubic-bezier(0.4, 0, 0.2, 1)';
+          bar.style.width = '80%';
+        }, 200);
+
+        // Atenuar suavemente el contenido actual para indicar que se está cargando el nuevo
+        const content = document.querySelector('main');
+        if (content) {
+          content.style.transition = 'opacity 200ms ease';
+          content.style.opacity = '0.6';
+        }
+
+        // Timer de seguridad por si la navegación se cancela
+        safetyTimer = setTimeout(() => {
+          finishNavProgress();
+        }, 8000);
+      }
+
+      function finishNavProgress() {
+        const container = document.getElementById('navigation-progress');
+        const bar = document.getElementById('navigation-progress-bar');
+        const content = document.querySelector('main');
+        if (content) {
+          content.style.opacity = '1';
+        }
+        if (!container || !bar) return;
+        clearTimeout(progressTimer);
+        clearTimeout(safetyTimer);
+        bar.style.transition = 'width 150ms ease-out';
+        bar.style.width = '100%';
+        setTimeout(() => {
+          container.style.opacity = '0';
+          setTimeout(() => {
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+          }, 200);
+        }, 150);
+      }
+
+      // Detectar clics en enlaces internos para retroalimentación instantánea
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link || !link.href || link.target === '_blank') return;
+        try {
+          const url = new URL(link.href, window.location.href);
+          if (url.origin === window.location.origin && (url.pathname !== window.location.pathname || url.search !== window.location.search)) {
+            startNavProgress();
+          }
+        } catch {}
+      });
+
+      document.addEventListener('astro:before-preparation', startNavProgress);
+      document.addEventListener('astro:after-swap', finishNavProgress);
+      document.addEventListener('astro:page-load', finishNavProgress);
+    </script>
     <slot />
   </body>
 </html>
