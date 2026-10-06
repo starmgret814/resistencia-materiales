@@ -25,6 +25,7 @@ import {
   Send,
   Loader2,
   CheckCircle2,
+  BookOpen,
   X
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
@@ -541,6 +542,16 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             )}
           </div>
           <div className="flex gap-2">
+            <a
+              href="/guia-colaboradores"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8eaea] border border-[#d5baba] hover:bg-[#f1dddd] text-[#8B0000] text-sm font-semibold rounded-md shadow-sm transition-colors"
+              title="Abrir la Guía para Colaboradores en una nueva pestaña"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">Guía</span>
+            </a>
              <button
               onClick={() => saveDraft('draft')}
               disabled={isSaving || isEditingTitle}

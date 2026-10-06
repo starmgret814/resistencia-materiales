@@ -1,254 +1,248 @@
 # Guía para Colaboradores — Resistencia de Materiales (MC361)
 
+> **Nota importante:** No necesitas instalar ningún programa ni conocer Git, GitHub o programación. Todo el contenido se escribe directamente desde la plataforma en tu navegador web.
+
 ¡Bienvenido al equipo de redacción y desarrollo de contenido interactivo del curso **Resistencia de Materiales (MC361)** de la **Universidad Nacional de Ingeniería (UNI)**!
 
-Esta guía rápida contiene todo lo necesario para redactar, estructurar y publicar temas teóricos, fórmulas y problemas resueltos en la plataforma.
+Esta guía rápida contiene todo lo necesario para redactar, estructurar y enviar temas teóricos, fórmulas y problemas resueltos en la plataforma.
 
 ---
 
 ## 1. Bienvenida
 
 ### ¿Qué es la plataforma?
-Es un libro de texto digital interactivo diseñado específicamente para los estudiantes del curso de Resistencia de Materiales. Combina explicaciones conceptuales claras, fórmulas matemáticas en alta calidad, simulaciones visuales y ejercicios prácticos con soluciones paso a paso.
+Es un libro digital interactivo diseñado para los estudiantes de Resistencia de Materiales. Su propósito es brindar una experiencia de aprendizaje moderna y accesible que combine explicaciones claras, fórmulas matemáticas nítidas, figuras técnicas y ejercicios prácticos resueltos paso a paso.
 
 ### ¿Qué debe hacer el colaborador?
 - Redactar y actualizar los temas teóricos de los capítulos asignados.
-- Incorporar diagramas, fórmulas con LaTeX y figuras claras.
-- Proponer ejemplos resueltos detallados y problemas de autoevaluación.
-- Asegurar que la notación y las unidades sigan el estándar académico de la UNI.
+- Incorporar fórmulas matemáticas y figuras explicativas claras.
+- Proponer ejemplos prácticos resueltos y preguntas de autoevaluación.
+- Asegurar que la notación, unidades y rigor correspondan al estándar académico de la UNI.
 
 ---
 
-## 2. Acceso y Editor
+## 2. Acceso y editor
 
 1. **Cómo entrar:**
-   - Ingresa a la ruta `/login` desde tu navegador.
-   - Inicia sesión con tus credenciales asignadas (correo y contraseña).
+   - Ingresa a la plataforma e inicia sesión con el correo y contraseña que te fueron asignados.
 2. **Cómo abrir un capítulo:**
-   - Una vez autenticado, serás dirigido al panel de capítulos (`/workspace-mc361`).
-   - Haz clic sobre el subtema que deseas editar para abrir el entorno de trabajo.
+   - Una vez que inicies sesión, verás la lista de capítulos del curso.
+   - Haz clic sobre el capítulo o subtema que deseas editar para ingresar al editor.
 3. **Cómo escribir:**
-   - El panel izquierdo contiene el **Editor** (basado en Monaco Editor / VS Code) con resaltado de sintaxis Markdown y MDX.
-   - Dispones de una barra de herramientas superior con botones de acceso rápido para dar formato, insertar ecuaciones y añadir bloques pedagógicos.
+   - En el lado izquierdo tienes el **Editor**, donde escribirás tu texto con formato Markdown.
+   - En la parte superior dispones de una barra de herramientas con botones de acceso rápido para títulos, negrita, cursiva, fórmulas matemáticas y bloques del libro.
 4. **Vista previa:**
-   - El panel derecho muestra la **Vista Previa en tiempo real**. Todo cambio que escribas se reflejará instantáneamente con los estilos finales del libro.
-5. **Guardar borrador:**
-   - Haz clic en el botón **"Guardar"** en la barra superior. Tus cambios se almacenarán de forma segura en la base de datos sin alterar la versión pública visible para los alumnos.
+   - En el lado derecho verás la **Vista Previa en tiempo real**. Todo lo que escribas se reflejará al instante tal como lo verá el estudiante en la página final.
+5. **Guardar:**
+   - Haz clic en el botón **"Guardar"** en la barra superior del editor para respaldar tu avance en cualquier momento.
 6. **Enviar a revisión:**
-   - Cuando hayas concluido tu redacción y verificado la vista previa, pulsa el botón **"Enviar a revisión"**. Tu aporte quedará en cola para que un administrador lo valide y lo publique en la web principal.
+   - Cuando hayas concluido el tema y verificado que todo se ve correctamente en la vista previa, pulsa **"Enviar a revisión"**. El equipo docente o administrador revisará tu contenido para publicarlo en la web del curso.
 
 ---
 
-## 3. Markdown Básico
+## 3. Markdown básico
 
-| Elemento | Sintaxis | Ejemplo / Resultado |
+El editor utiliza un formato muy simple para estructurar el texto:
+
+| Elemento | Cómo se escribe | Ejemplo / Uso |
 | :--- | :--- | :--- |
-| **Encabezado 1** | `# Título Principal` | Solo para el título de la página (uno por tema). |
-| **Encabezado 2** | `## Subtítulo de Sección` | Divide las grandes partes de la lección. |
-| **Encabezado 3** | `### Subsección` | Para apartados específicos. |
+| **Título principal** | `# Título` | `# 1.1 Esfuerzo Axial` |
+| **Subtítulo** | `## Subtítulo` | `## Fundamento Teórico` |
+| **Sección menor** | `### Sección` | `### Hipótesis de cálculo` |
 | **Negrita** | `**texto en negrita**` | **texto en negrita** |
 | **Cursiva** | `*texto en cursiva*` | *texto en cursiva* |
-| **Lista numerada** | `1. Primer paso`<br>`2. Segundo paso` | Pasos ordenados de un método. |
-| **Lista de viñetas** | `- Hipótesis 1`<br>`- Hipótesis 2` | Elementos sin orden estricto. |
-| **Enlace** | `[Texto del enlace](https://...)` | Vínculos a recursos o referencias. |
-| **Separador** | `---` | Línea divisoria horizontal entre bloques. |
+| **Lista numerada** | `1. Paso uno`<br>`2. Paso dos` | Pasos ordenados de un cálculo |
+| **Lista con viñetas** | `- Punto A`<br>`- Punto B` | Características o propiedades |
+| **Enlaces** | `[Texto del enlace](https://...)` | Enlace a una referencia |
+| **Separador** | `---` | Línea horizontal divisoria |
 
-> **Nota:** Deja siempre una línea en blanco entre párrafos y entre bloques para que el renderizado sea fluido.
+> **Consejo:** Deja siempre un renglón en blanco entre párrafos y entre bloques para que el texto respire y se visualice ordenado.
 
 ---
 
 ## 4. Matemáticas con LaTeX
 
-La plataforma utiliza **KaTeX** para renderizar matemáticas con tipografía vectorial nítida.
+Para escribir fórmulas y símbolos matemáticos se utiliza una notación estándar muy fácil de aprender.
 
 ### Fórmulas en línea vs. en bloque
-- **En línea** (dentro del texto): encierra la fórmula entre signos de dólar simples `$ ... $`.
+- **En línea** (dentro de una oración): enciérrala entre signos de dólar simples `$ ... $`.
   ```markdown
-  El esfuerzo axial promedio se define como $\sigma = P / A$ en la sección transversal.
+  El esfuerzo de fluencia del material es $\sigma_y = 250\text{ MPa}$.
   ```
-- **En bloque** (centrada e independiente): encierra la expresión entre signos dobles `$$ ... $$`.
+- **En bloque** (centrada en su propia línea): enciérrala entre signos de dólar dobles `$$ ... $$`.
   ```markdown
   $$
   \sigma = \frac{P}{A}
   $$
   ```
 
-### Sintaxis matemática frecuente
+### Operaciones y expresiones frecuentes
+- **Fracciones:** `\frac{numerador}{denominador}` $\rightarrow \frac{a}{b}$
+- **Subíndices y potencias:** `\sigma_{adm}`, `I_{xx}`, `x^2`, `L_0`
+- **Raíz cuadrada:** `\sqrt{x}` o raíz enésima `\sqrt[3]{V}`
+- **Multiplicación:** `\cdot` $\rightarrow \cdot$
+- **Aproximación:** `\approx` $\rightarrow \approx$
+- **Grados:** `45^\circ` $\rightarrow 45^\circ$
 
-| Operación / Símbolo | Sintaxis LaTeX | Resultado |
-| :--- | :--- | :--- |
-| **Fracción** | `\frac{numerador}{denominador}` | $\frac{a}{b}$ |
-| **Subíndices / Superíndices** | `\sigma_{adm}`, `I_{xx}`, `L^2` | $\sigma_{adm}$, $I_{xx}$, $L^2$ |
-| **Raíces** | `\sqrt{x}`, `\sqrt[3]{V}` | $\sqrt{x}$, $\sqrt[3]{V}$ |
-| **Multiplicación / Punto** | `\cdot`, `\times` | $\cdot$, $\times$ |
-| **Aproximación / Desigualdad** | `\approx`, `\le`, `\ge`, `\neq` | $\approx$, $\le$, $\ge$, $\neq$ |
-| **Ángulos y grados** | `\theta`, `\phi`, `45^\circ` | $\theta$, $\phi$, $45^\circ$ |
-| **Sumatorias e Integrales** | `\sum_{i=1}^n`, `\int_0^L` | $\sum_{i=1}^n$, $\int_0^L$ |
+### Símbolos frecuentes en Resistencia de Materiales
+- Esfuerzo normal: `\sigma` ($\sigma$)
+- Esfuerzo cortante: `\tau` ($\tau$)
+- Deformación unitaria normal: `\varepsilon` ($\varepsilon$)
+- Deformación angular (cortante): `\gamma` ($\gamma$)
+- Módulo de elasticidad (Young): `$E$`
+- Módulo de corte: `$G$`
+- Coeficiente de Poisson: `\nu` ($\nu$)
+- Alargamiento / desplazamiento: `\delta` ($\delta$)
 
-### Símbolos clave de Resistencia de Materiales
-
-| Símbolo | Comando | Significado usual |
-| :--- | :--- | :--- |
-| $\sigma$ | `\sigma` | Esfuerzo normal |
-| $\tau$ | `\tau` | Esfuerzo cortante |
-| $\varepsilon$ | `\varepsilon` | Deformación unitaria normal |
-| $\gamma$ | `\gamma` | Deformación angular (cortante) |
-| $\nu$ | `\nu` | Coeficiente de Poisson |
-| $\delta$ | `\delta` | Desplazamiento / alargamiento axial |
-
-### Ejemplos aplicados de fórmulas
-
-- **Ley de Hooke unidimensional:**
+### Ejemplos aplicados al curso
+- **Ley de Hooke:**
   ```markdown
   $$
   \sigma = E \cdot \varepsilon
   $$
   ```
-
 - **Deformación axial en barras:**
   ```markdown
   $$
   \delta = \frac{P \cdot L}{E \cdot A}
   $$
   ```
-
-- **Fórmula de flexión elástica (Navier):**
+- **Fórmula de flexión (Navier):**
   ```markdown
   $$
   \sigma = -\frac{M \cdot y}{I}
   $$
   ```
-
-- **Fórmula del esfuerzo cortante transversal:**
+- **Esfuerzo cortante en vigas:**
   ```markdown
   $$
   \tau = \frac{V \cdot Q}{I \cdot t}
   $$
   ```
-
 - **Torsión en ejes circulares:**
   ```markdown
   $$
-  \tau_{max} = \frac{T \cdot c}{J}
+  \tau = \frac{T \cdot \rho}{J}
   $$
   ```
 
 ---
 
-## 5. Componentes del Libro
+## 5. Componentes del libro
 
-Puedes utilizar componentes especiales diseñados para enriquecer pedagógicamente el libro. Todos los componentes se escriben con la primera letra en mayúscula.
+Para hacer el libro interactivo y visualmente atractivo, dispones de componentes especiales. Se escriben siempre con la **primera letra en mayúscula**.
 
 ### 1. `<Definition>`
-Resalta axiomas, conceptos fundamentales o definiciones formales.
+Recuadro destacado para conceptos fundamentales, hipótesis o definiciones formales.
 ```markdown
 <Definition title="Esfuerzo Normal">
-El esfuerzo normal $\sigma$ representa la intensidad de las fuerzas internas perpendiculares al plano de corte por unidad de área.
+El esfuerzo normal $\sigma$ representa la intensidad de las fuerzas internas que actúan perpendicularmente a la sección transversal por unidad de área.
 </Definition>
 ```
 
 ### 2. `<Formula>`
-Enfatiza una ecuación estelar del tema en un bloque central con etiqueta.
+Bloque central destacado para resaltar la ecuación más importante del tema.
 ```markdown
-<Formula label="Ley de Hooke Uniaxial">
+<Formula label="Ecuación de Deformación Axial">
 $$
-\sigma = E \cdot \varepsilon
+\delta = \frac{P \cdot L}{E \cdot A}
 $$
 </Formula>
 ```
 
 ### 3. `<Example>`
-Estructura un ejercicio práctico resuelto paso a paso.
+Bloque para presentar un ejercicio resuelto completo.
 ```markdown
 <Example number={1} title="Barra sometida a tracción">
-Una varilla de acero estructural con diámetro de $20\text{ mm}$ y longitud de $2\text{ m}$ soporta una carga axial de $50\text{ kN}$. Si $E = 200\text{ GPa}$, determine el esfuerzo normal y el alargamiento total.
+Una varilla de acero de $20\text{ mm}$ de diámetro y $2\text{ m}$ de longitud soporta una carga axial de $40\text{ kN}$. Si $E = 200\text{ GPa}$, calcule el esfuerzo normal y el alargamiento.
 
 <Solution>
-1. **Cálculo del área transversal:**
+1. **Área transversal:**
    $$
-   A = \frac{\pi}{4}(0.02\text{ m})^2 = 3.1416 \times 10^{-4}\text{ m}^2
-   $$
-
-2. **Cálculo del esfuerzo:**
-   $$
-   \sigma = \frac{50 \times 10^3\text{ N}}{3.1416 \times 10^{-4}\text{ m}^2} = 159.15\text{ MPa}
+   A = \frac{\pi}{4}(0.02)^2 = 3.1416 \times 10^{-4}\text{ m}^2
    $$
 
-3. **Cálculo del alargamiento:**
+2. **Esfuerzo normal:**
    $$
-   \delta = \frac{P \cdot L}{E \cdot A} = \frac{(50\times 10^3)(2)}{(200\times 10^9)(3.1416\times 10^{-4})} = 1.59\text{ mm}
+   \sigma = \frac{40 \times 10^3\text{ N}}{3.1416 \times 10^{-4}\text{ m}^2} = 127.32\text{ MPa}
+   $$
+
+3. **Alargamiento total:**
+   $$
+   \delta = \frac{(40 \times 10^3)(2)}{(200 \times 10^9)(3.1416 \times 10^{-4})} = 1.27\text{ mm}
    $$
 </Solution>
 </Example>
 ```
 
 ### 4. `<Problem>`
-Presenta un problema propuesto para el estudiante con borde delimitador.
+Recuadro con borde punteado para proponer problemas de práctica al estudiante.
 ```markdown
-<Problem number={1} title="Esfuerzo cortante en pasador">
-Determine el diámetro mínimo necesario de un pasador de acero con esfuerzo cortante admisible $\tau_{adm} = 80\text{ MPa}$ sometido a una fuerza cortante simple de $25\text{ kN}$.
+<Problem number={1} title="Diseño por cortante">
+Un pasador de acero debe resistir una fuerza cortante de $30\text{ kN}$. Si el esfuerzo cortante admisible es $\tau_{adm} = 90\text{ MPa}$, determine el diámetro mínimo requerido.
 
 <Solution>
-Aplicando la condición de diseño $\tau \le \tau_{adm}$:
+Aplicando la condición $\tau \le \tau_{adm}$:
 $$
-A \ge \frac{V}{\tau_{adm}} \implies d \ge \sqrt{\frac{4 \cdot V}{\pi \cdot \tau_{adm}}} = 19.95\text{ mm}
+A \ge \frac{V}{\tau_{adm}} \implies d \ge \sqrt{\frac{4 \cdot V}{\pi \cdot \tau_{adm}}} = 20.6\text{ mm}
 $$
-Se recomienda un diámetro comercial de $20\text{ mm}$.
+Se adopta un diámetro comercial de $22\text{ mm}$.
 </Solution>
 </Problem>
 ```
 
 ### 5. `<Solution>`
-Se coloca dentro de un `<Example>` o `<Problem>`. Genera un desplegable interactivo (**"Mostrar Solución"**) que no satura la lectura visual inicial del estudiante.
+**Aclaración clave:** Se utiliza **dentro** de `<Example>` o `<Problem>` para mostrar el desarrollo de la solución. Genera un botón interactivo desplegable (*"Mostrar Solución"*) para que el estudiante piense el problema antes de ver la respuesta.
 ```markdown
 <Solution>
-Paso 1: Dibujar el diagrama de cuerpo libre (DCL).
-Paso 2: Aplicar las ecuaciones de equilibrio estático $\sum F_y = 0$.
+1. Dibujar el diagrama de cuerpo libre (DCL).
+2. Aplicar las ecuaciones de equilibrio estático $\sum F_y = 0$.
+3. Despejar la incógnita y verificar las unidades.
 </Solution>
 ```
 
 ### 6. `<Summary>`
-Recuadro de cierre al final de la lección para sintetizar las conclusiones y fórmulas clave.
+Recuadro de cierre al final de la lección para resumir los puntos o fórmulas aprendidas.
 ```markdown
-<Summary title="Resumen del Capítulo">
-- El esfuerzo normal $\sigma = P/A$ es uniforme solo si la carga pasa por el centroide.
-- El principio de Saint-Venant garantiza validez lejos de las discontinuidades.
-- Verifica siempre la coherencia dimensional de las unidades antes de calcular.
+<Summary title="Resumen de la Lección">
+- La fórmula $\sigma = P/A$ presupone una carga centrada y un material homogéneo.
+- La deformación unitaria $\varepsilon$ es una cantidad adimensional.
+- En el rango elástico lineal rige la Ley de Hooke.
 </Summary>
 ```
 
 ### 7. `<Image>`
-Inserta una ilustración técnica con pie de foto y ajuste responsivo.
+Inserta una imagen técnica con pie de foto estilizado y ajuste automático.
 ```markdown
 <Image 
-  src="https://res.cloudinary.com/.../dcl-viga.png" 
-  alt="Diagrama de cuerpo libre de viga simplemente apoyada" 
+  src="https://..." 
+  alt="Diagrama de cuerpo libre de la barra" 
   caption="Figura 1.1: Diagrama de cuerpo libre y reacciones en los apoyos."
 />
 ```
 
 ### 8. `<ImageGrid>`
-Permite colocar dos o más imágenes alineadas en columnas para comparar diagramas.
+Permite colocar dos o más imágenes lado a lado en columnas para comparar esquemas.
 ```markdown
 <ImageGrid columns={2}>
   <Image 
-    src="https://res.cloudinary.com/.../viga-cargas.png" 
+    src="https://..." 
     alt="Distribución de cargas" 
-    caption="Figura 2a: Viga con carga distribuida" 
+    caption="Figura 1.2a: Viga con carga distribuida" 
   />
   <Image 
-    src="https://res.cloudinary.com/.../diagrama-cortante.png" 
-    alt="Diagrama de fuerza cortante" 
-    caption="Figura 2b: Diagrama de fuerza cortante (V)" 
+    src="https://..." 
+    alt="Diagrama de momentos flectores" 
+    caption="Figura 1.2b: Diagrama de momento flector" 
   />
 </ImageGrid>
 ```
 
 ### 9. `<Quiz>`
-Crea una pregunta conceptual interactiva de autoevaluación.
+Crea una pregunta interactiva de autoevaluación rápida con respuesta oculta.
 ```markdown
-<Quiz question="¿Qué ocurre con la deformación lateral cuando un elemento elástico se estira longitudinalmente?">
-El elemento experimenta una contracción lateral proporcional regida por el coeficiente de Poisson: $\varepsilon_{lat} = -\nu \cdot \varepsilon_{long}$.
+<Quiz question="¿Por qué la fórmula \sigma = P/A no es exacta en los puntos de aplicación de la carga?">
+Por el principio de Saint-Venant: cerca de cargas concentradas se generan concentraciones de esfuerzo locales que distorsionan la distribución uniforme.
 </Quiz>
 ```
 
@@ -256,117 +250,133 @@ El elemento experimenta una contracción lateral proporcional regida por el coef
 
 ## 6. Imágenes
 
-1. **Cómo subir una imagen con el botón del editor:**
-   - Ubica el cursor en la línea donde deseas que aparezca la imagen.
-   - Haz clic en el botón de **Imagen** en la barra superior del editor.
-   - Selecciona el archivo gráfico (`.png`, `.jpg`, `.svg`) desde tu computadora.
-   - El sistema subirá automáticamente la imagen a la nube y generará la etiqueta `<Image ... />` en el editor.
-2. **Atributos obligatorios:**
-   - **`alt`**: Descripción técnica breve de la figura (esencial para accesibilidad).
-   - **`caption`**: Leyenda numerada visible debajo de la imagen (ejemplo: *Figura 3.2: Deformación angular bajo momento torsor*).
+1. **Cómo utilizar el botón de imagen del editor:**
+   - Coloca el cursor en el editor en la línea donde deseas que aparezca la figura.
+   - Haz clic en el botón con ícono de **Imagen** en la barra superior.
+2. **Cómo insertar la imagen:**
+   - Selecciona el archivo gráfico desde tu computadora (`.png`, `.jpg`, `.svg`).
+   - La plataforma subirá automáticamente la imagen a la nube e insertará la etiqueta lista en la posición de tu cursor.
+3. **`alt` y `caption`:**
+   - **`alt`**: Breve descripción técnica de lo que se ve en la imagen (para accesibilidad).
+   - **`caption`**: Leyenda que se mostrará debajo de la figura (ejemplo: *Figura 2.1: Diagrama de esfuerzos cortantes*).
 
 ---
 
-## 7. Plantilla para Crear un Tema
+## 7. Plantilla para crear un tema
 
-Copia y pega la siguiente estructura base cuando comiences un nuevo subtema:
+Puedes copiar este bloque y comenzar a rellenarlo en el editor:
 
 ```markdown
-# 1.1 Concepto de Esfuerzo Normal
+# 1.1 Título del Subtema
 
-El concepto de esfuerzo es fundamental en la mecánica de materiales para cuantificar la intensidad de las fuerzas internas distribuidas que surgen en un cuerpo deformable.
+Escribe aquí una breve introducción conceptual del tema y su importancia en la ingeniería.
 
-<Definition title="Esfuerzo Normal Promedio">
-Intensidad de fuerza normal interna que actúa por unidad de área transversal en un elemento prismático sometido a carga axial centrada.
+<Definition title="Concepto Principal">
+Escribe aquí la definición formal del concepto estudiado.
 </Definition>
 
 ## Fundamento Teórico
 
-Consideremos una barra prismática de sección transversal constante $A$ sometida a una fuerza axial $P$ que pasa a través del centroide de la sección.
+Desarrolla aquí la teoría, hipótesis o deducción matemática.
 
-<Formula label="Ecuación del Esfuerzo Axial">
+<Formula label="Ecuación Principal">
 $$
 \sigma = \frac{P}{A}
 $$
 </Formula>
 
 Donde:
-- $\sigma$ es el esfuerzo normal en pascales ($\text{Pa}$) o megapascales ($\text{MPa}$).
-- $P$ es la carga axial interna resultante en newtons ($\text{N}$).
-- $A$ es el área de la sección transversal en metros cuadrados ($\text{m}^2$).
+- $\sigma$ es el esfuerzo normal ($\text{MPa}$).
+- $P$ es la fuerza interna normal ($\text{N}$).
+- $A$ es el área transversal ($\text{m}^2$).
 
 <Image 
-  src="https://res.cloudinary.com/.../barra-axial.png" 
-  alt="Distribución uniforme de esfuerzo normal en barra axial" 
-  caption="Figura 1.1: Distribución uniforme de esfuerzos en una sección transversal alejada de los apoyos."
+  src="https://..." 
+  alt="Esquema del elemento estructural" 
+  caption="Figura 1.1: Esquema representativo del elemento bajo carga."
 />
 
-## Ejemplo Práctico
+## Ejemplo Resuelto
 
-<Example number={1} title="Verificación de esfuerzo en tirante">
-Un tirante circular de aluminio con diámetro $d = 25\text{ mm}$ soporta una carga de tracción $P = 40\text{ kN}$. Determine si el esfuerzo de trabajo supera el esfuerzo admisible $\sigma_{adm} = 90\text{ MPa}$.
+<Example number={1} title="Nombre del Ejemplo">
+Enunciado claro del problema con datos numéricos en el Sistema Internacional.
 
 <Solution>
-1. **Área transversal:**
-   $$
-   A = \frac{\pi}{4}(0.025)^2 \approx 4.909 \times 10^{-4}\text{ m}^2
-   $$
+1. **Planteamiento:**
+   Detalle del primer paso o diagrama de cuerpo libre.
 
-2. **Esfuerzo actuante:**
+2. **Cálculo:**
    $$
-   \sigma = \frac{40 \times 10^3\text{ N}}{4.909 \times 10^{-4}\text{ m}^2} = 81.48\text{ MPa}
+   \sigma = \frac{50 \times 10^3}{2.5 \times 10^{-4}} = 200\text{ MPa}
    $$
 
 3. **Conclusión:**
-   Como $\sigma = 81.48\text{ MPa} \le 90\text{ MPa}$, el tirante **cumple** con el criterio de resistencia admisible.
+   Interpretación física del resultado obtenido.
 </Solution>
 </Example>
 
 ## Ejercicio de Autoevaluación
 
-<Quiz question="¿Bajo qué condición la distribución del esfuerzo normal deja de ser uniforme?">
-La distribución deja de ser uniforme cerca de los puntos de aplicación de cargas concentradas o ante cambios bruscos de sección (concentración de esfuerzos), según el principio de Saint-Venant.
+<Quiz question="¿Pregunta conceptual rápida para el estudiante?">
+Explicación concisa de la respuesta correcta.
 </Quiz>
 
-<Summary title="Puntos Clave">
-- La fórmula $\sigma = P/A$ es aplicable en barras prismáticas homogéneas cargadas axialmente.
-- Las unidades típicas son: $1\text{ MPa} = 10^6\text{ N/m}^2 = 1\text{ N/mm}^2$.
-- Las cargas deben pasar por el centroide para evitar flexión adicional.
+<Summary title="Resumen">
+- Conclusión o regla práctica número uno.
+- Conclusión o regla práctica número dos.
 </Summary>
 ```
 
 ---
 
-## 8. Errores Frecuentes
+## 8. Qué evitar
 
-1. **No cerrar las etiquetas de los componentes:**
-   - ❌ `<Definition> Texto sin cerrar`
-   - ✅ `<Definition> Texto </Definition>`
-2. **Escribir componentes con minúscula:**
-   - ❌ `<definition>` o `<example>`
-   - ✅ `<Definition>` o `<Example>`
-3. **No dejar saltos de línea entre bloques:**
-   - Si pegas un bloque JSX inmediatamente después de un párrafo sin dejar un renglón en blanco, el analizador de Markdown puede no reconocerlo correctamente.
-4. **Fórmulas de bloque sin los dobles signos `$$`:**
-   - ❌ `$\sigma = \frac{P}{A}$` en renglón solitario sin centrar.
-   - ✅ `$$\sigma = \frac{P}{A}$$`
-5. **Rutas de imagen locales:**
-   - ❌ `C:\MisDocumentos\foto.png`
-   - ✅ Utiliza siempre el botón de subir imagen para que se genere un enlace web accesible en la nube.
+- 🚫 **No cambiar los nombres de los componentes:** Escríbelos exactamente como se indican (`<Definition>`, `<Formula>`, `<Example>`, etc.).
+- 🚫 **No usar rutas locales para imágenes:** Nunca pegues rutas de tu computadora como `C:\Users\mi-carpeta\imagen.png`. Usa siempre el botón de subir imagen de la plataforma.
+- 🚫 **No dejar componentes sin cerrar:** Si abres `<Definition>`, debes cerrarlo con `</Definition>`.
+- 🚫 **No enviar sin revisar la vista previa:** Siempre asegúrate de que el contenido en el panel derecho se vea exactamente como deseas antes de enviar.
 
 ---
 
-## 9. Reglas de Contenido
+## 9. Errores frecuentes
 
-- **Claridad y rigor:** Escribe en un tono pedagógico, directo y académicamente riguroso acorde al nivel de la Facultad de Ingeniería Mecánica de la UNI.
-- **Uso estricto del Sistema Internacional (SI):**
-  - Fuerza en $\text{N}$ o $\text{kN}$.
-  - Longitud en $\text{m}$ o $\text{mm}$.
-  - Esfuerzo y presión en $\text{Pa}$, $\text{kPa}$, $\text{MPa}$ o $\text{GPa}$ (recuerda que $1\text{ MPa} = 1\text{ N/mm}^2$).
+1. **Escribir componentes con minúscula:**
+   - ❌ `<definition>` o `<example>`
+   - ✅ `<Definition>` o `<Example>` (Siempre con mayúscula inicial).
+2. **Olvidar cerrar etiquetas:**
+   - ❌ `<Example> ...` sin cerrar.
+   - ✅ `<Example> ... </Example>`
+3. **No dejar renglones en blanco:**
+   - Deja siempre un espacio en blanco entre el texto regular y las etiquetas de componentes `<...>` para evitar fallos de lectura visual.
+4. **Fórmulas de bloque sin doble signo:**
+   - ❌ `$\sigma = P/A$` en una línea suelta.
+   - ✅ `$$\sigma = \frac{P}{A}$$`
+
+---
+
+## 10. Reglas de contenido
+
+- **Escribir de forma clara:** Utiliza un lenguaje didáctico, ordenado y directo, acorde al nivel universitario.
+- **Usar unidades correctamente:** Utiliza siempre el Sistema Internacional (SI):
+  - Fuerzas en $\text{N}$ o $\text{kN}$.
+  - Dimensiones en $\text{m}$ o $\text{mm}$.
+  - Esfuerzos en $\text{Pa}$, $\text{MPa}$ o $\text{GPa}$ ($1\text{ MPa} = 1\text{ N/mm}^2$).
   - Momentos en $\text{N}\cdot\text{m}$ o $\text{kN}\cdot\text{m}$.
-- **Desarrollo paso a paso:** En los problemas resueltos, no omitas el planteamiento estático (DCL), las fórmulas base y la sustitución numérica con unidades.
-- **Sin enlaces innecesarios:** Evita colocar enlaces externos que puedan quedar rotos con el tiempo.
-- **Revisión previa:** Revisa minuciosamente el panel derecho (Vista Previa) para corroborar que ninguna fórmula o bloque quede cortado o con errores tipográficos.
+- **Explicar los pasos de los problemas:** No saltes pasos algebraicos clave; indica el DCL, las ecuaciones de equilibrio y la sustitución de valores.
+- **No llenar de enlaces innecesarios:** Mantén el contenido autocontenido para que el estudiante aprenda sin distracciones.
+- **Revisar la vista previa antes de enviar:** Comprueba que todas las fórmulas e imágenes carguen sin errores.
+
+---
+
+## ✅ Checklist antes de enviar a revisión
+
+Antes de pulsar el botón de envío, verifica estos 5 puntos:
+
+- [ ] **1. Revisé la vista previa:** El diseño se ve ordenado y sin bloques rotos.
+- [ ] **2. Las fórmulas funcionan:** Todas las expresiones matemáticas en KaTeX se leen claramente.
+- [ ] **3. Las imágenes se ven:** Todas las figuras cargan correctamente con su pie de foto.
+- [ ] **4. No hay errores de escritura:** Ortografía, redacción y unidades correctas.
+- [ ] **5. El contenido está listo para revisión:** La explicación y ejemplos están completos.
 
 ---
 
