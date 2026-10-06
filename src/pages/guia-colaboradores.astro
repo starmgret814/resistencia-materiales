@@ -1,4 +1,5 @@
 ---
+export const prerender = true;
 import Layout from '@/src/layouts/Layout.astro';
 ---
 
@@ -186,8 +187,8 @@ import Layout from '@/src/layouts/Layout.astro';
               <div class="rounded-lg border border-[#e8d5d4] dark:border-[#382022] p-4 bg-[#fdf9f8] dark:bg-[#1c0f11]">
                 <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">Fórmula en bloque ($$ ... $$)</p>
                 <p class="text-xs text-[#7a5c5c] dark:text-[#af9795] mt-1">Para ecuaciones centradas principales.</p>
-                <code is:raw class="mt-2 block bg-white dark:bg-[#281416] p-2 rounded border border-[#ebd0cf] dark:border-[#3d1f22] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5]">
-                  $$ \sigma = \frac{P}{A} $$
+                <code class="mt-2 block bg-white dark:bg-[#281416] p-2 rounded border border-[#ebd0cf] dark:border-[#3d1f22] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5]">
+                  $$ \sigma = \frac&#123;P&#125;&#123;A&#125; $$
                 </code>
               </div>
             </div>
@@ -195,14 +196,14 @@ import Layout from '@/src/layouts/Layout.astro';
             <div>
               <p class="font-semibold text-[#4a1719] dark:text-[#f7dfdd]">Comandos frecuentes en Resistencia de Materiales:</p>
               <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\sigma</code> &rarr; &sigma; (normal)</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\tau</code> &rarr; &tau; (cortante)</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\varepsilon</code> &rarr; &epsilon; (unit. def.)</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\delta</code> &rarr; &delta; (alargamiento)</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\frac{a}{b}</code> &rarr; fracción</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>\sqrt{x}</code> &rarr; raíz</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>I_{xx}</code> &rarr; subíndice</div>
-                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code is:raw>L^2</code> &rarr; exponente</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\sigma</code> &rarr; &sigma; (normal)</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\tau</code> &rarr; &tau; (cortante)</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\varepsilon</code> &rarr; &epsilon; (unit. def.)</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\delta</code> &rarr; &delta; (alargamiento)</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\frac&#123;a&#125;&#123;b&#125;</code> &rarr; fracción</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>\sqrt&#123;x&#125;</code> &rarr; raíz</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>I_&#123;xx&#125;</code> &rarr; subíndice</div>
+                <div class="p-2 rounded bg-[#f7ebea] dark:bg-[#261315] border border-[#ecd5d4] dark:border-[#3b1f22]"><code>L^2</code> &rarr; exponente</div>
               </div>
             </div>
           </div>
@@ -443,7 +444,7 @@ Explicación concisa de la respuesta correcta.
           </div>
           <ul class="mt-4 space-y-2 text-sm text-[#5f4445] dark:text-[#d9c4c2] list-disc pl-5">
             <li><strong>Escribir de forma clara:</strong> Redacta en un tono didáctico, ordenado y universitario.</li>
-            <li><strong>Usar unidades correctamente:</strong> Emplea el Sistema Internacional (N, kN, mm, m, MPa, GPa). Recuerda que $1\text{ MPa} = 1\text{ N/mm}^2$.</li>
+            <li><strong>Usar unidades correctamente:</strong> Emplea el Sistema Internacional (N, kN, mm, m, MPa, GPa). Recuerda que 1 MPa = 10⁶ Pa = 1 N/mm².</li>
             <li><strong>Explicar los pasos de los problemas:</strong> No omitas el DCL, las fórmulas base y la sustitución numérica.</li>
             <li><strong>No llenar de enlaces innecesarios:</strong> Mantén la lectura autocontenida sin distracciones externas.</li>
             <li><strong>Revisar la vista previa antes de enviar:</strong> Verifica que todo luzca impecable antes del envío.</li>
