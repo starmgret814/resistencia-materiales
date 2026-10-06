@@ -3,6 +3,7 @@ interface Props {
   session?: { email: string; role: string; assignedChapters?: string[] } | null;
 }
 
+
 const { session } = Astro.props;
 const initial = session?.email?.charAt(0).toUpperCase() || '?';
 const pathname = Astro.url.pathname;
