@@ -152,6 +152,20 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"resistencia": {
+"01-esfuerzos-falla/falla-y-factor-de-seguridad/index.mdx": {
+	id: "01-esfuerzos-falla/falla-y-factor-de-seguridad/index.mdx";
+  slug: "01-esfuerzos-falla/falla-y-factor-de-seguridad";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"01-esfuerzos-falla/prueba-2/index.mdx": {
+	id: "01-esfuerzos-falla/prueba-2/index.mdx";
+  slug: "01-esfuerzos-falla/prueba-2";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "01-esfuerzos-falla/subtema-inicial/index.mdx": {
 	id: "01-esfuerzos-falla/subtema-inicial/index.mdx";
   slug: "01-esfuerzos-falla/subtema-inicial";

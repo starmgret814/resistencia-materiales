@@ -1,9 +1,12 @@
 ---
 export const prerender = true;
 import Layout from '@/src/layouts/Layout.astro';
+import { AlertTriangle } from 'lucide-react';
+import { CircleAlert } from 'lucide-react';
 ---
 
-<Layout title="Guía para Colaboradores | Resistencia de Materiales — UNI" description="Manual práctico para redactores y colaboradores del libro digital de Resistencia de Materiales">
+
+<Layout title="Guía para Colaboradores | Resistencia de Materiales — UNI" description="Manual práctico para redactores y colaboradores del espacio digital de estudio de Resistencia de Materiales">
   <div class="min-h-screen bg-[#faf5f3] dark:bg-[#140b0c] text-[#4d3838] dark:text-[#f2e1df]">
     <!-- Cabecera de la guía -->
     <header class="sticky top-0 z-40 border-b border-[#e3caca] dark:border-[#382022] bg-[#fbf7f4]/95 dark:bg-[#1a0f10]/95 backdrop-blur">
@@ -59,7 +62,7 @@ import Layout from '@/src/layouts/Layout.astro';
           </div>
           <div class="mt-4 space-y-3 text-[15px] leading-relaxed text-[#5f4445] dark:text-[#d9c4c2]">
             <p>
-              <strong>¿Qué es la plataforma?</strong> Es un libro digital interactivo desarrollado para los estudiantes del curso <strong>Resistencia de Materiales (MC361)</strong> de la <strong>Universidad Nacional de Ingeniería (UNI)</strong>. Su objetivo es brindar explicaciones conceptuales claras, fórmulas matemáticas en alta resolución, esquemas técnicos y problemas resueltos paso a paso.
+              <strong>¿En qué consiste?</strong> Es un espacio digital de estudio desarrollado para los estudiantes del curso <strong>Resistencia de Materiales (MC361)</strong> de la <strong>Universidad Nacional de Ingeniería (UNI)</strong>. Su objetivo es brindar explicaciones conceptuales claras, fórmulas matemáticas en alta resolución, esquemas técnicos y problemas resueltos paso a paso.
             </p>
             <p>
               <strong>¿Qué debe hacer el colaborador?</strong>
@@ -82,7 +85,7 @@ import Layout from '@/src/layouts/Layout.astro';
           <div class="mt-4 grid gap-3 sm:grid-cols-2 text-sm text-[#5f4445] dark:text-[#d9c4c2]">
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">1. Cómo entrar</p>
-              <p class="mt-1">Inicia sesión con tu correo electrónico asignado y tu contraseña en la página de acceso.</p>
+              <p class="mt-1">Inicia sesión con tu correo electrónico institucional (@uni.pe) en la página de acceso.</p>
             </div>
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">2. Cómo abrir un capítulo</p>
@@ -94,7 +97,7 @@ import Layout from '@/src/layouts/Layout.astro';
             </div>
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">4. Vista previa</p>
-              <p class="mt-1">En el panel derecho verás en vivo cómo se renderiza exactamente tu tema con los estilos finales del libro.</p>
+              <p class="mt-1">En el panel derecho verás en vivo cómo se renderiza exactamente tu tema con los estilos finales.</p>
             </div>
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">5. Guardar avance</p>
@@ -209,11 +212,11 @@ import Layout from '@/src/layouts/Layout.astro';
           </div>
         </section>
 
-        <!-- 5. Componentes del libro -->
+        <!-- 5. Componentes del disponibles -->
         <section class="rounded-xl border border-[#ead5d4] dark:border-[#382022] bg-white dark:bg-[#1a0f10] p-6 sm:p-8 shadow-sm">
           <div class="flex items-center gap-2.5 text-[#8B0000] dark:text-[#f87171]">
             <span class="flex size-7 items-center justify-center rounded-full bg-[#f6e5e5] dark:bg-[#341619] font-mono text-xs font-bold">5</span>
-            <h2 class="font-serif text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd] m-0">Componentes del libro</h2>
+            <h2 class="font-serif text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd] m-0">Componentes disponibles</h2>
           </div>
           <p class="mt-2 text-sm text-[#7a5c5c] dark:text-[#af9795]">Escribe siempre la primera letra en mayúscula:</p>
 
@@ -308,7 +311,18 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
             <ul class="list-disc pl-5 space-y-1 text-xs text-[#735555] dark:text-[#c2aba9]">
               <li><strong>alt:</strong> Descripción breve de lo que se observa (para accesibilidad).</li>
               <li><strong>caption:</strong> Leyenda o pie de foto visible con la numeración de la figura.</li>
+              <li><strong>Nota:</strong> Si ya importaste la imagen y la quieres reutilizar, solo usa el link que se genera en el atributo src="https://...", no es necesario importar la imagen otra vez.</li>
             </ul>
+          </div>
+          <div class="mt-4 rounded bg-[#fdf9f8] dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] p-4">
+            <p class="m-0 text-sm text-[#5f4445] dark:text-[#d9c4c2]">
+              <strong class="text-[#8B0000] dark:text-[#f87171]">Importante:</strong>
+              Utiliza siempre imágenes de buena calidad. Para diagramas, esquemas y gráficos técnicos,
+              <strong>prioriza el formato vectorial (SVG)</strong>, ya que permite ampliar la imagen sin
+              perder nitidez. Para imágenes rasterizadas, se recomienda utilizar <strong>WebP</strong>
+              por su buena relación entre calidad y tamaño. También puedes utilizar PNG cuando necesites
+              máxima calidad o transparencia.
+            </p>
           </div>
         </section>
 
@@ -391,7 +405,9 @@ Explicación concisa de la respuesta correcta.
         <!-- 8. Qué evitar -->
         <section class="rounded-xl border-2 border-[#e7a3a3] dark:border-[#5a272b] bg-[#fdf5f5] dark:bg-[#201013] p-6 sm:p-8 shadow-sm">
           <div class="flex items-center gap-2.5 text-[#8B0000] dark:text-[#f87171]">
-            <span class="flex size-7 items-center justify-center rounded-full bg-[#f4d1d1] dark:bg-[#3f191d] font-bold text-xs">⚠️</span>
+            <span class="flex size-8 items-center justify-center rounded-full bg-[#f4d1d1] dark:bg-[#3f191d]">
+  <CircleAlert class="size-4" />
+</span>
             <h2 class="font-serif text-2xl font-bold text-[#6d1316] dark:text-[#fca5a5] m-0">Qué evitar</h2>
           </div>
           <ul class="mt-4 space-y-2.5 text-sm font-medium text-[#653335] dark:text-[#e4cccc]">
@@ -444,7 +460,7 @@ Explicación concisa de la respuesta correcta.
           </div>
           <ul class="mt-4 space-y-2 text-sm text-[#5f4445] dark:text-[#d9c4c2] list-disc pl-5">
             <li><strong>Escribir de forma clara:</strong> Redacta en un tono didáctico, ordenado y universitario.</li>
-            <li><strong>Usar unidades correctamente:</strong> Emplea el Sistema Internacional (N, kN, mm, m, MPa, GPa). Recuerda que 1 MPa = 10⁶ Pa = 1 N/mm².</li>
+            <li><strong>Usar unidades correctamente:</strong> Emplea el Sistema Internacional (N, kN, mm, m, MPa, GPa).</li>
             <li><strong>Explicar los pasos de los problemas:</strong> No omitas el DCL, las fórmulas base y la sustitución numérica.</li>
             <li><strong>No llenar de enlaces innecesarios:</strong> Mantén la lectura autocontenida sin distracciones externas.</li>
             <li><strong>Revisar la vista previa antes de enviar:</strong> Verifica que todo luzca impecable antes del envío.</li>
