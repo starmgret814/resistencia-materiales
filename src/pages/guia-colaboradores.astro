@@ -164,8 +164,20 @@ import Layout from '@/src/layouts/Layout.astro';
                   <td class="py-2.5 px-4 font-mono text-xs text-[#7f0303] dark:text-[#fca5a5]">---</td>
                   <td class="py-2.5 px-4">Línea divisoria horizontal limpia.</td>
                 </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-semibold">Tablas</td>
+                  <td class="py-2.5 px-4 font-mono text-xs text-[#7f0303] dark:text-[#fca5a5]">| Col 1 | Col 2 |<br />|---|---|</td>
+                  <td class="py-2.5 px-4">Organizar datos, hipótesis y comparativas.</td>
+                </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="mt-4 rounded-lg border border-[#e8d5d4] dark:border-[#382022] p-4 bg-[#fdf9f8] dark:bg-[#1c0f11]">
+            <p class="font-bold text-xs uppercase tracking-wider text-[#7f0303] dark:text-[#fca5a5]">Regla de oro para tablas:</p>
+            <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">
+              En Markdown es <strong>obligatorio dejar una línea en blanco</strong> antes y después de la tabla. Si la tabla está pegada al párrafo anterior, el compilador no la reconocerá.
+            </p>
           </div>
         </section>
 
@@ -285,6 +297,34 @@ $A \ge V / \tau_{adm} \implies d \ge 20.6\text{ mm}$.
               <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Quiz question="¿Por qué el esfuerzo no es uniforme cerca de la aplicación de la carga?"&gt;
 Por el principio de Saint-Venant: cerca de cargas concentradas se forman concentraciones locales de esfuerzo.
 &lt;/Quiz&gt;</code></pre>
+            </div>
+
+            <!-- Table -->
+            <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
+              <div class="flex items-center justify-between">
+                <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Table title="..."&gt; y Tablas Markdown</p>
+                <span class="rounded bg-[#8B0000]/10 px-2 py-0.5 text-[10px] font-bold text-[#8B0000] dark:text-[#fca5a5]">Nuevo</span>
+              </div>
+              <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">
+                Puedes escribir tablas Markdown estándar o envolverlas con <code>&lt;Table title="..."&gt;</code> para darles un título elegante y desplazamiento horizontal automático en teléfonos móviles.
+              </p>
+              <pre class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Table title="Componentes del estado tridimensional de esfuerzos"&gt;
+
+| Cara perpendicular al eje | Esfuerzo normal | Esfuerzos cortantes |
+|---|---|---|
+| $x$ | $\sigma_x$ | $\tau_&#123;xy&#125;$, $\tau_&#123;xz&#125;$ |
+| $y$ | $\sigma_y$ | $\tau_&#123;yx&#125;$, $\tau_&#123;yz&#125;$ |
+| $z$ | $\sigma_z$ | $\tau_&#123;zx&#125;$, $\tau_&#123;zy&#125;$ |
+
+&lt;/Table&gt;</code></pre>
+              <div class="mt-3 rounded bg-[#fbf2f0] dark:bg-[#251316] p-3 text-xs text-[#734c4d] dark:text-[#e4cccc] space-y-1">
+                <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">¿Por qué puede fallar una tabla?</p>
+                <ul class="list-disc pl-4 space-y-1">
+                  <li><strong>Líneas en blanco:</strong> Es indispensable dejar una línea en blanco antes y después de las barras <code>|</code> (y también dentro de <code>&lt;Table&gt;</code> o <code>&lt;Definition&gt;</code>).</li>
+                  <li><strong>Fórmulas matemáticas:</strong> Sí se permiten fórmulas como <code>$\sigma_x$</code> y <code>$\tau_&#123;xy&#125;$</code>. Si necesitas valor absoluto o barras verticales dentro de una fórmula, escribe <code>\vert x \vert</code> para que no corte la celda.</li>
+                  <li><strong>Botón en el editor:</strong> Haz clic en el botón de <strong>Tabla</strong> de la barra superior para insertar la plantilla lista con un solo clic.</li>
+                </ul>
+              </div>
             </div>
 
           </div>

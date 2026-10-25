@@ -126,6 +126,23 @@ export function ImageGrid({ children, columns = 2 }: { children: ReactNode; colu
   )
 }
 
-export const mdxComponents = { Definition, Formula, Example, Problem, Solution, Summary, Image, ImageGrid }
+export function Table({ children, title, caption }: { children: ReactNode; title?: string; caption?: string }) {
+  const displayTitle = title || caption
+  return (
+    <div className="my-7">
+      {displayTitle && (
+        <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7f0303] dark:text-[#fca5a5]">
+          {displayTitle}
+        </p>
+      )}
+      <div className="w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export const mdxComponents = { Definition, Formula, Example, Problem, Solution, Summary, Image, ImageGrid, Table }
 
 export default mdxComponents
+

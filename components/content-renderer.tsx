@@ -6,10 +6,11 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { visit } from 'unist-util-visit'
-import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary } from '@/components/mdx-components'
+import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary, Table } from '@/components/mdx-components'
 import type { CourseDocument } from '@/lib/content-schema'
 
-const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image'])
+const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table'])
+
 
 function attribute(source: string, name: string): string {
   return source.match(new RegExp(`${name}=["']([^"']*)["']`))?.[1]
@@ -57,6 +58,11 @@ function normalizeLegacyMdx(markdown: string): string {
     return `:::quiz{question="${question}"}\n${body.trim()}\n:::`
   })
 
+  normalized = normalized.replace(/<Table([^>]*)>\s*([\s\S]*?)\s*<\/Table>/gi, (_match, attrs, body) => {
+    const title = attribute(attrs, 'title') || attribute(attrs, 'caption')
+    return `\n\n::::table${title ? `{title="${title}"}` : ''}\n\n${body.trim()}\n\n::::\n\n`
+  })
+
   for (const tag of ['Definition', 'Note', 'Example', 'Problem', 'Summary']) {
     const pattern = new RegExp(`<(${tag})([^>]*)>\\s*([\\s\\S]*?)\\s*<\\/${tag}>`, 'gi')
     normalized = normalized.replace(pattern, (_match, _name, attrs, body) => {
@@ -64,7 +70,7 @@ function normalizeLegacyMdx(markdown: string): string {
       const title = attribute(attrs, 'title')
       const number = attribute(attrs, 'number')
       const displayTitle = number ? `${tag} ${number}${title ? `: ${title}` : ''}` : title
-      return `::::${kind}${displayTitle ? `{title="${displayTitle}"}` : ''}\n${body.trim()}\n::::`
+      return `\n\n::::${kind}${displayTitle ? `{title="${displayTitle}"}` : ''}\n\n${body.trim()}\n\n::::\n\n`
     })
   }
 
@@ -165,6 +171,9 @@ function CourseDirective({
   if (kind === 'summary') {
     return <Summary title={title}>{children}</Summary>
   }
+  if (kind === 'table') {
+    return <Table title={title}>{children}</Table>
+  }
   
   // definition or note fallback
   return <Definition title={title}>{children}</Definition>
@@ -211,11 +220,44 @@ export function ContentRenderer({ document }: { document: CourseDocument }) {
       components={{
         img: ({ src, alt, title }: any) => <Image src={src || ''} alt={alt || ''} caption={title || undefined} />,
         div: DirectiveDiv,
+        table: ({ children }: any) => (
+          <div className="my-6 w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm">
+            <table className="w-full border-collapse text-left text-sm text-[#4d3838] dark:text-[#ead4d2]">
+              {children}
+            </table>
+          </div>
+        ),
+        thead: ({ children }: any) => (
+          <thead className="border-b-2 border-[#e3caca] dark:border-[#382022] bg-[#fbf2f0] dark:bg-[#251316]">
+            {children}
+          </thead>
+        ),
+        tbody: ({ children }: any) => (
+          <tbody className="divide-y divide-[#f0dedd] dark:divide-[#2d181a]">
+            {children}
+          </tbody>
+        ),
+        tr: ({ children }: any) => (
+          <tr className="transition-colors hover:bg-[#faf4f3] dark:hover:bg-[#201012]">
+            {children}
+          </tr>
+        ),
+        th: ({ children }: any) => (
+          <th className="px-4 py-3 font-semibold text-xs tracking-wider uppercase text-[#7f0303] dark:text-[#fca5a5]">
+            {children}
+          </th>
+        ),
+        td: ({ children }: any) => (
+          <td className="px-4 py-3 text-sm">
+            {children}
+          </td>
+        ),
       }}
     >
       {normalizeLegacyMdx(document.contentMarkdown)}
     </ReactMarkdown>
   </article>
 }
+
 
 export default memo(ContentRenderer)

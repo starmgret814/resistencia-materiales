@@ -239,6 +239,40 @@
   display: none;
 }
 
+/* ─── Tablas en MDX ─── */
+.mdx-content table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4d3838;
+}
+
+.mdx-content thead {
+  background-color: #fbf2f0;
+  border-bottom: 2px solid #e3caca;
+}
+
+.mdx-content th {
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7f0303;
+}
+
+.mdx-content td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0dedd;
+}
+
+.mdx-content tr:hover {
+  background-color: #faf4f3;
+}
+
+
 
 /* ─── Aumentar tamaño de matemáticas (MathML) ─── */
 math {
@@ -293,3 +327,24 @@ math {
 .dark .mdx-content .katex {
   color: #fce7e7;
 }
+
+.dark .mdx-content table {
+  color: #ead4d2;
+}
+
+.dark .mdx-content thead {
+  background-color: #251316;
+  border-bottom-color: #382022;
+}
+
+.dark .mdx-content th {
+  color: #fca5a5;
+}
+
+.dark .mdx-content td {
+  border-bottom-color: #2d181a;
+}
+
+.dark .mdx-content tr:hover {
+  background-color: #201012;
+}

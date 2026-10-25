@@ -55,8 +55,11 @@ El editor utiliza un formato muy simple para estructurar el texto:
 | **Lista con viñetas** | `- Punto A`<br>`- Punto B` | Características o propiedades |
 | **Enlaces** | `[Texto del enlace](https://...)` | Enlace a una referencia |
 | **Separador** | `---` | Línea horizontal divisoria |
+| **Tablas** | `| Col 1 | Col 2 |`<br>`|---|---|` | Organizar datos, propiedades y comparativas |
 
-> **Consejo:** Deja siempre un renglón en blanco entre párrafos y entre bloques para que el texto respire y se visualice ordenado.
+> **Consejos:** 
+> - Deja siempre un renglón en blanco entre párrafos y entre bloques para que el texto respire y se visualice ordenado.
+> - **Regla de oro para tablas:** En Markdown es **obligatorio dejar una línea en blanco** antes y después de la tabla; de lo contrario el sistema no la detectará como tabla.
 
 ---
 
@@ -245,6 +248,26 @@ Crea una pregunta interactiva de autoevaluación rápida con respuesta oculta.
 Por el principio de Saint-Venant: cerca de cargas concentradas se generan concentraciones de esfuerzo locales que distorsionan la distribución uniforme.
 </Quiz>
 ```
+
+### 10. `<Table>` y Tablas Markdown
+Muestra tablas ordenadas con tipografía clara y barras de desplazamiento responsivas para móviles. Puedes escribir la tabla directamente o dentro de `<Table title="...">` para darle un encabezado elegante.
+
+```markdown
+<Table title="Componentes del estado tridimensional de esfuerzos">
+
+| Cara perpendicular al eje | Esfuerzo normal | Esfuerzos cortantes |
+| :--- | :--- | :--- |
+| $x$ | $\sigma_x$ | $\tau_{xy}$, $\tau_{xz}$ |
+| $y$ | $\sigma_y$ | $\tau_{yx}$, $\tau_{yz}$ |
+| $z$ | $\sigma_z$ | $\tau_{zx}$, $\tau_{zy}$ |
+
+</Table>
+```
+
+> **Consejos para tablas:**
+> - **Línea en blanco obligatoria:** Deja siempre un renglón vacío antes y después de la tabla (incluso dentro de `<Table>` o `<Definition>`).
+> - **Fórmulas dentro de celdas:** Puedes incluir fórmulas como `$\sigma_x$` y `$\tau_{xy}$`. Si necesitas valor absoluto o barras verticales en una fórmula, usa `\vert x \vert` en lugar de `|` para no romper la celda.
+> - **Botón en la barra del editor:** Puedes usar el botón **Tabla** de la barra superior para insertar la plantilla al instante.
 
 ---
 

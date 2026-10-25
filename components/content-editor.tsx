@@ -26,6 +26,7 @@ import {
   Loader2,
   CheckCircle2,
   BookOpen,
+  Table as TableIcon,
   X
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
@@ -402,6 +403,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     else if (kind === 'problem') insertMarkdown('\n<Problem number={1} title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
     else if (kind === 'quiz') insertMarkdown('\n<Quiz question="Escribe la pregunta">\n', '\n</Quiz>\n', 'Escribe la respuesta.')
     else if (kind === 'summary') insertMarkdown('\n<Summary title="Resumen">\n', '\n</Summary>\n', 'Resume los puntos principales.')
+    else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| :--- | :--- | :--- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
     else if (kind === 'imagegrid') insertMarkdown('\n<ImageGrid columns={2}>\n  <Image src="imagen-1.png" alt="Descripción de la primera imagen" caption="Figura 1" />\n\n  <Image src="imagen-2.png" alt="Descripción de la segunda imagen" caption="Figura 2" />\n</ImageGrid>\n')
   }
 
@@ -607,6 +609,17 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             <button type="button" className={toolClass} title="Enlace" aria-label="Enlace" onClick={() => insertMarkdown('[', '](https://ejemplo.com)', 'texto del enlace')}><Link className="size-4" /></button>
             <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
             <button type="button" className={toolClass} title="Fórmula" aria-label="Fórmula" onClick={() => insertMarkdown('\n<Formula label="Nombre de la fórmula">\n$$\n', '\n$$\n</Formula>\n', '\\sigma = \\frac{P}{A}')}><Sigma className="size-4" /></button>
+            <button
+              type="button"
+              className={toolClass}
+              title="Insertar Tabla"
+              aria-label="Tabla"
+              onClick={() => insertMarkdown(
+                '\n\n| Cara perpendicular al eje | Esfuerzo normal | Esfuerzos cortantes |\n| :--- | :--- | :--- |\n| $x$ | $\\sigma_x$ | $\\tau_{xy}$, $\\tau_{xz}$ |\n| $y$ | $\\sigma_y$ | $\\tau_{yx}$, $\\tau_{yz}$ |\n| $z$ | $\\sigma_z$ | $\\tau_{zx}$, $\\tau_{zy}$ |\n\n'
+              )}
+            >
+              <TableIcon className="size-4" />
+            </button>
             <button type="button" disabled={isUploading} className={`${toolClass} ${isUploading ? 'opacity-50 cursor-wait' : ''}`} title="Subir Imagen a la Nube" aria-label="Imagen" onClick={handleImageUploadClick}>
               {isUploading ? <span className="size-4 animate-spin rounded-full border-2 border-[#8b6d6d] border-t-transparent" /> : <ImageIcon className="size-4" />}
             </button>
@@ -829,6 +842,7 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
     { value: 'problem', label: 'Problema' },
     { value: 'quiz', label: 'Quiz' },
     { value: 'summary', label: 'Resumen' },
+    { value: 'table', label: 'Tabla con título' },
     { value: 'imagegrid', label: 'Cuadrícula de imágenes' },
   ]
 
