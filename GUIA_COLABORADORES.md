@@ -256,9 +256,24 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se generan concen
 2. **Cómo insertar la imagen:**
    - Selecciona el archivo gráfico desde tu computadora (`.png`, `.jpg`, `.svg`).
    - La plataforma subirá automáticamente la imagen a la nube e insertará la etiqueta lista en la posición de tu cursor.
-3. **`alt` y `caption`:**
+3. **Atributos disponibles:**
    - **`alt`**: Breve descripción técnica de lo que se ve en la imagen (para accesibilidad).
    - **`caption`**: Leyenda que se mostrará debajo de la figura (ejemplo: *Figura 2.1: Diagrama de esfuerzos cortantes*).
+   - **`width`**: Controla el ancho máximo de la imagen (ejemplos: `width="400px"`, `width="60%"`).
+   - **`height`**: Limita la altura máxima sin deformar la imagen (ejemplo: `height="300px"`).
+   - **`size`**: Tamaños predeterminados: `"small"` (384px), `"medium"` (672px), `"large"` (896px), o `"full"` (100% de ancho).
+   - **`align`**: Alineación horizontal: `"center"` (por defecto), `"left"` o `"right"`.
+
+   *Ejemplo con dimensiones y alineación:*
+   ```markdown
+   <Image 
+     src="https://..." 
+     alt="Diagrama de esfuerzo" 
+     caption="Figura 1.2: Distribución de esfuerzos en el centro de la barra."
+     width="450px"
+     align="center"
+   />
+   ```
 
 ---
 

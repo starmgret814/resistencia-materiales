@@ -52,7 +52,8 @@ export function Image({
   slug: propSlug,
   size = 'full',
   align = 'center',
-  width
+  width,
+  height,
 }: { 
   src: string; 
   alt: string; 
@@ -61,6 +62,7 @@ export function Image({
   size?: 'small' | 'medium' | 'large' | 'full';
   align?: 'left' | 'center' | 'right';
   width?: string | number;
+  height?: string | number;
 }) {
   const contextSlug = useContentSlug()
   const slug = propSlug || contextSlug
@@ -86,7 +88,12 @@ export function Image({
     right: 'ml-auto',
   }
 
-  const maxWidthStyle = width ? { maxWidth: typeof width === 'number' ? `${width}px` : width } : undefined;
+  const maxWidthStyle: React.CSSProperties = {
+    ...(width ? { maxWidth: typeof width === 'number' ? `${width}px` : width } : {}),
+  }
+  const imgStyle: React.CSSProperties = {
+    ...(height ? { maxHeight: typeof height === 'number' ? `${height}px` : height, objectFit: 'contain' as const } : {}),
+  }
 
   return (
     <figure 
@@ -97,6 +104,7 @@ export function Image({
         src={resolvedSrc} 
         alt={alt} 
         className="h-auto w-full rounded-lg border border-[#e5cfcd]" 
+        style={imgStyle}
         loading="lazy" 
       />
       {caption && <figcaption className="mt-2 text-center text-xs text-[#765e5e] dark:text-[#bca4a3]">{caption}</figcaption>}

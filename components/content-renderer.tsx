@@ -9,7 +9,7 @@ import { visit } from 'unist-util-visit'
 import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary } from '@/components/mdx-components'
 import type { CourseDocument } from '@/lib/content-schema'
 
-const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid'])
+const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image'])
 
 function attribute(source: string, name: string): string {
   return source.match(new RegExp(`${name}=["']([^"']*)["']`))?.[1]
@@ -29,6 +29,21 @@ function normalizeLegacyMdx(markdown: string): string {
     const src = attribute(attrs, 'src')
     const alt = attribute(attrs, 'alt') || 'Imagen del curso'
     const caption = attribute(attrs, 'caption').replace(/"/g, "'")
+    const width = attribute(attrs, 'width')
+    const height = attribute(attrs, 'height')
+    const size = attribute(attrs, 'size')
+    const align = attribute(attrs, 'align')
+
+    if (width || height || size || align) {
+      let props = `src="${src}" alt="${alt}"`
+      if (caption) props += ` caption="${caption}"`
+      if (width) props += ` width="${width}"`
+      if (height) props += ` height="${height}"`
+      if (size) props += ` size="${size}"`
+      if (align) props += ` align="${align}"`
+      return `:::image{${props}}\n:::`
+    }
+
     return src ? `![${alt}](${src}${caption ? ` "${caption}"` : ''})` : ''
   })
 
@@ -64,7 +79,7 @@ function normalizeLegacyMdx(markdown: string): string {
 
 function remarkCourseDirectives() {
   return (tree: unknown) => {
-    visit(tree as never, ['containerDirective'], (node: any) => {
+    visit(tree as never, ['containerDirective', 'leafDirective'], (node: any) => {
       if (!allowedDirectives.has(node.name)) return
       node.data ||= {}
       node.data.hName = 'div'
@@ -73,12 +88,58 @@ function remarkCourseDirectives() {
         'data-course-title': node.attributes?.title || node.label || '',
         'data-course-question': node.attributes?.question || '',
         'data-course-columns': node.attributes?.columns || '',
+        'data-course-src': node.attributes?.src || '',
+        'data-course-alt': node.attributes?.alt || '',
+        'data-course-caption': node.attributes?.caption || '',
+        'data-course-width': node.attributes?.width || '',
+        'data-course-height': node.attributes?.height || '',
+        'data-course-size': node.attributes?.size || '',
+        'data-course-align': node.attributes?.align || '',
       }
     })
   }
 }
 
-function CourseDirective({ kind, title, question, columns, children }: { kind: string; title?: string; question?: string; columns?: string; children: ReactNode }) {
+function CourseDirective({
+  kind,
+  title,
+  question,
+  columns,
+  src,
+  alt,
+  caption,
+  width,
+  height,
+  size,
+  align,
+  children
+}: {
+  kind: string;
+  title?: string;
+  question?: string;
+  columns?: string;
+  src?: string;
+  alt?: string;
+  caption?: string;
+  width?: string;
+  height?: string;
+  size?: string;
+  align?: string;
+  children: ReactNode
+}) {
+  if (kind === 'image') {
+    return (
+      <Image
+        src={src || ''}
+        alt={alt || 'Imagen del curso'}
+        caption={caption || title || undefined}
+        width={width || undefined}
+        height={height || undefined}
+        size={(size as any) || undefined}
+        align={(align as any) || undefined}
+      />
+    )
+  }
   if (kind === 'imagegrid') {
     return <ImageGrid columns={columns === '3' ? 3 : columns === '4' ? 4 : 2}>{children}</ImageGrid>
   }
@@ -116,7 +177,30 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   const title = String(rest['data-course-title' as keyof typeof rest] || '')
   const question = String(rest['data-course-question' as keyof typeof rest] || '')
   const columns = String(rest['data-course-columns' as keyof typeof rest] || '')
-  return <CourseDirective kind={kind} title={title} question={question} columns={columns}>{children}</CourseDirective>
+  const src = String(rest['data-course-src' as keyof typeof rest] || '')
+  const alt = String(rest['data-course-alt' as keyof typeof rest] || '')
+  const caption = String(rest['data-course-caption' as keyof typeof rest] || '')
+  const width = String(rest['data-course-width' as keyof typeof rest] || '')
+  const height = String(rest['data-course-height' as keyof typeof rest] || '')
+  const size = String(rest['data-course-size' as keyof typeof rest] || '')
+  const align = String(rest['data-course-align' as keyof typeof rest] || '')
+  return (
+    <CourseDirective
+      kind={kind}
+      title={title}
+      question={question}
+      columns={columns}
+      src={src}
+      alt={alt}
+      caption={caption}
+      width={width}
+      height={height}
+      size={size}
+      align={align}
+    >
+      {children}
+    </CourseDirective>
+  )
 }
 
 export function ContentRenderer({ document }: { document: CourseDocument }) {
