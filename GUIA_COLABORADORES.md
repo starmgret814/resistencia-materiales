@@ -419,3 +419,57 @@ Antes de pulsar el botón de envío, verifica estos 5 puntos:
 ---
 
 ### ¿Terminaste? Guarda el contenido y envíalo a revisión.
+
+
+### Personalizar la alineación y el ancho de las tablas
+
+```mdx
+<Table title="Propiedades" align="center" width="80%" columnWidths="40%, 30%, 30%">
+
+| Material | Módulo E | Unidad |
+| --- | --- | --- |
+| Acero | 200 | GPa |
+| Aluminio | 70 | GPa |
+
+</Table>
+```
+
+- `align="center"` centra el contenido de todas las celdas, incluidos los encabezados. También acepta `left` y `right`.
+- `width="80%"` define el ancho total. Puedes usar `100%`, `600px` o `40rem`. En pantallas pequeñas habrá desplazamiento horizontal si hace falta.
+- `columnWidths="40%, 30%, 30%"` asigna un ancho a cada columna, en orden. También acepta píxeles: `240px, 160px, 160px`. Para anchos fijos, define un ancho total coherente, por ejemplo `width="560px"`.
+- Para alinear una columna de forma independiente usa `:---` (izquierda), `:---:` (centro) o `---:` (derecha) en la fila separadora. Esa alineación tiene prioridad sobre `align`. Usa `---` para heredar `align`.
+
+Las opciones también funcionan con la directiva `::::table{align="center" width="80%" columnWidths="40%, 30%, 30%"}` y su cierre `::::`.
+
+
+### Centrar la tabla completa y poner varias en una fila
+
+Las tablas se centran por defecto. Para cambiar la ubicación del bloque completo (incluido el título), usa `position="left"`, `position="center"` o `position="right"`. Por ejemplo: `<Table width="70%" position="center" align="center">`. `align` controla el contenido de las celdas; `position` controla la tabla completa.
+
+Para mostrar dos o más tablas una al lado de otra, usa:
+
+```mdx
+<TableGrid columns="2">
+
+<Table title="Acero" align="center">
+
+| Propiedad | Valor |
+| --- | --- |
+| E | 200 GPa |
+
+</Table>
+
+<Table title="Aluminio" align="center">
+
+| Propiedad | Valor |
+| --- | --- |
+| E | 70 GPa |
+
+</Table>
+
+</TableGrid>
+```
+
+`columns` acepta `2`, `3` o `4`. Agrega tantas tablas como necesites: las siguientes pasan a otra fila. Las tablas se alinean por arriba y en pantallas pequeñas se apilan. Dentro de la cuadrícula cada tabla ocupa su columna; puedes seguir usando `columnWidths` y `align` en cada una.
+
+El menú de componentes del editor incluye **Tablas en una fila** para insertar esta plantilla.

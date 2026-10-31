@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
-import { memo } from 'react'
+import { createContext, memo, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkDirective from 'remark-directive'
 import remarkGfm from 'remark-gfm'
@@ -9,7 +9,31 @@ import { visit } from 'unist-util-visit'
 import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary, Table } from '@/components/mdx-components'
 import type { CourseDocument } from '@/lib/content-schema'
 
-const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table'])
+type TableOptions = { align?: 'left' | 'center' | 'right'; width?: string; columnWidths?: string[] }
+const TableContext = createContext<TableOptions>({})
+
+function tableLength(value: string): string | undefined {
+  const clean = value.trim()
+  return /^\d+(?:\.\d+)?(?:px|%|rem|em|vw)?$/.test(clean) ? (/^\d+(?:\.\d+)?$/.test(clean) ? `${clean}px` : clean) : undefined
+}
+
+function MarkdownTable({ children }: { children?: ReactNode }) {
+  const { align, width, columnWidths } = useContext(TableContext)
+  return <div className="my-6 max-w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm" style={{ width: width || '100%', marginInline: 'auto' }}>
+    <table style={{ width: '100%', textAlign: align || 'left', tableLayout: columnWidths?.length ? 'fixed' : undefined }}>
+      {columnWidths?.length ? <colgroup>{columnWidths.map((value, index) => <col key={index} style={{ width: tableLength(value) }} />)}</colgroup> : null}
+      {children}
+    </table>
+  </div>
+}
+
+function MarkdownCell({ header, children, style }: ComponentPropsWithoutRef<'td'> & { header?: boolean }) {
+  const { align } = useContext(TableContext)
+  const Tag = header ? 'th' : 'td'
+  return <Tag style={{ ...style, textAlign: style?.textAlign || align || 'left', overflowWrap: 'anywhere' }}>{children}</Tag>
+}
+
+const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table', 'tablegrid'])
 
 
 function attribute(source: string, name: string): string {
@@ -58,9 +82,16 @@ function normalizeLegacyMdx(markdown: string): string {
     return `:::quiz{question="${question}"}\n${body.trim()}\n:::`
   })
 
+  normalized = normalized.replace(/<TableGrid\b([^>]*)>\s*([\s\S]*?)\s*<\/TableGrid>/gi, (_match, attrs, body) => {
+    const columns = attribute(attrs, 'columns') || '2'
+    return `\n\n:::::tablegrid{columns="${columns}"}\n\n${body.trim()}\n\n:::::\n\n`
+  })
+
   normalized = normalized.replace(/<Table([^>]*)>\s*([\s\S]*?)\s*<\/Table>/gi, (_match, attrs, body) => {
     const title = attribute(attrs, 'title') || attribute(attrs, 'caption')
-    return `\n\n::::table${title ? `{title="${title}"}` : ''}\n\n${body.trim()}\n\n::::\n\n`
+    const options = { title, align: attribute(attrs, 'align'), width: attribute(attrs, 'width'), columnWidths: attribute(attrs, 'columnWidths'), position: attribute(attrs, 'position') }
+    const properties = Object.entries(options).filter(([, value]) => value).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(' ')
+    return `\n\n::::table{${properties}}\n\n${body.trim()}\n\n::::\n\n`
   })
 
   for (const tag of ['Definition', 'Note', 'Example', 'Problem', 'Summary']) {
@@ -93,6 +124,7 @@ function remarkCourseDirectives() {
         'data-course-kind': node.name,
         'data-course-title': node.attributes?.title || node.label || '',
         'data-course-question': node.attributes?.question || '',
+        'data-course-column-widths': node.attributes?.columnWidths || '',
         'data-course-columns': node.attributes?.columns || '',
         'data-course-src': node.attributes?.src || '',
         'data-course-alt': node.attributes?.alt || '',
@@ -100,6 +132,7 @@ function remarkCourseDirectives() {
         'data-course-width': node.attributes?.width || '',
         'data-course-height': node.attributes?.height || '',
         'data-course-size': node.attributes?.size || '',
+        'data-course-position': node.attributes?.position || '',
         'data-course-align': node.attributes?.align || '',
       }
     })
@@ -111,6 +144,8 @@ function CourseDirective({
   title,
   question,
   columns,
+  columnWidths,
+  position,
   src,
   alt,
   caption,
@@ -124,6 +159,8 @@ function CourseDirective({
   title?: string;
   question?: string;
   columns?: string;
+  columnWidths?: string;
+  position?: string;
   src?: string;
   alt?: string;
   caption?: string;
@@ -171,8 +208,21 @@ function CourseDirective({
   if (kind === 'summary') {
     return <Summary title={title}>{children}</Summary>
   }
+  if (kind === 'tablegrid') {
+    const grid = columns === '3' ? 'md:grid-cols-3' : columns === '4' ? 'md:grid-cols-4' : 'md:grid-cols-2'
+    return <div className={`course-table-grid my-7 grid grid-cols-1 items-start gap-6 ${grid}`}>{children}</div>
+  }
   if (kind === 'table') {
-    return <Table title={title}>{children}</Table>
+    const options: TableOptions = {
+      align: align === 'left' || align === 'center' || align === 'right' ? align : undefined,
+
+      columnWidths: columnWidths ? columnWidths.split(',').map(value => value.trim()) : undefined,
+    }
+    return <TableContext.Provider value={options}>
+      <div className="course-table-block min-w-0 max-w-full" style={{ width: width ? tableLength(width) : '100%', marginLeft: position === 'left' ? 0 : 'auto', marginRight: position === 'right' ? 0 : 'auto' }}>
+        <Table title={title}>{children}</Table>
+      </div>
+    </TableContext.Provider>
   }
   
   // definition or note fallback
@@ -185,6 +235,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   if (!kind) return <div {...rest}>{children}</div>
   const title = String(rest['data-course-title' as keyof typeof rest] || '')
   const question = String(rest['data-course-question' as keyof typeof rest] || '')
+  const position = String(rest['data-course-position' as keyof typeof rest] || '')
+  const columnWidths = String(rest['data-course-column-widths' as keyof typeof rest] || '')
   const columns = String(rest['data-course-columns' as keyof typeof rest] || '')
   const src = String(rest['data-course-src' as keyof typeof rest] || '')
   const alt = String(rest['data-course-alt' as keyof typeof rest] || '')
@@ -199,6 +251,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
       title={title}
       question={question}
       columns={columns}
+      columnWidths={columnWidths}
+      position={position}
       src={src}
       alt={alt}
       caption={caption}
@@ -220,13 +274,7 @@ export function ContentRenderer({ document }: { document: CourseDocument }) {
       components={{
         img: ({ src, alt, title }: any) => <Image src={src || ''} alt={alt || ''} caption={title || undefined} />,
         div: DirectiveDiv,
-        table: ({ children }: any) => (
-          <div className="my-6 w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm">
-            <table className="w-full border-collapse text-left text-sm text-[#4d3838] dark:text-[#ead4d2]">
-              {children}
-            </table>
-          </div>
-        ),
+        table: MarkdownTable,
         thead: ({ children }: any) => (
           <thead className="border-b-2 border-[#e3caca] dark:border-[#382022] bg-[#fbf2f0] dark:bg-[#251316]">
             {children}
@@ -242,16 +290,8 @@ export function ContentRenderer({ document }: { document: CourseDocument }) {
             {children}
           </tr>
         ),
-        th: ({ children }: any) => (
-          <th className="px-4 py-3 font-semibold text-xs tracking-wider uppercase text-[#7f0303] dark:text-[#fca5a5]">
-            {children}
-          </th>
-        ),
-        td: ({ children }: any) => (
-          <td className="px-4 py-3 text-sm">
-            {children}
-          </td>
-        ),
+        th: (props) => <MarkdownCell {...props} header />,
+        td: MarkdownCell,
       }}
     >
       {normalizeLegacyMdx(document.contentMarkdown)}

@@ -5,6 +5,7 @@ import {
   ChevronDown,
   ChevronRight,
   CircleHelp,
+  FileText,
   Menu,
   Moon,
   Search,
@@ -63,6 +64,7 @@ function Header({ onMenu, onSearch }: { onMenu: () => void; onSearch: () => void
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <a href="/examenes" className="inline-flex items-center gap-2 rounded-md px-2 py-2 text-xs font-semibold text-[#7f0303] hover:bg-[#f2dddd] dark:text-[#fca5a5] dark:hover:bg-[#2d181a]"><FileText className="size-4" /><span className="hidden sm:inline">Exámenes pasados</span><span className="sm:hidden">Exámenes</span></a>
           <button onClick={onSearch} className="hidden h-9 items-center gap-2 rounded-md border border-[#d5c0c0] dark:border-[#422527] bg-white/70 dark:bg-[#231416] px-3 text-sm text-[#765e5e] dark:text-[#cbb0ae] shadow-sm hover:border-[#b78383] hover:text-[#7f0303] dark:hover:text-[#f87171] md:flex transition-colors" aria-label="Buscar en el curso">
             <Search className="size-4" /><span>Buscar en el curso</span><kbd className="ml-3 rounded border border-[#e3caca] dark:border-[#422527] bg-[#f7f5f0] dark:bg-[#150c0d] px-1.5 py-0.5 text-[10px] text-[#967070] dark:text-[#a08282]">⌘ K</kbd>
           </button>
@@ -117,6 +119,7 @@ function Sidebar({
           <button onClick={onClose} className="inline-flex size-8 items-center justify-center rounded-md text-[#795e5e] dark:text-[#cbb0ae] hover:bg-[#f2dddd] dark:hover:bg-[#2d181a] lg:hidden transition-colors" aria-label="Cerrar navegación"><X className="size-4" /></button>
         </div>
         <nav className="scrollbar-none flex-1 overflow-y-auto px-3 pb-8" aria-label="Capítulos del curso">
+          <a href="/examenes" onClick={onClose} className="mb-5 flex items-center gap-3 rounded-lg border border-[#dfc5c3] bg-white/60 px-3 py-3 text-sm font-semibold text-[#7f0303] hover:bg-[#f2dddd] dark:border-[#422527] dark:bg-[#231416] dark:text-[#fca5a5]"><FileText className="size-4 shrink-0" />Exámenes pasados</a>
           {courseChapters.map((chapter) => {
             const isExpanded = expanded === chapter.number
             return (
@@ -273,6 +276,10 @@ export default function TextbookLayout({
               )}
 
               {/* MDX content slot */}
+              {chapterNumber && <a href="/examenes" className="mb-8 flex items-start gap-3 rounded-xl border border-[#e3caca] bg-[#f8eaea] p-4 text-[#7f0303] transition-colors hover:bg-[#f2dddd] dark:border-[#422527] dark:bg-[#281517] dark:text-[#fca5a5]">
+                <FileText className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+                <div><p className="text-sm font-semibold">Practica con exámenes pasados →</p><p className="mt-1 text-xs leading-5 text-[#765e5e] dark:text-[#cbb0ae]">Prácticas calificadas, parciales, finales y sustitutorios organizados por periodo.</p></div>
+              </a>}
               <div className="mdx-content">
                 {children}
               </div>

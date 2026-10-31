@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ReactNode, CSSProperties, FC } from 'react'
 import { useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
@@ -126,8 +126,28 @@ export function ImageGrid({ children, columns = 2 }: { children: ReactNode; colu
   )
 }
 
-export function Table({ children, title, caption }: { children: ReactNode; title?: string; caption?: string }) {
-  const displayTitle = title || caption
+export interface TableProps {
+  children: ReactNode;
+  title?: string;
+  caption?: string;
+  /** Alignment for cell content: 'left', 'center', or 'right'. Default is 'center'. */
+  align?: 'left' | 'center' | 'right';
+  /** Optional widths for each column, e.g., ['100px', '2fr', 150]. */
+  columnWidths?: (string | number)[];
+}
+
+export const Table: FC<TableProps> = ({ children, title, caption, align = 'center', columnWidths }) => {
+  const displayTitle = title || caption;
+  // Build CSS variable style for column widths
+  const widthStyle: CSSProperties = {};
+  if (columnWidths) {
+    columnWidths.forEach((w, i) => {
+      const value = typeof w === 'number' ? `${w}px` : w;
+      // CSS variable --col-width-0, --col-width-1, ...
+      // @ts-ignore
+      widthStyle[`--col-width-${i}`] = value;
+    });
+  }
   return (
     <div className="my-7">
       {displayTitle && (
@@ -135,14 +155,13 @@ export function Table({ children, title, caption }: { children: ReactNode; title
           {displayTitle}
         </p>
       )}
-      <div className="w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm">
+      <div style={{ ...widthStyle, textAlign: align }}>
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export const mdxComponents = { Definition, Formula, Example, Problem, Solution, Summary, Image, ImageGrid, Table }
+export const mdxComponents = { Definition, Formula, Example, Problem, Solution, Summary, Image, ImageGrid, Table };
 
-export default mdxComponents
-
+export default mdxComponents;

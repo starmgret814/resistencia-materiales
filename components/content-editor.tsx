@@ -403,7 +403,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     else if (kind === 'problem') insertMarkdown('\n<Problem number={1} title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
     else if (kind === 'quiz') insertMarkdown('\n<Quiz question="Escribe la pregunta">\n', '\n</Quiz>\n', 'Escribe la respuesta.')
     else if (kind === 'summary') insertMarkdown('\n<Summary title="Resumen">\n', '\n</Summary>\n', 'Resume los puntos principales.')
-    else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| :--- | :--- | :--- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
+    else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla" align="center" width="100%" columnWidths="40%, 30%, 30%">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| --- | --- | --- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
+    else if (kind === 'tablegrid') insertMarkdown('\n<TableGrid columns="2">\n\n<Table title="Tabla 1" align="center">\n\n| A | B |\n| --- | --- |\n| 1 | 2 |\n\n</Table>\n\n<Table title="Tabla 2" align="center">\n\n| C | D |\n| --- | --- |\n| 3 | 4 |\n\n</Table>\n\n</TableGrid>\n')
     else if (kind === 'imagegrid') insertMarkdown('\n<ImageGrid columns={2}>\n  <Image src="imagen-1.png" alt="Descripción de la primera imagen" caption="Figura 1" />\n\n  <Image src="imagen-2.png" alt="Descripción de la segunda imagen" caption="Figura 2" />\n</ImageGrid>\n')
   }
 
@@ -615,7 +616,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
               title="Insertar Tabla"
               aria-label="Tabla"
               onClick={() => insertMarkdown(
-                '\n\n| Cara perpendicular al eje | Esfuerzo normal | Esfuerzos cortantes |\n| :--- | :--- | :--- |\n| $x$ | $\\sigma_x$ | $\\tau_{xy}$, $\\tau_{xz}$ |\n| $y$ | $\\sigma_y$ | $\\tau_{yx}$, $\\tau_{yz}$ |\n| $z$ | $\\sigma_z$ | $\\tau_{zx}$, $\\tau_{zy}$ |\n\n'
+                '\n<Table align="center" width="100%" columnWidths="40%, 30%, 30%">\n\n| Cara perpendicular al eje | Esfuerzo normal | Esfuerzos cortantes |\n| --- | --- | --- |\n| $x$ | $\\sigma_x$ | $\\tau_{xy}$, $\\tau_{xz}$ |\n| $y$ | $\\sigma_y$ | $\\tau_{yx}$, $\\tau_{yz}$ |\n| $z$ | $\\sigma_z$ | $\\tau_{zx}$, $\\tau_{zy}$ |\n\n</Table>\n'
               )}
             >
               <TableIcon className="size-4" />
@@ -842,6 +843,7 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
     { value: 'problem', label: 'Problema' },
     { value: 'quiz', label: 'Quiz' },
     { value: 'summary', label: 'Resumen' },
+    { value: 'tablegrid', label: 'Tablas en una fila' },
     { value: 'table', label: 'Tabla con título' },
     { value: 'imagegrid', label: 'Cuadrícula de imágenes' },
   ]

@@ -82,6 +82,22 @@ service cloud.firestore {
         && assignedOrUnchanged(12));
     }
 
+    match /exams/{examId} {
+      allow read: if true;
+      allow create, update: if admin()
+        && request.resource.data.keys().hasOnly(['period', 'type', 'title', 'contentMarkdown'])
+        && request.resource.data.period is string
+        && request.resource.data.period.matches('^[0-9]{4}-[12]$')
+        && request.resource.data.type in ['practica', 'parcial', 'final', 'sustitutorio']
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 160
+        && request.resource.data.contentMarkdown is string
+        && request.resource.data.contentMarkdown.size() > 0
+        && request.resource.data.contentMarkdown.size() <= 200000;
+      allow delete: if admin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

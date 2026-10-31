@@ -16,6 +16,7 @@ const showBack = isEditor || isManagement;
 const backHref = isEditor ? editorBackHref : '/workspace-mc361/content/chapters';
 const backText = isEditor ? editorBackText : 'Volver a capítulos';
 const links = [
+    { label: 'Exámenes', href: '/workspace-mc361/management/exams', active: pathname.endsWith('/exams') },
     { label: 'Colaboradores', href: '/workspace-mc361/management/collaborators', active: pathname.endsWith('/collaborators') },
     { label: 'Solicitudes', href: '/workspace-mc361/management/requests', active: pathname.replace(/\/$/, '').endsWith('/requests') },
 ];

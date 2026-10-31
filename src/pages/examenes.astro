@@ -1,0 +1,16 @@
+---
+import Layout from '@/src/layouts/Layout.astro';
+import TextbookLayout from '@/components/textbook-layout';
+import ExamArchive from '@/components/exam-archive';
+---
+
+<Layout title="Exámenes pasados | Resistencia de Materiales — UNI" description="Practica con evaluaciones de Resistencia de Materiales: prácticas calificadas, parciales, finales y sustitutorios organizados por periodo académico.">
+  <TextbookLayout activeSlug={null} client:load>
+    <div class="not-prose">
+      <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#967070]">Material para practicar · MC361</p>
+      <h1 class="font-serif text-4xl font-bold text-[#4b1719] dark:text-[#f5dedd]">Exámenes pasados</h1>
+      <p class="mt-4 text-sm leading-7 text-[#765e5e] dark:text-[#cbb0ae]">Encuentra prácticas calificadas, exámenes parciales, finales y sustitutorios de cada periodo. Elige una evaluación para leer sus problemas y practicar aquí mismo.</p>
+      <ExamArchive client:load />
+    </div>
+  </TextbookLayout>
+</Layout>

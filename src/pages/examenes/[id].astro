@@ -1,0 +1,30 @@
+---
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { validExam, examTypes, type PastExam } from '@/lib/exam-data';
+import Layout from '@/src/layouts/Layout.astro';
+import TextbookLayout from '@/components/textbook-layout';
+import ContentRenderer from '@/components/content-renderer';
+
+let exam: PastExam | null = null;
+let unavailable = false;
+try {
+  const snapshot = await getDoc(doc(db, 'exams', Astro.params.id!));
+  if (snapshot.exists() && validExam(snapshot.data())) exam = { ...snapshot.data(), id: snapshot.id } as PastExam;
+} catch { unavailable = true; }
+if (!exam) Astro.response.status = unavailable ? 503 : 404;
+const category = examTypes.find(type => type.id === exam?.type)?.label;
+---
+
+<Layout title={`${exam?.title || 'Evaluación no disponible'} | Resistencia de Materiales — UNI`}>
+  <TextbookLayout activeSlug={null} client:load>
+    <div class="not-prose">
+      <a href="/examenes" class="text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]">← Volver a exámenes pasados</a>
+      {exam ? <>
+        <p class="mt-7 text-xs font-semibold uppercase tracking-wider text-[#967070]">{exam.period} · {category}</p>
+        <h1 class="mt-3 font-serif text-3xl font-bold">{exam.title}</h1>
+        <ContentRenderer client:load document={{ schemaVersion: 2, title: exam.title, chapterId: exam.period, slug: exam.id, contentMarkdown: exam.contentMarkdown }} />
+      </> : <div class="py-12"><h1 class="font-serif text-2xl font-bold">{unavailable ? 'No se pudo cargar la evaluación' : 'Evaluación no encontrada'}</h1><p class="mt-3 text-sm">{unavailable ? 'Inténtalo de nuevo en unos momentos.' : 'La evaluación ya no está disponible. Puedes consultar las demás en el archivo.'}</p></div>}
+    </div>
+  </TextbookLayout>
+</Layout>

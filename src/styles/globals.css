@@ -274,9 +274,13 @@
 
 
 
-/* ─── Aumentar tamaño de matemáticas (MathML) ─── */
+/* ─── Normalizar tamaño de expresiones matemáticas ─── */
 math {
-  font-size: 1.15em;
+  font-size: 1.15em; /* Igual que texto normal */
+}
+/* Clase opcional para tamaños mayores en casos excepcionales */
+.math-large {
+  font-size: 1.5em;
 }
 
 /* ─── Mostrar MathML nativo y ocultar versión HTML de KaTeX ─── */
@@ -294,6 +298,12 @@ math {
   overflow: visible !important;
   clip: auto !important;
   white-space: normal !important;
+}
+.katex {
+  font-size: 1em; /* Igual que texto normal */
+}
+.katex-large {
+  font-size: 1.5em; /* Opcional para casos excepcionales */
 }
 
 /* ─── Modo Oscuro para MDX ─── */
@@ -347,4 +357,13 @@ math {
 
 .dark .mdx-content tr:hover {
   background-color: #201012;
-}
+}
+
+/* Keep adjacent tables aligned at the top, including their titles. */
+.course-table-grid > .course-table-block > div {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.course-table-grid > .course-table-block {
+  align-self: start;
+}

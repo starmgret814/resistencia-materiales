@@ -1,0 +1,11 @@
+---
+import Layout from '@/src/layouts/Layout.astro';
+import WorkspaceHeader from '@/src/components/WorkspaceHeader.astro';
+import ExamManagement from '@/components/exam-management';
+const session = Astro.locals.session;
+if (!session || session.role !== 'admin') return Astro.redirect('/workspace-mc361/login');
+---
+<Layout title="Administrar exámenes | Resistencia de Materiales">
+  <WorkspaceHeader session={session} />
+  <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6"><ExamManagement client:only="react" /></main>
+</Layout>
