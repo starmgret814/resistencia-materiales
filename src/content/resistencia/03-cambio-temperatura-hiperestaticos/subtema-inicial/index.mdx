@@ -1,3 +1,295 @@
-# Subtema inicial
+# Ley de Hooke generalizada
 
-Empieza a escribir aquí...
+En el régimen elástico, los materiales de ingeniería responden de forma proporcional a las cargas aplicadas. Esta lección presenta las constantes que describen esa respuesta ($E$, $G$ y $\nu$), cómo se relacionan entre sí y cómo se extiende la ley de Hooke a estados de esfuerzo en tres dimensiones.
+
+<Definition title="Ley de Hooke">
+En el rango elástico lineal, el esfuerzo es directamente proporcional a la deformación. La constante de proporcionalidad es una propiedad del material.
+</Definition>
+
+## Ley de Hooke
+
+La relación esfuerzo-deformación es lineal hasta el límite de proporcionalidad (punto A del diagrama). A partir de ahí el comportamiento es inelástico.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792804519/wn05qlgwitis6wtrar4m.png"
+  alt="Diagrama esfuerzo-deformación con zona elástica e inelástica"
+  caption="Figura 1.1: Diagrama σ-ε con las zonas elástica e inelástica."
+/>
+
+### Esfuerzo normal
+
+<Formula label="Ley de Hooke para esfuerzo normal">
+$$
+\sigma = E \cdot \varepsilon \qquad \Longleftrightarrow \qquad \varepsilon = \frac{\sigma}{E}
+$$
+</Formula>
+
+### Esfuerzo cortante
+
+<Formula label="Ley de Hooke para esfuerzo cortante">
+$$
+\tau = G \cdot \gamma \qquad \Longleftrightarrow \qquad \gamma = \frac{\tau}{G}
+$$
+</Formula>
+
+Donde:
+- $\sigma$ es el esfuerzo normal y $\varepsilon$ la deformación unitaria normal.
+- $\tau$ es el esfuerzo cortante y $\gamma$ la deformación angular.
+- $E$ es el módulo de elasticidad (módulo de Young).
+- $G$ es el módulo de corte.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792804665/ewszkqnyzvqg3rsbur3i.png" 
+  alt="Diagrama esfuerzo cortante-distorsión angular con zona elástica e inelástica"
+  caption="Figura 1.2: Diagrama τ-γ con las zonas elástica e inelástica."
+/>
+
+## Módulo de Poisson
+
+<Definition title="Módulo de Poisson">
+Relación entre la contracción lateral y la deformación axial de un elemento sometido a carga axial.
+</Definition>
+
+<Formula label="Módulo de Poisson">
+$$
+\nu = -\frac{\text{Deformación lateral}}{\text{Deformación axial}}
+$$
+</Formula>
+
+Para una carga axial en la dirección $x$, el módulo de Poisson en las direcciones $y$ y $z$ es:
+
+<Formula label="Poisson en Y y Z">
+$$
+\nu_y = -\frac{\varepsilon_y}{\varepsilon_x} \qquad \qquad \nu_z = -\frac{\varepsilon_z}{\varepsilon_x}
+$$
+</Formula>
+
+- **Materiales ortotrópicos:** $\nu_x \neq \nu_y \neq \nu_z$
+- **Materiales isótropos:** $\nu_x = \nu_y = \nu_z = \nu$
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792804798/thzhuvmkvuacccig2jtk.png"
+  alt="Barra sometida a carga axial P con contracción lateral"
+  caption="Figura 1.3: Barra bajo carga axial P con contracción lateral."
+/>
+
+## Constantes elásticas de un material
+
+Un material elástico queda caracterizado por tres constantes:
+
+- **Módulo de elasticidad (Young):** $E$
+- **Módulo de corte:** $G$
+- **Módulo de Poisson:** $\nu$
+
+<Quiz question="¿Son independientes una de otra?">
+No. Para un material isótropo solo dos de las tres constantes son independientes, porque $G$ se obtiene a partir de $E$ y $\nu$ (ver la siguiente sección).
+</Quiz>
+
+## Relación entre $E$, $G$ y $\nu$
+
+### Barra sometida a tracción
+
+Para una barra sujeta a tracción uniaxial, la ley de Hooke da:
+
+$$
+\sigma_x = E\,\varepsilon_x
+$$
+
+El esfuerzo cortante máximo ocurre en planos a $45^\circ$ y vale la mitad del esfuerzo normal:
+
+<Formula label="Esfuerzo cortante máximo en tracción">
+$$
+\tau_m = G\,\gamma_{xy} \qquad \tau_m = \frac{1}{2}\sigma_x = \frac{1}{2}E\,\varepsilon_x \quad \Rightarrow \quad G\,\gamma_{xy} = \frac{1}{2}E\,\varepsilon_x
+$$
+</Formula>
+
+### Distorsión en función de la deformación angular
+
+El ángulo del elemento deformado cumple:
+
+$$
+2\beta = \frac{\pi}{2} - \gamma_{xy} \quad \Rightarrow \quad \beta = \frac{\pi}{4} - \frac{\gamma_{xy}}{2}
+$$
+
+$$
+\tan\beta = \tan\left(\frac{\pi}{4} - \frac{\gamma_{xy}}{2}\right) = \frac{1 - \dfrac{\gamma_{xy}}{2}}{1 + \dfrac{\gamma_{xy}}{2}}
+$$
+
+### Distorsión en función de la deformación longitudinal
+
+Por geometría, el mismo ángulo también se expresa con las deformaciones longitudinales:
+
+$$
+\tan\beta = \frac{1 - \nu\,\varepsilon_x}{1 + \varepsilon_x}
+$$
+
+### Igualando ambas expresiones
+
+Relación entre las deformaciones cortantes y axiales:
+
+$$
+\frac{1 - \dfrac{\gamma_{xy}}{2}}{1 + \dfrac{\gamma_{xy}}{2}} = \frac{1 - \nu\,\varepsilon_x}{1 + \varepsilon_x}
+\quad \Rightarrow \quad
+\gamma_{xy} = \frac{2(1+\nu)\,\varepsilon_x}{2 + (1-\nu)\,\varepsilon_x}
+$$
+
+En deformaciones pequeñas se cumple que $2 + (1-\nu)\,\varepsilon_x \approx 2$, por lo tanto:
+
+$$
+\gamma_{xy} = (1+\nu)\,\varepsilon_x
+$$
+
+Sustituyendo en $G\,\gamma_{xy} = \dfrac{1}{2}E\,\varepsilon_x$ se obtiene finalmente:
+
+<Formula label="Relación entre E, G y ν">
+$$
+G = \frac{E}{2(1+\nu)}
+$$
+</Formula>
+
+## Ley de Hooke generalizada
+
+Para un estado de esfuerzos triaxial ($\sigma_x$, $\sigma_y$, $\sigma_z$) se aplica el principio de superposición: se calcula la deformación que produce cada esfuerzo por separado y luego se suman los efectos.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792804988/yxhkzhqxa3hgdaflvx6g.png"
+  alt="Superposición de los esfuerzos σx, σy y σz sobre un cubo"
+  caption="Figura 1.4: Superposición de esfuerzos en las tres direcciones."
+/>
+
+### Deformaciones provocadas por cada esfuerzo
+
+**Efecto de $\sigma_x$**
+
+$$
+\varepsilon_x = \frac{\sigma_x}{E} \qquad\qquad \varepsilon_y = -\nu\,\frac{\sigma_x}{E} \qquad\qquad \varepsilon_z = -\nu\,\frac{\sigma_x}{E}
+$$
+
+**Efecto de $\sigma_y$**
+
+$$
+\varepsilon_x = -\nu\,\frac{\sigma_y}{E} \qquad\qquad \varepsilon_y = \frac{\sigma_y}{E} \qquad\qquad \varepsilon_z = -\nu\,\frac{\sigma_y}{E}
+$$
+
+**Efecto de $\sigma_z$**
+
+$$
+\varepsilon_x = -\nu\,\frac{\sigma_z}{E} \qquad\qquad \varepsilon_y = -\nu\,\frac{\sigma_z}{E} \qquad\qquad \varepsilon_z = \frac{\sigma_z}{E}
+$$
+
+### Deformaciones totales
+
+Sumando los tres efectos en cada dirección:
+
+<Formula label="Deformaciones normales (Hooke generalizada)">
+$$
+\varepsilon_x = \frac{\sigma_x}{E} - \nu\,\frac{\sigma_y}{E} - \nu\,\frac{\sigma_z}{E}
+$$
+$$
+\varepsilon_y = -\nu\,\frac{\sigma_x}{E} + \frac{\sigma_y}{E} - \nu\,\frac{\sigma_z}{E}
+$$
+$$
+\varepsilon_z = -\nu\,\frac{\sigma_x}{E} - \nu\,\frac{\sigma_y}{E} + \frac{\sigma_z}{E}
+$$
+</Formula>
+
+### Esfuerzos y deformaciones cortantes
+
+Los esfuerzos cortantes son simétricos y cada uno produce solo su deformación angular correspondiente:
+
+$$
+\tau_{xy} = \tau_{yx} \qquad\qquad \tau_{xy} = G\,\gamma_{xy}
+$$
+
+$$
+\tau_{yz} = \tau_{zy} \qquad\qquad \tau_{yz} = G\,\gamma_{yz}
+$$
+
+$$
+\tau_{xz} = \tau_{zx} \qquad\qquad \tau_{zx} = G\,\gamma_{zx}
+$$
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792805082/qacenw7fuikelnh2iszd.png"
+  alt="Cubo con esfuerzos cortantes en sus caras"
+  caption="Figura 1.5: Esfuerzos cortantes sobre un elemento cúbico."
+/>
+
+## Módulo de dilatación
+
+<Definition title="Módulo de dilatación">
+Cambio de volumen por unidad de volumen de un elemento sometido a deformación. Se denota con $e$.
+</Definition>
+
+Volumen final de un cubo unitario sujeto a deformación:
+
+$$
+v = (1+\varepsilon_x)(1+\varepsilon_y)(1+\varepsilon_z)
+$$
+
+Para deformaciones pequeñas se desprecian los productos entre deformaciones:
+
+$$
+v = 1 + \varepsilon_x + \varepsilon_y + \varepsilon_z
+$$
+
+Como el volumen inicial es $1$, el cambio de volumen del cubo unitario es:
+
+$$
+e = \varepsilon_x + \varepsilon_y + \varepsilon_z
+$$
+
+Sustituyendo las deformaciones de la ley de Hooke generalizada:
+
+$$
+e = \frac{\sigma_x + \sigma_y + \sigma_z}{E} - \frac{2\nu\,(\sigma_x + \sigma_y + \sigma_z)}{E}
+$$
+
+Factorizando, el cambio de volumen en función de los esfuerzos axiales es:
+
+<Formula label="Módulo de dilatación">
+$$
+e = \frac{1 - 2\nu}{E}\,(\sigma_x + \sigma_y + \sigma_z)
+$$
+</Formula>
+
+## Módulo de Bulk
+
+Si un cubo unitario está sujeto a presión hidrostática $p$, los tres esfuerzos son iguales y de compresión: $\sigma_x = \sigma_y = \sigma_z = -p$. Al sustituir en el módulo de dilatación:
+
+<Formula label="Cambio de volumen bajo presión hidrostática">
+$$
+e = -\frac{3(1 - 2\nu)}{E}\,p
+$$
+</Formula>
+
+### Módulo de compresión del material
+
+<Formula label="Módulo de compresión (Bulk)">
+$$
+k = \frac{E}{3(1 - 2\nu)}
+$$
+</Formula>
+
+La presión requerida para producir un cambio de volumen unitario del material es:
+
+$$
+e = -\frac{p}{k}
+$$
+
+Como el módulo de compresión es positivo ($k > 0$), se debe cumplir que $1 - 2\nu > 0$, es decir:
+
+<Formula label="Rango del módulo de Poisson">
+$$
+0 < \nu < \frac{1}{2}
+$$
+</Formula>
+
+<Summary title="Resumen">
+- En el régimen elástico lineal: $\sigma = E\,\varepsilon$ para esfuerzos normales y $\tau = G\,\gamma$ para esfuerzos cortantes.
+- El módulo de Poisson $\nu = -\varepsilon_{lateral}/\varepsilon_{axial}$ mide la contracción lateral; en materiales isótropos $\nu_x = \nu_y = \nu_z$.
+- $E$, $G$ y $\nu$ no son independientes: $G = \dfrac{E}{2(1+\nu)}$.
+- La ley de Hooke generalizada se obtiene por superposición de los efectos de $\sigma_x$, $\sigma_y$ y $\sigma_z$.
+- El cambio de volumen unitario es $e = \dfrac{1-2\nu}{E}(\sigma_x + \sigma_y + \sigma_z)$.
+- El módulo de compresión es $k = \dfrac{E}{3(1-2\nu)}$ y obliga a que $0 < \nu < \dfrac{1}{2}$.
+</Summary>
