@@ -1,0 +1,60 @@
+# Resistencia y seguridad
+
+Para evaluar si un elemento puede soportar las cargas que actúan sobre él, se considera la resistencia del material y se compara la capacidad disponible con la demanda aplicada. El esfuerzo de falla describe el comportamiento del material cuando se acerca a la fractura; el factor de seguridad expresa la relación entre la capacidad y la demanda.
+
+## 1.3.1. Esfuerzo de falla
+
+Al someter una probeta a tensión y relacionar el esfuerzo con la deformación unitaria, se obtiene una curva esfuerzo-deformación. Esta curva permite identificar distintas etapas del comportamiento del material.
+
+En la región lineal, el esfuerzo aumenta proporcionalmente a la deformación. El límite de proporcionalidad marca el final de esa relación lineal. Luego se encuentra el límite elástico: mientras no se supere, el material puede recuperar su forma al retirar la carga.
+
+Al alcanzar el **esfuerzo de fluencia**, el material comienza a deformarse plásticamente. Después puede producirse endurecimiento por deformación, durante el cual se requiere un esfuerzo cada vez mayor para continuar deformándolo. El **esfuerzo último** es el valor máximo de esfuerzo que alcanza la curva. Luego ocurre la estricción, que reduce localmente el área de la probeta, hasta que finalmente se produce la fractura.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793422812/ryhowrhjkpls4bmymkza.png"
+  alt="Curva esfuerzo-deformación que muestra la región lineal, la fluencia, el endurecimiento por deformación, el esfuerzo último, la estricción y la fractura."
+  caption="Figura 10. Etapas de la curva esfuerzo-deformación hasta la fractura."
+  width="80%"
+/>
+
+En la curva de esfuerzo-deformación también puede distinguirse el esfuerzo de fractura del esfuerzo de fractura real. El primero se calcula usando el área original de la probeta; el segundo considera la reducción del área en la zona de estricción al momento de la fractura. Por ello, sus valores pueden ser diferentes.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793422894/srpti1m6xbkqphrzjkgz.png"
+  alt="Curvas esfuerzo-deformación que señalan el límite proporcional, el límite elástico, la fluencia, el esfuerzo último y los esfuerzos de fractura nominal y real."
+  caption="Figura 11. Comparación de los esfuerzos señalados en la curva hasta la fractura."
+  width="80%"
+/>
+
+## 1.3.2. Factor de seguridad
+
+El factor de seguridad compara la capacidad de un elemento con la demanda que debe soportar:
+
+$$
+F.S.=\frac{\text{Capacidad}}{\text{Demanda}}
+=\frac{C}{D}.
+$$
+
+La capacidad y la demanda deben expresarse con magnitudes compatibles. Por ejemplo, pueden compararse cargas con cargas o esfuerzos con esfuerzos. El factor de seguridad no tiene unidades.
+
+Según esta relación:
+
+- $F.S. > 1$: **¿Seguro?** La capacidad supera la demanda considerada, pero debe comprobarse que se alcance el factor de seguridad requerido.
+- $F.S. = 1$: **Al límite.** La demanda iguala la capacidad del elemento.
+- $F.S. < 1$: **¡Colapso seguro!** La demanda supera la capacidad, aunque la consecuencia puede ser fluencia, fractura u otra falla según el criterio adoptado.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793424016/omxkl1lxn69prepnn7to.png"
+  alt="Relación entre capacidad y demanda para calcular el factor de seguridad; se muestran los casos mayor que uno, igual a uno y menor que uno."
+  caption="Figura 12. Interpretación del factor de seguridad según la relación entre capacidad y demanda."
+/>
+
+<Summary title="Resumen">
+
+- La curva esfuerzo-deformación muestra las etapas del material desde la región lineal hasta la fractura.
+- El esfuerzo de fluencia marca el inicio de la deformación plástica; el esfuerzo último es el máximo de la curva.
+- El esfuerzo de fractura real considera la reducción del área en la zona de estricción.
+- El factor de seguridad se calcula como la relación entre capacidad y demanda: $F.S.=C/D$.
+- Si $F.S.>1$, la capacidad supera la demanda; si $F.S.=1$, el elemento está al límite; y si $F.S.<1$, la demanda supera la capacidad.
+
+</Summary>
