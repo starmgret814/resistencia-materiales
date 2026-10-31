@@ -1,0 +1,72 @@
+# Tablas
+
+Los perfiles normalizados (W, I, canales, ángulos) vienen con sus propiedades ya calculadas. Usar las tablas evita calcular áreas e inercias a mano, pero hay que saber **qué eje es cuál**.
+
+## Cómo leer una tabla
+
+<Definition title="Propiedades de un perfil">
+Cada fila da, para un perfil, su área $A$, sus dimensiones, los momentos de inercia $I$ respecto a los ejes centroidales, el módulo de sección $S$, el radio de giro $r$ y la distancia $c$ del centroide a una cara.
+</Definition>
+
+Los ejes se numeran así:
+
+- **Ejes $1\text{-}1$ y $2\text{-}2$:** pasan por el centroide y son paralelos a los lados. En perfiles I, W, HE, IPN y canales son **ejes principales**. En ángulos **no lo son**.
+- **Ejes $3\text{-}3$ y $4\text{-}4$:** solo aparecen en ángulos y son los **ejes principales**. El $3\text{-}3$ tiene la inercia mínima.
+
+Para un ángulo, el eje $4\text{-}4$ se obtiene con:
+
+$$
+I_{4\text{-}4} = I_{1\text{-}1} + I_{2\text{-}2} - I_{3\text{-}3}
+$$
+
+Donde todas las inercias están en $\text{cm}^4$. Sale de que la suma $I_{1\text{-}1} + I_{2\text{-}2}$ no cambia al girar los ejes (subtema 8.2).
+
+**Unidades:** unas tablas dan $I$ en $\text{cm}^4$, otras en $10^6\text{ mm}^4$ y otras en $\text{in}^4$. Para pasar a $\text{m}^4$: de $\text{cm}^4$ se multiplica por $10^{-8}$ y de $\text{mm}^4$ por $10^{-12}$.
+
+## Tablas
+
+### Perfiles W de acero en unidades SI (1/2)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700677/veuvtpkaff5zb2xx0cii.png"  alt="Tabla de propiedades de perfiles W de acero en unidades SI, con área, peralte, ancho y espesor del ala, espesor del alma, inercias, módulos de sección y radios de giro" caption="Tabla 8.1: Perfiles W de acero, unidades SI (1/2)." />
+
+### Perfiles W (2/2)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700707/nhbx3giihlwef7febotg.png"  alt="Continuación de la tabla de perfiles W de acero en unidades SI, que incluye las series W360, W310, W250, W200 y W150" caption="Tabla 8.2: Perfiles W de acero, unidades SI (2/2). Aquí está el W250×45 del Problema 3." />
+
+### Ángulos en pulgadas
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700754/khsthg8polxupgjo3sls.png" alt="Tabla de ángulos de lados iguales en unidades inglesas con inercias respecto a los ejes X, Y y Z, y su esquema" caption="Tabla 8.3: Ángulos de lados iguales, unidades inglesas." />
+
+### Perfiles europeos HE
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700800/iobdwng1mixlvaowclew.png" alt="Tabla F-1 de perfiles europeos de ala ancha HE con el esquema de la sección y sus ejes 1-1 y 2-2" caption="Tabla 8.4: Perfiles europeos de ala ancha (HE). Los ejes 1-1 y 2-2 son principales." />
+
+### Perfiles europeos IPN
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700851/igji7wkyouul2eknyl9l.png" alt="Tabla F-2 de vigas europeas estándar IPN con el esquema de la sección y sus ejes 1-1 y 2-2" caption="Tabla 8.5: Vigas europeas estándar (IPN). Los ejes 1-1 y 2-2 son principales." />
+
+### Canales UPN
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700896/qc7edjbts4aecjwaucwi.png"  alt="Tabla F-3 de canales europeos estándar UPN con el esquema de la sección, los ejes 1-1 y 2-2 y la distancia c" caption="Tabla 8.6: Canales europeos estándar (UPN). Aquí está el UPN 160 del Problema 4." />
+
+### Ángulos de lados iguales
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700935/m2bx98a1erllasmehh39.png" alt="Tabla F-4 de ángulos de lados iguales con los ejes 1-1, 2-2, 3-3 y 4-4 y la distancia c" caption="Tabla 8.7: Ángulos de lados iguales. Aquí está el L150×150×14 del Problema 5." />
+
+### Ángulos de lados desiguales
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792700973/q9klbmxewfir9e4oftsu.png" alt="Tabla F-5 de ángulos de lados desiguales con los ejes 1-1, 2-2, 3-3 y 4-4, las distancias c y d, y el ángulo alfa" caption="Tabla 8.8: Ángulos de lados desiguales. Aquí está el L120×80×12 del Problema 6." />
+
+## Ejercicio de autoevaluación
+
+<Quiz question="En un ángulo de lados iguales, ¿los ejes 1-1 y 2-2 de la tabla son principales?">
+No. Son centroidales y paralelos a las alas, pero el producto de inercia respecto a ellos no es cero. Los principales son $3\text{-}3$ y $4\text{-}4$.
+</Quiz>
+
+<Summary title="Resumen">
+- Las tablas dan $A$, las inercias y la distancia $c$ de cada perfil.
+- En perfiles I, W, HE, IPN y canales los ejes $1\text{-}1$ y $2\text{-}2$ son principales; en ángulos son los $3\text{-}3$ y $4\text{-}4$.
+- En un ángulo, $I_{4\text{-}4} = I_{1\text{-}1} + I_{2\text{-}2} - I_{3\text{-}3}$.
+- Hay que revisar las unidades de la tabla antes de calcular.
+</Summary>
