@@ -1,0 +1,119 @@
+# PROBLEMAS RESUELTOS (LEY DE HOOKE GENERALIZADA)
+## Problemas propuestos
+
+<Problem number={1} title="Varilla de aluminio en prueba de tensión">
+En una prueba de tensión estándar, una varilla de aluminio de $20\text{ mm}$ de diámetro está sometida a una fuerza de tensión de $P = 30\text{ kN}$. Sabiendo que $\nu = 0.35$ y $E = 70\text{ GPa}$, determine: (a) la elongación de la varilla en una longitud de calibración de $150\text{ mm}$, (b) el cambio en el diámetro de la varilla.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792805575/nrfszdbceki7imydlztq.png"
+  alt="Varilla de aluminio de 20 mm de diámetro con longitud de calibración de 150 mm sometida a fuerza P"
+  caption="Figura P1: Varilla de aluminio sometida a tensión."
+/>
+
+<Solution>
+1. **Área de la sección transversal:**
+   $$
+   A = \frac{\pi}{4}d^2 = \frac{\pi}{4}(0.02)^2 = 3.1416\times 10^{-4}\text{ m}^2
+   $$
+
+2. **Esfuerzo normal:**
+   $$
+   \sigma = \frac{P}{A} = \frac{30\times 10^{3}}{3.1416\times 10^{-4}} = 95.49\text{ MPa}
+   $$
+
+3. **Deformación axial (ley de Hooke):**
+   $$
+   \varepsilon_{axial} = \frac{\sigma}{E} = \frac{95.49\times 10^{6}}{70\times 10^{9}} = 1.364\times 10^{-3}
+   $$
+
+4. **(a) Elongación en la longitud de calibración:**
+   $$
+   \delta = \varepsilon_{axial}\,L = (1.364\times 10^{-3})(150) = 0.2046\text{ mm}
+   $$
+
+5. **Deformación lateral (módulo de Poisson):**
+   $$
+   \varepsilon_{lateral} = -\nu\,\varepsilon_{axial} = -(0.35)(1.364\times 10^{-3}) = -4.775\times 10^{-4}
+   $$
+
+6. **(b) Cambio en el diámetro:**
+   $$
+   \Delta d = \varepsilon_{lateral}\,d = (-4.775\times 10^{-4})(20) = -9.55\times 10^{-3}\text{ mm}
+   $$
+
+**Respuestas:** (a) $\delta = 0.205\text{ mm}$ (alargamiento). (b) $\Delta d = -0.00955\text{ mm}$ (el diámetro se reduce).
+</Solution>
+</Problem>
+
+<Problem number={2} title="Apoyo elastomérico de un puente">
+Un apoyo elastomérico ($G = 130\text{ psi}$) se utiliza para soportar una viga de puente, proporcionando flexibilidad durante terremotos. La viga no debe desplazarse más de $\frac{3}{8}\text{ in}$ cuando se aplica una carga lateral de $5\text{ kips}$. Sabiendo que el esfuerzo cortante máximo permitido es de $60\text{ psi}$, determine: (a) la dimensión mínima permitida $b$, (b) el espesor mínimo requerido $a$.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792805534/smtc9skxvbarlvhcwhtx.png"
+  alt="Viga sobre apoyo elastomérico de espesor a, ancho 8 in y longitud b, con carga lateral P"
+  caption="Figura P2: Apoyo elastomérico bajo carga lateral."
+/>
+
+<Solution>
+1. **Planteamiento:** el área que resiste el cortante es $A = (8\text{ in})\,b$ y la fuerza cortante es $P = 5\text{ kips} = 5000\text{ lb}$.
+
+2. **(a) Dimensión mínima $b$:** se impone el esfuerzo cortante máximo permitido.
+   $$
+   \tau = \frac{P}{A} \le \tau_{adm} \implies \frac{5000}{8\,b} \le 60
+   $$
+   $$
+   b \ge \frac{5000}{(8)(60)} = 10.42\text{ in}
+   $$
+
+3. **Deformación angular con el esfuerzo máximo:**
+   $$
+   \gamma = \frac{\tau}{G} = \frac{60}{130} = 0.4615\text{ rad}
+   $$
+
+4. **(b) Espesor mínimo $a$:** el desplazamiento de la viga es $\delta = a\,\gamma$, con $\delta = \frac{3}{8}\text{ in}$.
+   $$
+   a = \frac{\delta}{\gamma} = \frac{0.375}{0.4615} = 0.8125\text{ in}
+   $$
+
+**Respuestas:** (a) $b_{min} = 10.42\text{ in}$. (b) $a_{min} = 0.8125\text{ in}\ \left(\tfrac{13}{16}\text{ in}\right)$.
+</Solution>
+</Problem>
+
+<Problem number={3} title="Módulo de rigidez de la goma">
+Dos bloques de goma, cada uno con un ancho $w = 60\text{ mm}$, están adheridos a soportes rígidos y a la placa móvil $AB$. Sabiendo que una fuerza de magnitud $P = 19\text{ kN}$ provoca un desplazamiento $\delta = 3\text{ mm}$ de la placa $AB$, determine el módulo de rigidez de la goma utilizada.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792805457/qel5s2utlgtufsysxkud.png"
+  alt="Dos bloques de goma de 35 mm de espesor entre soportes rígidos y la placa móvil AB"
+  caption="Figura P3: Bloques de goma sometidos a cortante por la fuerza P."
+/>
+
+<Solution>
+1. **Planteamiento:** la placa $AB$ está entre dos bloques, por lo que cada uno resiste la mitad de la carga:
+   $$
+   F = \frac{P}{2} = \frac{19\times 10^{3}}{2} = 9500\text{ N}
+   $$
+
+2. **Área de cortante de cada bloque** (longitud $180\text{ mm}$ por ancho $60\text{ mm}$):
+   $$
+   A = (0.180)(0.060) = 0.0108\text{ m}^2
+   $$
+
+3. **Esfuerzo cortante:**
+   $$
+   \tau = \frac{F}{A} = \frac{9500}{0.0108} = 0.8796\text{ MPa}
+   $$
+
+4. **Deformación angular** (espesor del bloque $h = 35\text{ mm}$):
+   $$
+   \gamma = \frac{\delta}{h} = \frac{3}{35} = 0.08571\text{ rad}
+   $$
+
+5. **Módulo de rigidez:**
+   $$
+   G = \frac{\tau}{\gamma} = \frac{0.8796}{0.08571} = 10.26\text{ MPa}
+   $$
+
+**Respuesta:** $G \approx 10.3\text{ MPa}$.
+</Solution>
+</Problem>
