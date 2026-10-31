@@ -1,0 +1,265 @@
+<Problem 
+title="Área de un enlace para un factor de seguridad de 3.20"
+image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793460537/a8um1ah0xhdsi1rbzyf0.png"
+imageAlt="Diagrama del enlace"
+imagePosition="right"
+imageWidth="50%">
+El enlace AB estará hecho de un acero cuyo esfuerzo normal último es de $65\ \mathrm{ksi}$. Determine el área de la sección transversal de AB para la cual el factor de seguridad sea de $3.20$. Suponga que el enlace estará adecuadamente reforzado alrededor de los pasadores en A y B.
+
+<Solution>
+
+El enlace AB es un elemento de dos fuerzas, por lo que la fuerza que transmite actúa a lo largo de su eje, inclinado $35^\circ$ respecto de la horizontal.
+
+**1. Resultante de la carga distribuida**
+
+La carga uniforme actúa sobre toda la longitud BE:
+
+$$
+W=(600\ \mathrm{lb/ft})(4.2\ \mathrm{ft})
+=2520\ \mathrm{lb}
+=2.52\ \mathrm{kips}
+$$
+
+Su resultante se ubica en el centro de BE, a $0.7\ \mathrm{ft}$ a la izquierda de D.
+
+**2. Fuerza axial en AB**
+
+Tomando momentos respecto de D, con sentido antihorario positivo:
+
+$$
+\sum M_D=0,
+$$
+
+$$
+5(1.4)+2.52(0.7)
+-F_{AB}(\sin35^\circ)(2.8)=0
+$$
+
+Por tanto:
+
+$$
+F_{AB}
+=\frac{5(1.4)+2.52(0.7)}
+{(2.8)(\sin35^\circ)}
+=5.456988\ \mathrm{kips}
+$$
+
+El enlace AB trabaja a **tracción**.
+
+**3. Área para el factor de seguridad especificado**
+
+El factor de seguridad respecto del esfuerzo último es:
+
+$$
+F.S.=\frac{\sigma_u}{\sigma},
+\qquad
+\sigma=\frac{F_{AB}}{A}
+$$
+
+Sustituyendo y despejando el área:
+
+$$
+A=\frac{(F.S.)F_{AB}}{\sigma_u}
+$$
+
+Para que el factor de seguridad sea $3.20$:
+
+$$
+A=\frac{(3.20)(5.456988)}{65}
+=\boxed{0.268652\ \mathrm{in^2}}
+$$
+
+</Solution>
+</Problem>
+
+<Problem title="Longitud de placas de empalme encoladas"
+image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474501/r7anoody6qztmvlczsu9.png"
+imageAlt="Diagrama de las placas de empalme"
+imagePosition="right"
+imageWidth="20%">
+Dos elementos de madera están unidos mediante placas de empalme de madera contrachapada que están completamente encoladas en las superficies de contacto.
+Sabiendo que el espacio entre los extremos de los elementos es de $6\ \mathrm{mm}$ y que el esfuerzo cortante último en la unión encolada es de $2.5\ \mathrm{MPa}$, determine la longitud $L$ para la cual el factor de seguridad es de $2.75$ bajo la carga mostrada de $16\ \mathrm{kN}$. El ancho de los elementos y de las placas es de $125\ \mathrm{mm}$.
+
+<Solution>
+
+**1. Fuerza transmitida por cada placa**
+
+Las dos placas de empalme comparten por igual la carga axial. Por tanto, cada placa transmite:
+
+$$
+F=\frac{16}{2}=8\ \mathrm{kN}.
+$$
+
+**2. Esfuerzo cortante admisible**
+
+El factor de seguridad respecto del esfuerzo cortante último permite obtener:
+
+$$
+\tau_{\mathrm{adm}}
+=\frac{\tau_u}{F.S.}
+=\frac{2.5}{2.75}
+=0.909091\ \mathrm{MPa}.
+$$
+
+**3. Longitud encolada sobre cada elemento**
+
+Sea $\ell$ la longitud de contacto de cada placa con cada elemento de madera. El área encolada correspondiente es:
+
+$$
+A=b\ell.
+$$
+
+Cada una de estas superficies transmite los $8\ \mathrm{kN}$ de la placa. Considerando el esfuerzo cortante promedio:
+
+$$
+\tau_{\mathrm{adm}}=\frac{F}{b\ell}.
+$$
+
+Despejando y sustituyendo:
+
+$$
+\ell
+=\frac{F}{b\tau_{\mathrm{adm}}}
+=\frac{(F.S.)F}{b\tau_u},
+$$
+
+$$
+\ell
+=\frac{(2.75)(8000)}
+{(125)(2.5)}
+=70.400000\ \mathrm{mm}.
+$$
+
+**4. Longitud total de las placas**
+
+La longitud total incluye las dos zonas encoladas y el espacio de $6\ \mathrm{mm}$ entre los elementos:
+
+$$
+L=2\ell+6.
+$$
+
+Por tanto:
+
+$$
+L=2(70.4)+6
+=\boxed{146.800000\ \mathrm{mm}}.
+$$
+
+</Solution>
+</Problem>
+
+<Problem number={3} title="Dimensionamiento de una placa de anclaje"
+image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474659/zatel5np18fnvujtdbok.png"
+imageAlt="Diagrama de una placa de anclaje"
+imagePosition="right"
+imageWidth="60%">
+Una placa de acero de $1/4\ \mathrm{in}$ de espesor está empotrada en una pared de concreto para anclar un cable de alta resistencia, como se muestra. El diámetro del agujero en la placa es de $3/4\ \mathrm{in}$, la resistencia última del acero utilizado es de $36\ \mathrm{ksi}$ y la resistencia última de adherencia entre la placa y el concreto es de $300\ \mathrm{psi}$.
+
+Sabiendo que se desea un factor de seguridad de $3.60$ cuando $P=2.5\ \mathrm{kips}$, determine:
+
+- **(a)** El ancho requerido $a$ de la placa.
+- **(b)** La profundidad mínima $b$ a la que una placa de ese ancho debe estar empotrada en el concreto.
+
+Se deben ignorar los esfuerzos normales entre el concreto y el extremo de la placa.
+
+<Solution>
+
+**1. Resistencias admisibles**
+
+Los valores proporcionados corresponden a resistencias últimas. Aplicando el factor de seguridad:
+
+$$
+\sigma_{\mathrm{adm}}
+=\frac{\sigma_u}{F.S.}
+=\frac{36}{3.60}
+=10\ \mathrm{ksi},
+$$
+
+$$
+\tau_{\mathrm{adm}}
+=\frac{\tau_u}{F.S.}
+=\frac{300}{3.60}
+=83.333333\ \mathrm{psi}.
+$$
+
+**2. Ancho requerido de la placa**
+
+La sección crítica pasa por el agujero. Si su diámetro es $d$, el área neta resistente es:
+
+$$
+A_{\mathrm{neta}}=(a-d)t.
+$$
+
+El esfuerzo normal promedio en esta sección es:
+
+$$
+\sigma=\frac{P}{(a-d)t}.
+$$
+
+Para obtener el factor de seguridad especificado, se iguala este esfuerzo al admisible:
+
+$$
+\frac{P}{(a-d)t}=\sigma_{\mathrm{adm}}.
+$$
+
+Despejando el ancho:
+
+$$
+a=d+\frac{P}{t\sigma_{\mathrm{adm}}}.
+$$
+
+Con $t=0.25\ \mathrm{in}$ y $d=0.75\ \mathrm{in}$:
+
+$$
+a=0.75+\frac{2.5}{(0.25)(10)}
+=\boxed{1.750000\ \mathrm{in}}.
+$$
+
+En milímetros:
+
+$$
+\boxed{a=44.450000\ \mathrm{mm}}.
+$$
+
+**3. Profundidad mínima de empotramiento**
+
+La adherencia transmite la carga mediante esfuerzos cortantes sobre las dos caras anchas y los dos cantos de la longitud empotrada. Por tanto, el área de contacto resistente es:
+
+$$
+A_{\mathrm{adherencia}}
+=2ab+2tb
+=2(a+t)b.
+$$
+
+No se incluye la superficie del extremo de la placa, de acuerdo con el enunciado.
+
+El esfuerzo cortante promedio debe satisfacer:
+
+$$
+\frac{P}{2(a+t)b}\leq\tau_{\mathrm{adm}}.
+$$
+
+La profundidad mínima se obtiene con la igualdad:
+
+$$
+b_{\min}
+=\frac{P}{2(a+t)\tau_{\mathrm{adm}}}.
+$$
+
+Usando $P=2500\ \mathrm{lb}$:
+
+$$
+b_{\min}
+=\frac{2500}
+{2(1.75+0.25)(300/3.60)}
+=\boxed{7.500000\ \mathrm{in}}.
+$$
+
+En milímetros:
+
+$$
+\boxed{b_{\min}=190.500000\ \mathrm{mm}}.
+$$
+
+</Solution>
+</Problem>
