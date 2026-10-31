@@ -1,0 +1,266 @@
+# Ley de Hooke para barras
+
+Cuando una barra se carga axialmente, la ley de Hooke permite calcular cuánto se alarga o se acorta. Esta lección extiende esa idea a barras con varios tramos, a barras de sección variable y a sistemas hiperestáticos, donde el equilibrio por sí solo no alcanza y hay que usar las deformaciones.
+
+<Definition title="Deformación axial de una barra">
+Cambio de longitud $\delta$ de una barra sometida a una carga axial $P$. En el rango elástico lineal es directamente proporcional a la carga y a la longitud, e inversamente proporcional a la rigidez axial $EA$.
+</Definition>
+
+## Ley de Hooke en barras
+
+Dentro del comportamiento elástico lineal (tramo $OA$ del diagrama), el esfuerzo es proporcional a la deformación unitaria:
+
+<Formula label="Ley de Hooke">
+$$
+\sigma = E\,\varepsilon
+$$
+</Formula>
+
+Sustituyendo $\sigma = \dfrac{P}{A}$ y $\varepsilon = \dfrac{\delta}{L}$ se relacionan fuerzas y desplazamientos:
+
+<Formula label="Fuerza y desplazamiento">
+$$
+\frac{P}{A} = E\,\frac{\delta}{L}
+$$
+</Formula>
+
+Despejando $\delta$ se obtiene la elongación de la barra:
+
+<Formula label="Elongación de una barra">
+$$
+\delta = \frac{P\,L}{E\,A}
+$$
+</Formula>
+
+Donde:
+- $P$ es la carga axial interna ($\text{N}$).
+- $L$ es la longitud inicial de la barra ($\text{m}$).
+- $E$ es el módulo de elasticidad del material ($\text{Pa}$).
+- $A$ es el área de la sección transversal ($\text{m}^2$).
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807597/vwopqhriw9pcyrhar6ho.png"
+  alt="Diagrama esfuerzo-deformación elástico lineal y barra de longitud L con carga P y elongación δ"
+  caption="Figura 1.1: Comportamiento elástico lineal y aplicación a una barra simple."
+/>
+
+## Analogía barra-resorte
+
+Una barra cargada axialmente se comporta como un resorte lineal: la fuerza es proporcional al desplazamiento.
+
+<Formula label="Barra como resorte">
+$$
+P = \frac{E\,A}{L}\,\delta \qquad \Longleftrightarrow \qquad F = K\,x
+$$
+</Formula>
+
+<Definition title="Rigidez axial">
+Fuerza necesaria para producir un desplazamiento unitario en la barra. Depende del material y de la geometría.
+</Definition>
+
+<Formula label="Rigidez axial de una barra">
+$$
+K = \frac{E\,A}{L}
+$$
+</Formula>
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807565/swecpxezsromzide5tvn.png"
+  alt="Barra cargada axialmente comparada con un resorte lineal"
+  caption="Figura 1.2: Analogía entre una barra y un resorte."
+/>
+
+## Sistemas discretos y continuos
+
+### Barras discretas (por tramos)
+
+Si la barra está formada por varios tramos con carga, área o material constantes en cada uno, se suman las deformaciones de cada tramo:
+
+<Formula label="Deformación total de barras discretas">
+$$
+\delta = \sum_i \frac{P_i\,L_i}{A_i\,E_i}
+$$
+</Formula>
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807550/ly6r2dvb9hiinbyllixq.png"
+  alt="Barra escalonada con áreas A1, A2 y A3 y longitudes l1, l2 y l3"
+  caption="Figura 1.3: Barra escalonada con tres tramos."
+/>
+
+### Barras continuas (sección variable)
+
+Si el área o la carga varían de forma continua, se analiza un elemento diferencial de longitud $dx$ y luego se integra:
+
+$$
+d\delta = \varepsilon\,dx = \frac{P}{A\,E}\,dx
+$$
+
+<Formula label="Deformación total de barras continuas">
+$$
+\delta = \int_0^L \frac{P\,dx}{A\,E}
+$$
+</Formula>
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807539/z8hehknvaanyfoojev79.png"
+  alt="Barra de sección variable con un elemento diferencial de longitud Δx a una distancia x"
+  caption="Figura 1.4: Barra de sección variable con un elemento diferencial."
+/>
+
+## Principio de superposición
+
+<Definition title="Principio de superposición">
+En un sistema lineal, el efecto total de varias cargas actuando juntas es igual a la suma de los efectos de cada carga actuando por separado.
+</Definition>
+
+- **Sistema lineal:** $\delta_3 = \delta_1 + \delta_2$
+- **Sistema no lineal:** $\delta_3 < \delta_1 + \delta_2$
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807529/tanzfchgoyfcjxnnghxv.png"
+  alt="Curvas carga-desplazamiento de un sistema lineal y uno no lineal con las cargas P1 y P2"
+  caption="Figura 1.5: Superposición en sistemas lineales y no lineales."
+/>
+
+## Problemas hiperestáticos
+
+Un sistema es **hiperestático** cuando tiene más incógnitas que ecuaciones de equilibrio. Para resolverlo se necesitan ecuaciones adicionales, que salen de las deformaciones.
+
+Se analiza un sistema de tres barras articuladas que sostiene una carga $P$, con fuerzas internas $F_1$, $F_2$ y $F_3$.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807516/oi4j21ytbttvvrlf0qfc.png"
+  alt="Sistema de tres barras con materiales E1A1, E2A2, E3A3, ángulos α y β, y carga P"
+  caption="Figura 1.6: Sistema hiperestático de tres barras."
+/>
+
+### Ecuaciones de equilibrio
+
+<Formula label="Sumatoria de fuerzas en X (1)">
+$$
+-F_1\cos\alpha + F_3\cos\beta = 0
+$$
+</Formula>
+
+<Formula label="Sumatoria de fuerzas en Y (2)">
+$$
+F_1\,\text{sen}\,\alpha + F_2 + F_3\,\text{sen}\,\beta - P = 0
+$$
+</Formula>
+
+### Grado de indeterminación
+
+- Número de incógnitas: $N_i = 3$ ($F_1$, $F_2$, $F_3$)
+- Número de ecuaciones: $N_e = 2$
+
+$$
+N_i > N_e \quad \Rightarrow \quad \text{problema hiperestático}
+$$
+
+## Análisis de deformaciones
+
+Al cargar el sistema, el nudo común baja una distancia $\delta$ y la barra 1 pasa de su longitud $L_1$ a una longitud final $L_{1f}$.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807481/fps3gybr0how0cy71qbu.png"
+  alt="Triángulo de deformaciones de la barra 1 con longitud inicial L1, longitud final L1f y desplazamiento δ"
+  caption="Figura 1.7: Triángulo de deformaciones de la barra 1."
+/>
+
+### Ley de cosenos
+
+En el triángulo de deformaciones se tiene:
+
+$$
+L_{1f}^2 = L_1^2 + \delta^2 - 2\,L_1\,\delta\cos\left(\frac{\pi}{2} + \alpha\right)
+$$
+
+$$
+L_{1f}^2 = L_1^2\left(1 + \frac{\delta^2}{L_1^2} + 2\,\frac{\delta}{L_1}\,\text{sen}(\alpha)\right)
+$$
+
+### Simplificación por deformaciones pequeñas
+
+Las deformaciones son pequeñas comparadas con las dimensiones de los elementos:
+
+$$
+\frac{\delta}{L_1} \ll \frac{1}{500} = 0.002 \quad \Rightarrow \quad \frac{\delta^2}{L_1^2} \ll \frac{1}{250\,000} = 0.000004
+$$
+
+Por eso es posible ignorar los efectos de segundo orden:
+
+$$
+L_{1f}^2 = L_1^2\left(1 + 2\,\frac{\delta}{L_1}\,\text{sen}(\alpha)\right)
+$$
+
+Tomando la raíz cuadrada y simplificando:
+
+$$
+L_{1f} = L_1\sqrt{1 + 2\,\frac{\delta}{L_1}\,\text{sen}(\alpha)} = L_1\left(1 + \frac{\delta}{L_1}\,\text{sen}(\alpha)\right)
+$$
+
+La longitud final de primer orden es, entonces, $L_{1f} = L_1 + \delta\,\text{sen}(\alpha)$, y el cambio de longitud de la barra es:
+
+<Formula label="Cambio de longitud de la barra 1">
+$$
+\Delta L = \delta\,\text{sen}(\alpha)
+$$
+</Formula>
+
+### Deformaciones de primer orden
+
+Las deformaciones de primer orden consideran deformaciones pequeñas respecto de las dimensiones del elemento. El cambio de longitud de una barra es la proyección del desplazamiento del nudo sobre la dirección de la barra:
+
+<Formula label="Proyección del desplazamiento">
+$$
+\Delta L = \delta \cdot n
+$$
+</Formula>
+
+Donde $n$ es el vector unitario en la dirección de la barra.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792807867/q0du68vtxb6uutvb1atw.png"
+  alt="Proyección del desplazamiento δ del nudo sobre la dirección de la barra"
+  caption="Figura 1.8: Deformación de primer orden como proyección del desplazamiento."
+/>
+
+## Ecuación de compatibilidad
+
+Los desplazamientos de cada barra se relacionan con el desplazamiento vertical $\delta$ del nudo común:
+
+$$
+\delta_1 = \delta\,\text{sen}\,\alpha \qquad\qquad \delta_2 = \delta \qquad\qquad \delta_3 = \delta\,\text{sen}\,\beta
+$$
+
+Eliminando $\delta$ se obtienen las relaciones entre deformaciones:
+
+$$
+\frac{\delta_1}{\text{sen}\,\alpha} = \frac{\delta_3}{\text{sen}\,\beta} = \delta_2
+$$
+
+Como $\delta_i = \dfrac{F_i\,L_i}{E_i\,A_i}$, las ecuaciones de compatibilidad quedan en función de las fuerzas:
+
+<Formula label="Ecuaciones de compatibilidad (3)">
+$$
+\frac{F_1\,L_1}{E_1\,A_1\,\text{sen}\,\alpha} = \frac{F_3\,L_3}{E_3\,A_3\,\text{sen}\,\beta} = \frac{F_2\,L_2}{E_2\,A_2}
+$$
+</Formula>
+
+Las ecuaciones de equilibrio (1) y (2) junto con las de compatibilidad (3) permiten resolver las tres fuerzas $F_1$, $F_2$ y $F_3$.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792808029/jkv5lft3b8wmk6ppicnt.png"
+  alt="Sistema de tres barras con los desplazamientos δ1, δ2 y δ3 de cada barra"
+  caption="Figura 1.9: Desplazamientos de cada barra y compatibilidad geométrica."
+/>
+
+<Summary title="Resumen">
+- La elongación de una barra cargada axialmente es $\delta = \dfrac{PL}{EA}$.
+- Una barra se comporta como un resorte de rigidez $K = \dfrac{EA}{L}$.
+- En barras por tramos se suman las deformaciones: $\delta = \sum \dfrac{P_i L_i}{A_i E_i}$. En barras de sección variable se integra: $\delta = \displaystyle\int_0^L \dfrac{P\,dx}{AE}$.
+- En un sistema lineal rige la superposición: $\delta_3 = \delta_1 + \delta_2$.
+- Un problema es hiperestático cuando $N_i > N_e$. Se resuelve combinando equilibrio con compatibilidad de deformaciones.
+- Con deformaciones pequeñas se usa el primer orden: $\Delta L = \delta\,\text{sen}(\alpha)$.
+</Summary>
