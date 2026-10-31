@@ -1,0 +1,90 @@
+# Fundamentos Matemáticos y Deducción de la Curva Elástica
+
+## Relación curvatura-momento flector:
+
+Se analiza un elemento diferencial de viga de longitud $dx$, que al flexionarse forma un arco de radio de curvatura $\rho$ y ángulo $d\theta$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792738058/p887wauclgm91nmsci8k.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+**Arco y curvatura:** como $ds = \rho\,d\theta$, la curvatura es:
+
+$$
+\frac{1}{\rho} = \frac{d\theta}{ds}
+$$
+
+**Deformación unitaria:** Un grosor infinitesimal a distancia $y$ del eje neutro pasa de longitud $\rho\,d\theta$ a $(\rho - y)\,d\theta$, entonces:
+
+$$
+\varepsilon_y = \frac{(\rho - y)\,d\theta - \rho\,d\theta}{\rho\,d\theta} = -\frac{y}{\rho}
+$$
+
+**Por ley de Hooke:**
+
+$$
+\sigma_y = E \cdot \varepsilon_y = -E \cdot \frac{y}{\rho}
+$$
+
+**Fuerza diferencial respecto al esfuerzo:**
+
+$$
+dF = \sigma_y \cdot dA
+$$
+
+**Momento diferencial:**
+
+$$
+dM = y \cdot dF = y \cdot \left( \sigma_y \cdot dA \right) = y \cdot \left( E \cdot \frac{y}{\rho} \cdot dA \right) = E \cdot \frac{y^2}{\rho} \cdot dA
+$$
+
+$$
+M = \int E \cdot \frac{y^2}{\rho} \cdot dA = \frac{E}{\rho} \int y^2 \, dA = \frac{E \cdot I}{\rho}
+$$
+
+<Formula label="Relación curvatura-momento flector">
+$$
+\frac{1}{\rho} = \frac{M}{E \cdot I}
+$$
+</Formula>
+
+* Momento flector ($M$).
+* Módulo de Young ($E$).
+* Momento de inercia de la sección transversal ($I$).
+* Radio de curvatura ($\rho$).
+
+## Ecuación diferencial exacta vs aproximación de pequeñas pendientes:
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792738120/q2e8umootodgupaeujtd.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+**Pendiente:** $\tan\theta = y'(x)$, es decir, $\theta(x) = \arctan(y'(x))$.
+
+**Elementos diferenciales:** Al derivar el ángulo y la longitud de arco respecto a $x$:
+
+$$
+d\theta = \frac{y''(x)}{1 + \left[ y'(x) \right]^2}\,dx \qquad ds = \sqrt{1 + \left[ y'(x) \right]^2}\,dx
+$$
+
+**Curvatura exacta:**
+
+$$
+\frac{1}{\rho} = \frac{d\theta}{ds} = \frac{y''(x)}{\left( 1 + \left[ y'(x) \right]^2 \right)^{3/2}}
+$$
+
+**Ecuación diferencial exacta:** Igualando con $\frac{M}{E \cdot I}$
+
+$$
+\frac{y''(x)}{\left( 1 + \left[ y'(x) \right]^2 \right)^{3/2}} = \frac{M}{E \cdot I}
+$$
+
+La ecuación es no lineal, por lo que es difícil de integrar directamente.
+
+**Hipótesis de pequeñas deformaciones:** En ingeniería la pendiente suele ser muy pequeña, así que $y'(x) \ll 1$, entonces $\left[ y'(x) \right]^2 \approx 0$ y el denominador vale aproximadamente 1.
+
+**Ecuación simplificada de segundo orden:**
+
+$$
+y''(x) = \frac{M}{E \cdot I}
+$$
