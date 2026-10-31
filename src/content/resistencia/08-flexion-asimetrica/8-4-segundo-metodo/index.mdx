@@ -1,0 +1,115 @@
+# 8.4 Segundo método
+
+El **segundo método** evita buscar los ejes principales. Se trabaja con **cualquier par de ejes centroidales** $z$, $y$ y se incluye el producto de inercia $I_{yz}$ en las fórmulas. Es el método más cómodo cuando $I_z$, $I_y$ e $I_{yz}$ ya se conocen o se calculan directamente.
+
+<Definition title="Segundo método (ejes centroidales)">
+Se plantea el equilibrio entre los esfuerzos y los momentos usando ejes centroidales arbitrarios $z$, $y$. La fórmula resultante contiene a $I_y$, $I_z$ e $I_{yz}$ y vale para cualquier sección.
+</Definition>
+
+## Fundamento
+
+El análisis se hace en cuatro pasos:
+
+**Paso 1: las secciones planas siguen planas.** La deformación unitaria varía linealmente con la posición. Con las curvaturas $\kappa_y$ y $\kappa_z$ ($\text{1/m}$), el esfuerzo es:
+
+$$
+\sigma_x = -\kappa_y E\, y - \kappa_z E\, z
+$$
+
+Donde $E$ es el módulo de elasticidad ($\text{Pa}$) y $y$, $z$ son las coordenadas del punto ($\text{m}$).
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792686400/n8te6mrpgjfazkxrigqi.svg" alt="Sección irregular con ejes centroidales z, y, momentos My y Mz, un punto A y el eje neutro con ángulo beta" 
+ caption="Figura 8.7: Segundo método. Los ejes z, y son centroidales pero no principales, por eso Iyz ≠ 0."
+/>
+
+**Paso 2: no hay fuerza axial.** La fuerza axial debe ser nula, $\int \sigma_x\, dA = 0$, es decir $\kappa_y E\int y\, dA + \kappa_z E\int z\, dA = 0$. Esto se cumple porque los ejes son **centroidales**: $\int y\, dA = \int z\, dA = 0$.
+
+**Paso 3: equilibrio de momentos.** Los momentos de los esfuerzos respecto a $y$ y a $z$ deben igualar a $M_y$ y $M_z$:
+
+$$
+M_y = \int \sigma_x\, z\, dA = -\kappa_y E\, I_{yz} - \kappa_z E\, I_y
+$$
+
+$$
+M_z = -\int \sigma_x\, y\, dA = \kappa_y E\, I_z + \kappa_z E\, I_{yz}
+$$
+
+**Paso 4: resolver las dos ecuaciones** para $\kappa_y$ y $\kappa_z$:
+
+<Formula label="Curvaturas">
+$$
+\kappa_y = \frac{M_z I_y + M_y I_{yz}}{E\,(I_y I_z - I_{yz}^2)} \qquad \kappa_z = \frac{-M_y I_z - M_z I_{yz}}{E\,(I_y I_z - I_{yz}^2)}
+$$
+</Formula>
+
+Al sustituir en $\sigma_x = -\kappa_y E y - \kappa_z E z$:
+
+<Formula label="Esfuerzo normal (ejes centroidales cualesquiera)">
+$$
+\sigma_x = \frac{(M_y I_z + M_z I_{yz})\, z - (M_z I_y + M_y I_{yz})\, y}{I_y I_z - I_{yz}^2}
+$$
+</Formula>
+
+El eje neutro ($\sigma_x = 0$) y su inclinación respecto a $z$ son:
+
+<Formula label="Eje neutro (ejes centroidales cualesquiera)">
+$$
+\tan\beta = \frac{y}{z} = \frac{M_y I_z + M_z I_{yz}}{M_z I_y + M_y I_{yz}}
+$$
+</Formula>
+
+Donde $I_y = \int z^2 dA$, $I_z = \int y^2 dA$ e $I_{yz} = \int yz\, dA$ se miden en $\text{m}^4$, y los momentos $M_y$, $M_z$ en $\text{N}\cdot\text{m}$.
+
+Cuando $I_{yz} = 0$ (ejes principales o de simetría), las fórmulas se reducen exactamente a las del subtema 8.1.
+
+**Cuidado con el signo de $I_{yz}$:** se calcula con los **mismos ejes** que se usan en $\sigma_x$. Si se invierte la dirección de un eje, $I_{yz}$ cambia de signo.
+
+## Procedimiento
+
+1. Ubicar el centroide y fijar los ejes centroidales $z$, $y$ (con $x$ saliendo hacia el lector).
+2. Calcular $I_y$, $I_z$ e $I_{yz}$ respecto a esos ejes (o tomarlos de tablas).
+3. Escribir $M_y$ y $M_z$ con su signo según la dirección del vector $M$.
+4. Calcular $\tan\beta$ y dibujar el eje neutro.
+5. Evaluar $\sigma_x$ en los vértices más alejados del eje neutro y comparar.
+
+<Example number={1} title="Sección con producto de inercia">
+Una sección tiene respecto a los ejes centroidales $I_y = 4\times 10^6\text{ mm}^4$, $I_z = 9\times 10^6\text{ mm}^4$ e $I_{yz} = -2\times 10^6\text{ mm}^4$, con $E = 200\text{ GPa}$. Soporta $M_y = 1\text{ kN}\cdot\text{m}$ y $M_z = 2\text{ kN}\cdot\text{m}$. Determine las curvaturas, la inclinación del eje neutro y el esfuerzo en el punto $A$ con $y = 40\text{ mm}$ y $z = 20\text{ mm}$.
+
+<Solution>
+1. **Denominador común:**
+   $$
+   I_y I_z - I_{yz}^2 = (4)(9) - (-2)^2 = 32 \implies 32\times 10^{12}\text{ mm}^8
+   $$
+2. **Curvaturas** (con $M_y = 1\times 10^6\text{ N}\cdot\text{mm}$ y $M_z = 2\times 10^6\text{ N}\cdot\text{mm}$):
+   $$
+   \kappa_y = \frac{2\times 10^6(4\times 10^6) + 10^6(-2\times 10^6)}{200\,000\,(32\times 10^{12})} = 9.38\times 10^{-4}\text{ m}^{-1}
+   $$
+   $$
+   \kappa_z = \frac{-10^6(9\times 10^6) - 2\times 10^6(-2\times 10^6)}{200\,000\,(32\times 10^{12})} = -7.81\times 10^{-4}\text{ m}^{-1}
+   $$
+3. **Eje neutro:**
+   $$
+   \tan\beta = \frac{(1)(9) + (2)(-2)}{(2)(4) + (1)(-2)} = \frac{5}{6} \implies \beta = 39.8°
+   $$
+4. **Esfuerzo en A:**
+   $$
+   \sigma_A = \frac{(1\times 10^6 \cdot 9\times 10^6 + 2\times 10^6\cdot(-2\times 10^6))(20) - (2\times 10^6\cdot 4\times 10^6 + 1\times 10^6\cdot(-2\times 10^6))(40)}{32\times 10^{12}} = -4.4\text{ MPa}
+   $$
+5. **Comprobación con las curvaturas:** $\sigma_A = -\kappa_y E y - \kappa_z E z = -7.5 + 3.1 = -4.4\text{ MPa}$. El punto $A$ está en compresión.
+</Solution>
+</Example>
+
+## Ejercicio de autoevaluación
+
+<Quiz question="¿Qué pasa con las fórmulas del segundo método si I_yz = 0?">
+Se reducen a las del primer método y a las de doble simetría: $\sigma_x = M_y z/I_y - M_z y/I_z$ y $\tan\beta = M_y I_z/(M_z I_y)$.
+</Quiz>
+
+<Summary title="Resumen">
+- El segundo método usa ejes centroidales cualesquiera y por eso incluye el producto de inercia $I_{yz}$.
+- Parte de $\sigma_x = -\kappa_y E y - \kappa_z E z$ y del equilibrio de momentos; de ahí salen las curvaturas.
+- $\sigma_x = [(M_y I_z + M_z I_{yz}) z - (M_z I_y + M_y I_{yz}) y]/(I_y I_z - I_{yz}^2)$.
+- $\tan\beta = (M_y I_z + M_z I_{yz})/(M_z I_y + M_y I_{yz})$.
+- $I_{yz}$ debe calcularse con los mismos ejes de $\sigma_x$; si un eje se invierte, cambia de signo.
+</Summary>
