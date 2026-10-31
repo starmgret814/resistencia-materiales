@@ -1,0 +1,68 @@
+# Funciones de discontinuidad y singularidad (Método de Macaulay)
+
+
+Con cargas puntuales, momentos concentrados o cargas distribuidas parciales, $M(x)$ cambia de expresión en cada tramo. Las funciones de Macaulay permiten escribir una sola expresión válida para toda la viga, que se integra de una vez.
+
+### Definición y propiedades de la función de Macaulay
+
+<Formula label="Función de Macaulay">
+$$
+\langle x-a\rangle^{n} =
+\begin{cases}
+(x-a)^{n}, & \text{si } x \geq a \\
+0, & \text{si } x < a
+\end{cases}
+$$
+</Formula>
+
+- **Significado de $a$:** es el punto donde empieza a actuar la carga. El término vale cero a la izquierda de $a$ y empieza a actuar desde $a$.
+- **Para $n \geq 0$:** $n=0$ es un escalón de valor 1 que empieza en $a$, $n=1$ es una rampa y $n=2$ es una parábola que parte de cero en $a$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792815205/gwbdisiyh418ariovd4z.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+- **Para $n < 0$:** son funciones de singularidad. Valen cero en todo punto salvo en $x=a$ y representan acciones concentradas:
+
+<Formula label="Fuerza concentrada (n = -1)">
+$$
+w = P\langle x-a\rangle^{-1} =
+\begin{cases}
+0, & x \neq a \\
+P, & x = a
+\end{cases}
+$$
+</Formula>
+
+<Formula label="Momento concentrado (n = -2)">
+$$
+w = M_{0}\langle x-a\rangle^{-2} =
+\begin{cases}
+0, & x \neq a \\
+M_{0}, & x = a
+\end{cases}
+$$
+</Formula>
+
+- **Interpretación física:** una carga distribuida $w = \frac{P}{\varepsilon}$ sobre un ancho $\varepsilon$ que tiende a cero equivale a la fuerza concentrada $P$. Un par de fuerzas opuestas equivale al momento concentrado $M_{0}$, con $w = \frac{P}{\varepsilon} = \frac{M_{0}}{\varepsilon^{2}}$.
+
+**Para $w = \frac{P}{\varepsilon}$ :**
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792815250/zoc5amuopqvtnqaebjga.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+**Para $w = \frac{M_{0}}{\varepsilon^{2}}$ :**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792815265/oonvzvm5plr64vonhrim.png" alt="Descripción de la imagen" caption="Figura" />
+
+- **Al evaluar en un punto $x$:** se descartan los términos con $x < a$, porque valen $0$.
+
+### Reglas de integración y derivación
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792815328/ud7irdaawccwshx8pvph.png" alt="Descripción de la imagen" caption="Figura" />
+
+### Representación unificada de cargas mediante funciones de singularidad
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792815375/fvddqysvjeajpuyxl3x3.png" alt="Descripción de la imagen" caption="Figura" />
