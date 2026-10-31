@@ -1,0 +1,296 @@
+# Problemas para practicar
+
+Problemas resueltos de flexión asimétrica con los dos métodos del capítulo. En todos se usa la convención del subtema 8.1: el eje $x$ sale hacia el lector. Cuando el problema tiene otra orientación de ejes, se indica en la solución; las fórmulas valen con cualquier par de ejes $y$, $z$ que formen un sistema derecho con $x$.
+
+Las propiedades de los perfiles ($A$, $I$, $c$, $r_{min}$) se toman de tablas de perfiles normalizados, resumidas en el subtema 8.6.
+
+## Secciones rectangulares
+
+<Problem number={1} title="Viga de madera con la sección inclinada">
+Una viga de madera de sección rectangular está simplemente apoyada sobre una luz $L = 1.75\text{ m}$. El eje de la viga es horizontal y la sección está inclinada un ángulo $\alpha = 82.5°$ respecto a la horizontal. La carga es uniforme y vertical, $q = 7.5\text{ kN/m}$, y actúa por el centroide $C$. Sección: $b = 80\text{ mm}$ (lado en $z$), $h = 140\text{ mm}$ (lado en $y$). Determine la orientación del eje neutro y el esfuerzo máximo de tracción.
+
+<Solution>
+1. **Momento máximo** (viga simplemente apoyada con carga uniforme), en el centro de la luz:
+   $$
+   M = \frac{q L^2}{8} = \frac{7.5\,(1.75)^2}{8} = 2.871\text{ kN}\cdot\text{m}
+   $$
+2. **Componentes** (la carga vertical forma $\alpha$ con el eje $y$ de la sección):
+   $$
+   M_z = M\cos\alpha = 374.8\text{ N}\cdot\text{m}, \qquad M_y = M\sin\alpha = 2846.5\text{ N}\cdot\text{m}
+   $$
+3. **Inercias:**
+   $$
+   I_z = \frac{b h^3}{12} = 1.829\times 10^{-5}\text{ m}^4, \qquad I_y = \frac{h b^3}{12} = 5.973\times 10^{-6}\text{ m}^4
+   $$
+4. **Eje neutro:**
+   $$
+   \tan\beta = \frac{I_z}{I_y}\tan\alpha = 3.0625\,(7.596) = 23.26 \implies \beta = 87.5°
+   $$
+5. **Esfuerzo máximo:**
+   $$
+   \sigma_{max} = \frac{6 M_z}{b h^2} + \frac{6 M_y}{h b^2} = 1.43\text{ MPa} + 19.06\text{ MPa} = 20.5\text{ MPa}
+   $$
+6. **Conclusión:**
+   El eje neutro queda casi alineado con $y$ ($87.5°$ desde $z$): la viga trabaja casi toda su flexión sobre el eje débil. El máximo de tracción es $\sigma_t = 20.5\text{ MPa}$.
+</Solution>
+</Problem>
+
+<Problem number={2} title="Correa de techo">
+Una viga de madera $AB$ de $100\text{ mm} \times 150\text{ mm}$ ($b = 100\text{ mm}$, $h = 150\text{ mm}$) funciona como correa de techo, simplemente apoyada sobre los cordones de dos cerchas con pendiente $\alpha = 27°$. La longitud es $L = 2\text{ m}$ y la carga distribuida $q$ es vertical, por el centroide. Determine la carga $q$ permisible si el esfuerzo admisible a tracción y a compresión es $\sigma_{adm} = 14\text{ MPa}$.
+
+<Solution>
+1. **Esfuerzo máximo en función de $M$:**
+   $$
+   \sigma_{max} = \frac{6M}{b h}\left(\frac{\cos\alpha}{h} + \frac{\sin\alpha}{b}\right) = \frac{6M}{(0.1)(0.15)}\left(\frac{0.891}{0.15} + \frac{0.454}{0.1}\right) = 4192\, M
+   $$
+   (con $M$ en $\text{N}\cdot\text{m}$ y $\sigma$ en $\text{Pa}$).
+2. **Momento permisible:**
+   $$
+   4192\, M \le 14\times 10^6 \implies M_{perm} = 3340\text{ N}\cdot\text{m}
+   $$
+3. **Carga permisible:** de $M = qL^2/8$:
+   $$
+   q = \frac{8 M}{L^2} = \frac{8\,(3340)}{(2)^2} = 6679\text{ N/m} \approx 6.68\text{ kN/m}
+   $$
+4. **Conclusión:**
+   La carga permisible es $q = 6.68\text{ kN/m}$. El eje neutro está a $\beta = \arctan\left(\tfrac{I_z}{I_y}\tan\alpha\right) = 48.9°$ de $z$.
+</Solution>
+</Problem>
+
+<Problem number={3} title="Desalineación de carga en una viga W250×45">
+Una viga $W250\times 45$ soporta un momento $M = 30\text{ kN}\cdot\text{m}$ que debería actuar a lo largo del eje fuerte $z$. (a) Determine el efecto de una desalineación de $2°$ en la orientación del eje neutro. (b) Calcule el esfuerzo máximo de tracción y compárelo con el de la carga alineada ($0°$). Propiedades (subtema 8.6): $I_z = 71.1\times 10^6\text{ mm}^4$, $I_y = 7.03\times 10^6\text{ mm}^4$, $d = 266\text{ mm}$, $b_f = 148\text{ mm}$.
+
+<Solution>
+1. **Eje neutro** con $\theta = 2°$:
+   $$
+   \tan\beta = \frac{I_z}{I_y}\tan\theta = \frac{71.1}{7.03}\tan 2° = 0.3532 \implies \beta = 19.5°
+   $$
+   Una desalineación de solo $2°$ gira el eje neutro $19.5°$ (con carga alineada, $\beta = 0°$).
+2. **Carga alineada ($0°$):** el esfuerzo máximo está a $y = d/2 = 133\text{ mm}$:
+   $$
+   \sigma_0 = \frac{M\, y}{I_z} = \frac{30\times 10^6(133)}{71.1\times 10^6} = 56.1\text{ MPa}
+   $$
+3. **Carga desalineada ($2°$):**
+   $$
+   M_z = M\cos 2° = 29.98\text{ kN}\cdot\text{m}, \qquad M_y = M\sin 2° = 1.047\text{ kN}\cdot\text{m}
+   $$
+   El punto crítico es la esquina del ala, con $y = 133\text{ mm}$ y $z = b_f/2 = 74\text{ mm}$:
+   $$
+   \sigma_{max} = \frac{M_z y}{I_z} + \frac{M_y z}{I_y} = 56.1\text{ MPa} + 11.0\text{ MPa} = 67.1\text{ MPa}
+   $$
+4. **Conclusión:**
+   El esfuerzo máximo aumenta de $56.1$ a $67.1\text{ MPa}$, es decir, casi $20\%$ más, porque el ala (débil en $y$) recibe un momento pequeño pero con una inercia muy baja. Una viga de alma ancha es muy sensible a la desalineación.
+</Solution>
+</Problem>
+
+## Perfiles de tabla (primer método)
+
+<Problem number={4} title="Canal UPN 160">
+Una viga de sección en canal UPN 160 soporta un momento flector $M = 2.5\text{ kN}\cdot\text{m}$ cuyo vector forma un ángulo $\theta$ con el eje $z$, con $\tan\theta = 1/3$. El alma del canal queda del lado izquierdo ($z>0$) y las alas se extienden hacia la derecha. Determine la orientación del eje neutro y los esfuerzos máximos de tracción $\sigma_t$ y de compresión $\sigma_c$. Propiedades (subtema 8.6): $h = 160\text{ mm}$, $b = 65\text{ mm}$, $I_1 = 925\text{ cm}^4$ (eje $z$), $I_2 = 85.3\text{ cm}^4$ (eje $y$), $c = 18.4\text{ mm}$ (del alma al centroide).
+
+<Solution>
+1. **Ejes principales:** en el canal, los ejes $1\text{-}1$ y $2\text{-}2$ ya son principales: $I_z = 925\text{ cm}^4 = 9.25\times 10^{-6}\text{ m}^4$ e $I_y = 85.3\text{ cm}^4 = 8.53\times 10^{-7}\text{ m}^4$.
+2. **Componentes del momento:** $\theta = \arctan(1/3) = 18.43°$.
+   $$
+   M_z = 2500\cos\theta = 2372\text{ N}\cdot\text{m}, \qquad M_y = 2500\sin\theta = 790.6\text{ N}\cdot\text{m}
+   $$
+3. **Eje neutro:**
+   $$
+   \tan\beta = \frac{I_z}{I_y}\tan\theta = \frac{925}{85.3}\cdot\frac{1}{3} = 3.614 \implies \beta = 74.5°
+   $$
+4. **Puntos candidatos** (por las coordenadas de las esquinas): $y = \pm 80\text{ mm}$; $z = +18.4\text{ mm}$ (cara del alma) o $z = -46.6\text{ mm}$ (extremo de las alas).
+   - Punto $A$: $y = -80\text{ mm}$, $z = 18.4\text{ mm}$ (parte baja del alma):
+   $$
+   \sigma_A = \frac{790.6(0.0184)}{8.53\times 10^{-7}} - \frac{2372(-0.08)}{9.25\times 10^{-6}} = 17.1 + 20.5 = 37.6\text{ MPa}
+   $$
+   - Punto $B$: $y = +80\text{ mm}$, $z = -46.6\text{ mm}$ (extremo del ala superior):
+   $$
+   \sigma_B = \frac{790.6(-0.0466)}{8.53\times 10^{-7}} - \frac{2372(0.08)}{9.25\times 10^{-6}} = -43.2 - 20.5 = -63.7\text{ MPa}
+   $$
+5. **Conclusión:**
+   $\sigma_t = 37.6\text{ MPa}$ (tracción, en $A$) y $\sigma_c = 63.7\text{ MPa}$ (compresión, en $B$). Los otros dos vértices dan $-3.5\text{ MPa}$ y $-22.7\text{ MPa}$, menores en magnitud.
+</Solution>
+</Problem>
+
+<Problem number={5} title="Ángulo de alas iguales L 150×150×14">
+Un ángulo L $150\times 150\times 14$ soporta un momento $M = 2.5\text{ kN}\cdot\text{m}$ con el vector dirigido a lo largo del eje $1\text{-}1$ (horizontal), hacia la izquierda. El vértice del ángulo está abajo a la izquierda y las alas apuntan hacia arriba y hacia la derecha. Determine la orientación del eje neutro y los esfuerzos máximos de tracción y compresión. Propiedades (subtema 8.6): $I_{1\text{-}1} = I_{2\text{-}2} = 845.4\text{ cm}^4$, $I_{3\text{-}3} = I_{min} = 346.8\text{ cm}^4$, $c = 42.1\text{ mm}$.
+
+<Solution>
+1. **Ejes:** $y$ horizontal hacia la derecha, $z$ vertical hacia arriba, $x$ hacia el lector, con origen en el centroide. El vector $M$ apunta hacia la izquierda: $M_y = -2.5\text{ kN}\cdot\text{m}$ y $M_z = 0$.
+2. **Producto de inercia.** Los ejes $1\text{-}1$ y $2\text{-}2$ no son principales (en un ángulo, lo son $3\text{-}3$ y $4\text{-}4$). Se usa el segundo método. Con el círculo de Mohr (centro $I = 845.4$ y $I_y = I_z$, el radio es $|I_{yz}|$):
+   $$
+   I_{4\text{-}4} = 2(845.4) - 346.8 = 1344.0\text{ cm}^4 \implies |I_{yz}| = \frac{1344.0 - 346.8}{2} = 498.6\text{ cm}^4
+   $$
+   Las alas ocupan los cuadrantes $(+y,\ -z)$ y $(-y,\ +z)$, donde $y\,z<0$, así que $I_{yz} = -498.6\text{ cm}^4 = -4.986\times 10^6\text{ mm}^4$. Además $I_y = I_z = 8.454\times 10^6\text{ mm}^4$.
+3. **Eje neutro** (con $M_z = 0$):
+   $$
+   \tan\beta = \frac{M_y I_z}{M_y I_{yz}} = \frac{I_z}{I_{yz}} = \frac{8.454}{-4.986} = -1.696 \implies |\beta| = 59.5°
+   $$
+   El eje neutro forma $59.5°$ con la vertical, es decir $30.5°$ con el eje horizontal $1\text{-}1$.
+4. **Esfuerzo:** con $I_y I_z - I_{yz}^2 = 4.661\times 10^{13}\text{ mm}^8$,
+   $$
+   \sigma_x = \frac{M_y\,(I_z\, z - I_{yz}\, y)}{I_y I_z - I_{yz}^2}
+   $$
+   - Vértice del ángulo ($y = -42.1$, $z = -42.1\text{ mm}$): $\sigma = \dfrac{(-2.5\times 10^6)(-5.658\times 10^8)}{4.661\times 10^{13}} = 30.3\text{ MPa}$
+   - Extremo del ala vertical, cara interior ($y = -28.1$, $z = 107.9\text{ mm}$): $\sigma = \dfrac{(-2.5\times 10^6)(7.721\times 10^8)}{4.661\times 10^{13}} = -41.4\text{ MPa}$
+5. **Conclusión:**
+   $\sigma_t = 30.3\text{ MPa}$ (en el vértice) y $\sigma_c = 41.4\text{ MPa}$ (extremo del ala vertical). Los demás vértices dan magnitudes menores ($37.7$, $20.3$, $16.1$ y $9.8\text{ MPa}$).
+</Solution>
+</Problem>
+
+<Problem number={6} title="Dos ángulos de alas desiguales L 120×80×12">
+Dos ángulos L $120\times 80\times 12$ forman una viga con un momento $M = 3.5\text{ kN}\cdot\text{m}$ cuyo vector forma $\theta = 58°$ con el eje $z$, hacia abajo y a la izquierda. (a) Las alas largas son verticales, con $19\text{ mm}$ de separación entre ellas, y las alas cortas apuntan hacia afuera arriba. (b) Los ángulos se invierten y se colocan espalda con espalda (las alas largas en contacto, las cortas abajo); se supone sin separación. Determine el eje neutro y los esfuerzos $\sigma_t$ y $\sigma_c$ en ambos casos. Propiedades de un ángulo (subtema 8.6): $A = 22.69\text{ cm}^2$, $I_{1\text{-}1} = 322.8\text{ cm}^4$, $I_{2\text{-}2} = 114.3\text{ cm}^4$, $d = 40\text{ mm}$ (del centroide al dorso del ala corta) y $c = 20.3\text{ mm}$ (del centroide al dorso del ala larga).
+
+<Solution>
+1. **Componentes del momento** (ejes $z$ a la izquierda, $y$ arriba; el vector apunta hacia abajo y a la izquierda):
+   $$
+   M_z = M\cos 58° = 1.855\text{ kN}\cdot\text{m}, \qquad M_y = -M\sin 58° = -2.968\text{ kN}\cdot\text{m}
+   $$
+2. **Caso (a): propiedades.** Los ejes $y$, $z$ son de simetría (ejes principales):
+   $$
+   I_z = 2(322.8) = 645.6\text{ cm}^4, \qquad I_y = 2\left[114.3 + 22.69(2.98)^2\right] = 631.6\text{ cm}^4
+   $$
+   (cada centroide está a $9.5 + 20.3 = 29.8\text{ mm}$ del eje $y$).
+3. **Caso (a): eje neutro:**
+   $$
+   \tan\beta = \frac{M_y I_z}{M_z I_y} = \frac{(-2.968)(645.6)}{(1.855)(631.6)} = -1.636 \implies \beta = -58.6°
+   $$
+   El eje neutro forma $58.6°$ con $z$ y sube hacia la derecha.
+4. **Caso (a): esfuerzos.** La inercia es $I_y = 6.316\times 10^6\text{ mm}^4$ e $I_z = 6.456\times 10^6\text{ mm}^4$. Los puntos críticos son los extremos de las alas, a $z = \pm 89.5\text{ mm}$:
+   - Extremo derecho, cara inferior del ala ($y = 28$, $z = -89.5\text{ mm}$):
+   $$
+   \sigma = \frac{(-2.968\times 10^6)(-89.5)}{6.316\times 10^6} - \frac{(1.855\times 10^6)(28)}{6.456\times 10^6} = 42.1 - 8.0 = 34.0\text{ MPa}
+   $$
+   - Extremo izquierdo, cara superior del ala ($y = 40$, $z = 89.5\text{ mm}$):
+   $$
+   \sigma = -42.1 - \frac{(1.855\times 10^6)(40)}{6.456\times 10^6} = -42.1 - 11.5 = -53.6\text{ MPa}
+   $$
+5. **Caso (b): propiedades.** Ahora los centroides están a $20.3\text{ mm}$ del eje $y$ e $I_z$ no cambia:
+   $$
+   I_y = 2\left[114.3 + 22.69(2.03)^2\right] = 415.6\text{ cm}^4, \qquad I_z = 645.6\text{ cm}^4
+   $$
+6. **Caso (b): eje neutro y esfuerzos.**
+   $$
+   \tan\beta = \frac{(-2.968)(645.6)}{(1.855)(415.6)} = -2.486 \implies \beta = -68.1°
+   $$
+   Los puntos críticos son los extremos de las alas inferiores ($y = -40\text{ mm}$ debajo del eje, $z = \pm 80\text{ mm}$), con $I_y = 4.156\times 10^6\text{ mm}^4$:
+   - $y = -40$, $z = -80\text{ mm}$: $\sigma = 57.1 + 11.5 = 68.6\text{ MPa}$ (tracción)
+   - $y = -28$, $z = 80\text{ mm}$: $\sigma = -57.1 + 8.0 = -49.1\text{ MPa}$ (compresión)
+7. **Conclusión:**
+
+   - Caso (a), alas cortas arriba: $\beta = -58.6°$, $\sigma_t = 34.0\text{ MPa}$, $\sigma_c = 53.6\text{ MPa}$.
+   - Caso (b), alas cortas abajo: $\beta = -68.1°$, $\sigma_t = 68.6\text{ MPa}$, $\sigma_c = 49.1\text{ MPa}$.
+
+   Al invertir los ángulos, la inercia $I_y$ baja de $631.6$ a $415.6\text{ cm}^4$ y la tracción máxima se duplica: la disposición (a) es mucho más favorable.
+</Solution>
+</Problem>
+
+## Ángulo y sección Z (segundo método)
+
+<Problem number={7} title="Ángulo de acero de lados iguales 4×4">
+Un ángulo de acero de lados iguales $4 \times 4 \times \tfrac{1}{2}\text{ in}$ está sometido a un momento $M_{y'} = 12\text{ kip}\cdot\text{in}$ en la sección indicada. El vértice del ángulo está arriba a la izquierda; el ala horizontal queda arriba y a la derecha, y el ala vertical a la izquierda y hacia abajo. El centroide está a $1.18\text{ in}$ del dorso del ala horizontal y a $1.18\text{ in}$ del dorso del ala vertical. Los ejes $y'$ (horizontal, hacia la derecha) y $z'$ (vertical, hacia arriba) son paralelos a las alas, con $I_{y'} = I_{z'} = 5.56\text{ in}^4$; el momento principal mínimo es $I_{min} = 2.29\text{ in}^4$. (a) Determine el producto de inercia $I_{y'z'}$. (b) Determine la orientación del eje neutro. (c) Determine el esfuerzo máximo de tracción y su ubicación.
+
+<Solution>
+1. **Producto de inercia.** Como $I_{y'} = I_{z'}$, el círculo de Mohr tiene su centro en $5.56\text{ in}^4$ y su radio es $|I_{y'z'}|$. El momento principal máximo es:
+   $$
+   I_{max} = 2(5.56) - 2.29 = 8.83\text{ in}^4 \implies |I_{y'z'}| = \frac{8.83 - 2.29}{2} = 3.27\text{ in}^4
+   $$
+   El ala horizontal ocupa sobre todo puntos con $y'>0$, $z'>0$ y el ala vertical, puntos con $y'<0$, $z'<0$: en ambos el producto $y'z'$ es positivo. Entonces $I_{y'z'} = +3.27\text{ in}^4$.
+2. **Eje neutro** (con $M_{z'} = 0$ y $M_{y'} = 12\text{ kip}\cdot\text{in}$):
+   $$
+   \tan\beta = \frac{M_{y'} I_{z'}}{M_{y'} I_{y'z'}} = \frac{5.56}{3.27} = 1.700 \implies \beta = 59.5°
+   $$
+   El ángulo se mide desde $z'$ hacia $y'$: el eje neutro forma $59.5°$ con la vertical, es decir sube hacia la derecha a $30.5°$ sobre la horizontal.
+3. **Esfuerzo:** con $I_{y'}I_{z'} - I_{y'z'}^2 = 30.91 - 10.69 = 20.22\text{ in}^8$,
+   $$
+   \sigma_x = \frac{M_{y'}\,(I_{z'}\, z' - I_{y'z'}\, y')}{20.22} = \frac{12\,(5.56\, z' - 3.27\, y')}{20.22}\text{ ksi}
+   $$
+   En el vértice exterior ($y' = -1.18$, $z' = +1.18\text{ in}$):
+   $$
+   \sigma_{max} = \frac{12\,[5.56(1.18) + 3.27(1.18)]}{20.22} = 6.18\text{ ksi}
+   $$
+4. **Conclusión:**
+   $\sigma_t = 6.18\text{ ksi}$, en el vértice exterior del ángulo (esquina superior izquierda). La compresión máxima, de $7.99\text{ ksi}$, ocurre en el extremo inferior del ala vertical, cara interior.
+</Solution>
+</Problem>
+
+<Problem number={8} title="Sección Z de aluminio">
+Una sección en Z de aluminio tiene el alma vertical de $1\text{ in}$ de espesor y $8\text{ in}$ de altura, con el ala superior que se extiende $4\text{ in}$ hacia la derecha del alma y el ala inferior $4\text{ in}$ hacia la izquierda; ambas alas tienen $1\text{ in}$ de espesor. El momento actúa con su vector a lo largo de $+y'$ (horizontal, hacia la derecha). La resistencia a la fluencia es $Y = 40\text{ ksi}$ y se exige un factor de seguridad $FS = 2.0$. (a) Determine $I_{y'}$, $I_{z'}$ e $I_{y'z'}$. (b) Determine el eje neutro. (c) Determine el momento máximo permisible $M_{y'}$.
+
+<Solution>
+1. **Ejes:** el centroide está en el centro del alma, por la simetría de la Z. Con $y'$ horizontal hacia la derecha y $z'$ vertical hacia arriba:
+   - Alma: $y'\in[-0.5,\ 0.5]$, $z'\in[-4,\ 4]$.
+   - Ala superior: $y'\in[0.5,\ 4.5]$, $z'\in[3,\ 4]$.
+   - Ala inferior: $y'\in[-4.5,\ -0.5]$, $z'\in[-4,\ -3]$.
+2. **Inercias** (alma + dos alas, con Steiner; cada ala tiene $A = 4\text{ in}^2$, centroide a $z' = \pm 3.5$ e $y' = \pm 2.5$):
+   $$
+   I_{y'} = \int z'^2\, dA = \frac{1(8)^3}{12} + 2\left[\frac{4(1)^3}{12} + 4(3.5)^2\right] = 141.3\text{ in}^4
+   $$
+   $$
+   I_{z'} = \int y'^2\, dA = \frac{8(1)^3}{12} + 2\left[\frac{1(4)^3}{12} + 4(2.5)^2\right] = 61.3\text{ in}^4
+   $$
+   $$
+   I_{y'z'} = \int y'z'\, dA = 2\,[4\,(2.5)(3.5)] = 70.0\text{ in}^4
+   $$
+3. **Eje neutro** (solo hay $M_{y'}$):
+   $$
+   \tan\beta = \frac{I_{z'}}{I_{y'z'}} = \frac{61.3}{70.0} = 0.876 \implies \beta = 41.2°
+   $$
+   Medido desde $z'$ hacia $y'$: el eje neutro forma $41.2°$ con la vertical.
+4. **Esfuerzo máximo.** Con $I_{y'}I_{z'} - I_{y'z'}^2 = 8668 - 4900 = 3768\text{ in}^8$:
+   $$
+   \sigma_x = \frac{M_{y'}\,(61.3\, z' - 70\, y')}{3768}
+   $$
+   Los puntos más alejados del eje neutro son las esquinas $(y' = -0.5,\ z' = 4)$ y $(y' = 0.5,\ z' = -4)$:
+   $$
+   |\sigma_{max}| = \frac{M_{y'}\,(61.3\cdot 4 + 70\cdot 0.5)}{3768} = 0.0744\, M_{y'}\ \text{(ksi, con } M_{y'}\text{ en kip}\cdot\text{in)}
+   $$
+5. **Momento permisible:** el esfuerzo admisible es $\sigma_{adm} = Y/FS = 40/2 = 20\text{ ksi}$:
+   $$
+   M_{y',max} = \frac{20}{0.0744} = 269\text{ kip}\cdot\text{in} \approx 22.4\text{ kip}\cdot\text{ft}
+   $$
+</Solution>
+</Problem>
+
+<Problem number={9} title="Ángulo de alas desiguales">
+El momento flector $M = 2.0\text{ kN}\cdot\text{m}$ actúa con un ángulo de $20°$ en sentido antihorario desde el eje $y'$ de una sección angular de alas desiguales. Geometría: ala horizontal arriba de $180\text{ mm}$ de longitud total ($20 + 160\text{ mm}$), ala vertical de $120\text{ mm}$ de altura total, con espesor $t = 20\text{ mm}$ y vértice arriba a la izquierda. (a) Ubique el centroide y calcule $I_{y'}$, $I_{z'}$ e $I_{y'z'}$. (b) Determine la orientación del eje neutro. (c) Calcule los esfuerzos máximos de tracción y de compresión.
+
+<Solution>
+1. **Centroide.** Con $A = 180(20) + 100(20) = 5600\text{ mm}^2$ (ala horizontal completa más la parte del ala vertical bajo ella). Medido desde el dorso de la cara izquierda y desde la cara superior:
+   $$
+   \bar y = \frac{3600(90) + 2000(10)}{5600} = 61.4\text{ mm}, \qquad \bar z = \frac{3600(10) + 2000(70)}{5600} = 31.4\text{ mm}\ \text{(hacia abajo)}
+   $$
+2. **Inercias** con $y'$ horizontal hacia la derecha, $z'$ vertical hacia arriba y origen en el centroide (teorema de Steiner):
+   $$
+   I_{y'} = \int z'^2\, dA = 6.415\times 10^6\text{ mm}^4, \qquad I_{z'} = \int y'^2\, dA = 18.015\times 10^6\text{ mm}^4
+   $$
+   $$
+   I_{y'z'} = \int y'z'\, dA = 3600(28.6)(21.4) + 2000(-51.4)(-38.6) = +6.171\times 10^6\text{ mm}^4
+   $$
+3. **Componentes del momento:**
+   $$
+   M_{y'} = 2\cos 20° = 1.879\text{ kN}\cdot\text{m}, \qquad M_{z'} = 2\sin 20° = 0.684\text{ kN}\cdot\text{m}
+   $$
+4. **Eje neutro:**
+   $$
+   \tan\beta = \frac{M_{y'} I_{z'} + M_{z'} I_{y'z'}}{M_{z'} I_{y'} + M_{y'} I_{y'z'}} = \frac{(1.879)(18.015) + (0.684)(6.171)}{(0.684)(6.415) + (1.879)(6.171)} = 2.382 \implies \beta = 67.2°
+   $$
+   El eje neutro forma $67.2°$ con la vertical $z'$ (hacia $y'$), es decir $22.8°$ con la horizontal.
+5. **Esfuerzos:** con $I_{y'}I_{z'} - I_{y'z'}^2 = 77.49\times 10^{12}\text{ mm}^8$, se evalúa en los vértices:
+   $$
+   \sigma_x = \frac{(M_{y'} I_{z'} + M_{z'} I_{y'z'})\, z' - (M_{z'} I_{y'} + M_{y'} I_{y'z'})\, y'}{I_{y'}I_{z'} - I_{y'z'}^2}
+   $$
+   - Vértice exterior ($y' = -61.4$, $z' = +31.4\text{ mm}$): $\sigma = 28.1\text{ MPa}$
+   - Extremo del ala vertical, cara interior ($y' = -41.4$, $z' = -88.6\text{ mm}$): $\sigma = -35.0\text{ MPa}$
+   - Extremo del ala vertical, cara exterior ($y' = -61.4$, $z' = -88.6\text{ mm}$): $\sigma = -30.9\text{ MPa}$
+6. **Conclusión:**
+   $\sigma_t = 28.1\text{ MPa}$ (en el vértice exterior) y $\sigma_c = 35.0\text{ MPa}$ (extremo inferior del ala vertical, cara interior).
+</Solution>
+</Problem>
+
+<Summary title="Resumen">
+- Para secciones con simetría o perfiles con ejes principales de tabla (rectángulo, W, canal) se usa el primer método: $\tan\beta = (I_z/I_y)\tan\theta$ y $\sigma_x = M_y z/I_y - M_z y/I_z$.
+- Para ángulos y secciones Z, con ejes no principales, se usa el segundo método con $I_{yz}$; en ángulos de alas iguales, $|I_{yz}| = (I_{max} - I_{min})/2$.
+- El esfuerzo es lineal: los máximos están en los vértices más alejados del eje neutro, y conviene evaluar todos.
+- Una pequeña desalineación del momento gira mucho el eje neutro y puede subir bastante el esfuerzo en secciones muy desiguales (viga W).
+</Summary>
