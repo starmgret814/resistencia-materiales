@@ -1,6 +1,14 @@
 import type { Chapter } from './course-data'
 import type { CourseDocument } from './content-schema'
 
+/** Derive the section number from its current position, including reordered sections. */
+export function findSubtopicNumber(chapters: Chapter[], chapterId: string, slug: string): string | undefined {
+  const chapter = chapters.find(item => Number(item.number) === Number(chapterId))
+  if (!chapter || !/^\d+$/.test(chapter.number)) return undefined
+  const index = chapter.sections.findIndex(section => section.slug === slug || section.id === slug || section.slug?.split('/').pop() === slug)
+  return index < 0 ? undefined : `${Number(chapter.number)}.${index + 1}`
+}
+
 export function findSubtopicTitle(chapters: Chapter[], chapterId: string, slug: string): string | undefined {
   const chapter = chapters.find((c) => c.number === chapterId);
   if (!chapter) return undefined;

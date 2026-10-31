@@ -46,7 +46,7 @@ El editor utiliza un formato muy simple para estructurar el texto:
 
 | Elemento | Cómo se escribe | Ejemplo / Uso |
 | :--- | :--- | :--- |
-| **Título principal** | `# Título` | `# 1.1 Esfuerzo Axial` |
+| **Título principal** | `# Título` | `# Esfuerzo Axial` |
 | **Subtítulo** | `## Subtítulo` | `## Fundamento Teórico` |
 | **Sección menor** | `### Sección` | `### Hipótesis de cálculo` |
 | **Negrita** | `**texto en negrita**` | **texto en negrita** |
@@ -56,6 +56,8 @@ El editor utiliza un formato muy simple para estructurar el texto:
 | **Enlaces** | `[Texto del enlace](https://...)` | Enlace a una referencia |
 | **Separador** | `---` | Línea horizontal divisoria |
 | **Tablas** | `| Col 1 | Col 2 |`<br>`|---|---|` | Organizar datos, propiedades y comparativas |
+
+La numeración de títulos del curso es automática: en la segunda sección del capítulo 5, `# Título` se muestra como **5.2 Título**, `## Subtítulo` como **5.2.1 Subtítulo** y `### Detalle` como **5.2.1.1 Detalle**. Los siguientes H2 y H3 se numeran por orden y los niveles inferiores se reinician al cambiar de subtítulo. Escribe los títulos sin números; la vista previa y el índice usan la misma jerarquía. Si se reordenan las secciones del capítulo, su numeración se actualiza.
 
 > **Consejos:** 
 > - Deja siempre un renglón en blanco entre párrafos y entre bloques para que el texto respire y se visualice ordenado.
@@ -181,7 +183,7 @@ Una varilla de acero de $20\text{ mm}$ de diámetro y $2\text{ m}$ de longitud s
 ### 4. `<Problem>`
 Recuadro con borde punteado para proponer problemas de práctica al estudiante.
 ```markdown
-<Problem number={1} title="Diseño por cortante">
+<Problem title="Diseño por cortante">
 Un pasador de acero debe resistir una fuerza cortante de $30\text{ kN}$. Si el esfuerzo cortante admisible es $\tau_{adm} = 90\text{ MPa}$, determine el diámetro mínimo requerido.
 
 <Solution>
@@ -193,6 +195,31 @@ Se adopta un diámetro comercial de $22\text{ mm}$.
 </Solution>
 </Problem>
 ```
+
+Los problemas se numeran automáticamente por capítulo, siguiendo el orden de sus secciones. En el capítulo 5, el primer problema será **5.1** aunque aparezca en la sección 2, y el siguiente será **5.2** aunque esté en la sección 4. No escribas `number`: los valores antiguos se ignoran dentro del curso. Se cuentan las versiones publicadas de las secciones anteriores; sus borradores no afectan a la web pública.
+
+Para colocar una imagen junto al enunciado:
+
+```mdx
+<Problem title="Área de un enlace para un factor de seguridad de 3.20"
+  image="enlace.png"
+  imageAlt="Geometría y cargas del enlace"
+  imageCaption="Figura del enlace"
+  imageWidth="38%"
+  imagePosition="right">
+
+Determina el área requerida del enlace usando las cargas de la figura.
+
+<Solution>
+
+Escribe aquí la solución paso a paso.
+
+</Solution>
+
+</Problem>
+```
+
+`imagePosition` acepta `right` o `left`. `imageWidth` acepta un porcentaje o un ancho como `240px`; se limita al 60% del bloque para conservar espacio para el enunciado. En móviles la imagen pasa debajo del texto. La solución queda debajo de ambos y ocupa el ancho completo. Usa una URL completa o una imagen de la carpeta del tema, igual que en `<Image>`. El menú de componentes incluye **Problema con imagen al costado**.
 
 ### 5. `<Solution>`
 **Aclaración clave:** Se utiliza **dentro** de `<Example>` o `<Problem>` para mostrar el desarrollo de la solución. Genera un botón interactivo desplegable (*"Mostrar Solución"*) para que el estudiante piense el problema antes de ver la respuesta.

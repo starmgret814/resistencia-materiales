@@ -17,7 +17,7 @@ const category = examTypes.find(type => type.id === exam?.type)?.label;
 ---
 
 <Layout title={`${exam?.title || 'Evaluación no disponible'} | Resistencia de Materiales — UNI`}>
-  <TextbookLayout activeSlug={null} client:load>
+  <TextbookLayout activeSlug={null} variant="exam" client:load>
     <div class="not-prose">
       <a href="/examenes" class="text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]">← Volver a exámenes pasados</a>
       {exam ? <>

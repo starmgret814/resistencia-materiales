@@ -34,7 +34,7 @@ import { workspaceFetch } from '@/lib/workspace-api'
 import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
 import Editor from '@monaco-editor/react'
 import { chapters, type Chapter } from '@/lib/course-data'
-import { findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
+import { findSubtopicNumber, findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
 import {
   starterDocument,
   validateCourseDocument,
@@ -54,6 +54,9 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const [assignedChapters, setAssignedChapters] = useState<string[]>([])
   const [courseChapters, setCourseChapters] = useState<Chapter[]>(chapters)
+  const [problemOffset, setProblemOffset] = useState<number | null>(null)
+  const [problemNumberError, setProblemNumberError] = useState(false)
+  const [numberingRetry, setNumberingRetry] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
@@ -64,6 +67,22 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const currentChapter = useMemo(() => {
     return courseChapters.find((c) => c.number === document.chapterId)
   }, [courseChapters, document.chapterId])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setProblemOffset(null)
+    setProblemNumberError(false)
+    const parameters = new URLSearchParams({ chapter: document.chapterId, slug: document.slug })
+    fetch(`/api/problem-offset?${parameters}`, { signal: controller.signal, cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) throw new Error('No se pudo cargar la numeración')
+        const data = await response.json()
+        if (!Number.isSafeInteger(data.offset) || data.offset < 0) throw new Error('Numeración no válida')
+        if (!controller.signal.aborted) setProblemOffset(data.offset)
+      })
+      .catch(() => { if (!controller.signal.aborted) setProblemNumberError(true) })
+    return () => controller.abort()
+  }, [document.chapterId, document.slug, numberingRetry])
 
   const currentSection = useMemo(() => {
     if (!currentChapter) return null
@@ -400,7 +419,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     if (kind === 'definition') insertMarkdown('\n<Definition title="Definición">\n', '\n</Definition>\n', 'Escribe la definición.')
     else if (kind === 'note') insertMarkdown('\n<Note title="Nota importante">\n', '\n</Note>\n', 'Escribe la observación.')
     else if (kind === 'example') insertMarkdown('\n<Example number={1} title="Ejemplo resuelto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Example>\n', 'Escribe el enunciado.')
-    else if (kind === 'problem') insertMarkdown('\n<Problem number={1} title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
+    else if (kind === 'problem') insertMarkdown('\n<Problem title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
+    else if (kind === 'problemimage') insertMarkdown('\n<Problem title="Título del problema" image="figura.png" imageAlt="Diagrama del problema" imageWidth="38%" imagePosition="right">\n\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el enunciado. La imagen aparecerá a su costado.')
     else if (kind === 'quiz') insertMarkdown('\n<Quiz question="Escribe la pregunta">\n', '\n</Quiz>\n', 'Escribe la respuesta.')
     else if (kind === 'summary') insertMarkdown('\n<Summary title="Resumen">\n', '\n</Summary>\n', 'Resume los puntos principales.')
     else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla" align="center" width="100%" columnWidths="40%, 30%, 30%">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| --- | --- | --- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
@@ -751,7 +771,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           <div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]">
             <div className="mx-auto max-w-[760px]">
               <Suspense fallback={<p role="status" className="text-sm text-[#8b6d6d]">Cargando vista previa...</p>}>
-                <ContentRenderer document={deferredDocument} />
+                {problemOffset !== null ? <ContentRenderer document={deferredDocument} headingPrefix={findSubtopicNumber(courseChapters, deferredDocument.chapterId, deferredDocument.slug)} problemOffset={problemOffset} /> : problemNumberError ? <p role="alert" className="text-sm text-[#8b2020]">No se pudo comprobar la numeración del capítulo. <button type="button" onClick={() => setNumberingRetry(value => value + 1)} className="underline">Reintentar</button></p> : <p role="status" className="text-sm">Calculando numeración de problemas…</p>}
               </Suspense>
             </div>
           </div>
@@ -841,6 +861,7 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
     { value: 'note', label: 'Nota' },
     { value: 'example', label: 'Ejemplo' },
     { value: 'problem', label: 'Problema' },
+    { value: 'problemimage', label: 'Problema con imagen al costado' },
     { value: 'quiz', label: 'Quiz' },
     { value: 'summary', label: 'Resumen' },
     { value: 'tablegrid', label: 'Tablas en una fila' },

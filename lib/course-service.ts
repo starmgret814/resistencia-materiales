@@ -1,6 +1,7 @@
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { chapters as defaultChapters, type Chapter, type Section } from '@/lib/course-data';
+import { countCourseProblems } from '@/lib/course-headings';
 
 export async function getLiveChapters(): Promise<Chapter[]> {
   try {
@@ -23,7 +24,7 @@ export interface ApprovedSubtopicContent {
   authorEmail?: string;
 }
 
-export async function getApprovedSubtopic(chapterNumber: string, slug: string): Promise<ApprovedSubtopicContent | null> {
+export async function getApprovedSubtopic(chapterNumber: string, slug: string, strict = false): Promise<ApprovedSubtopicContent | null> {
   try {
     const cleanSlug = slug.includes('/') ? slug.split('/').pop()! : slug;
     const docId = `${chapterNumber}_${cleanSlug}`;
@@ -45,7 +46,19 @@ export async function getApprovedSubtopic(chapterNumber: string, slug: string): 
       }
     }
   } catch (err) {
+    if (strict) throw err;
     console.warn(`No se pudo cargar contenido publicado de Firestore para ${chapterNumber}_${slug}:`, err);
   }
   return null;
+}
+
+/** Count only published problems in earlier sections of this chapter. */
+export async function getChapterProblemOffset(chapter: Chapter, slug: string): Promise<number> {
+  const index = chapter.sections.findIndex(section => section.slug === slug || section.id === slug || section.slug?.split('/').pop() === slug);
+  if (index < 0) throw new Error('Sección no encontrada');
+  const counts = await Promise.all(chapter.sections.slice(0, index).map(async section => {
+    const content = await getApprovedSubtopic(chapter.number, section.slug || section.id, true);
+    return content ? countCourseProblems(content.contentMarkdown) : 0;
+  }));
+  return counts.reduce((total, count) => total + count, 0);
 }

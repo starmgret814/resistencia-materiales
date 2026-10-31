@@ -2,6 +2,8 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { createContext, memo, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkDirective from 'remark-directive'
+import remarkNumberHeadings from '@/lib/remark-number-headings'
+import { normalizeLegacyMdx } from '@/lib/course-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
@@ -36,93 +38,36 @@ function MarkdownCell({ header, children, style }: ComponentPropsWithoutRef<'td'
 const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table', 'tablegrid'])
 
 
-function attribute(source: string, name: string): string {
-  return source.match(new RegExp(`${name}=["']([^"']*)["']`))?.[1]
-    || source.match(new RegExp(`${name}=\\{([^}]*)\\}`))?.[1]
-    || ''
-}
-
-function normalizeLegacyMdx(markdown: string): string {
-  // Text copied from chats/editors commonly escapes Markdown punctuation and inserts space entities.
-  let normalized = markdown
-    .replace(/&#x20;|&nbsp;/gi, ' ')
-    .replace(/\\([#*<>_])/g, '$1')
-
-  normalized = normalized.replace(/<(Solution)\s*>\s*([\s\S]*?)\s*<\/\1>/gi, (_match, _tag, body) => `:::solution\n${body.trim()}\n:::`)
-
-  normalized = normalized.replace(/<Image\b([\s\S]*?)\/>/gi, (_match, attrs) => {
-    const src = attribute(attrs, 'src')
-    const alt = attribute(attrs, 'alt') || 'Imagen del curso'
-    const caption = attribute(attrs, 'caption').replace(/"/g, "'")
-    const width = attribute(attrs, 'width')
-    const height = attribute(attrs, 'height')
-    const size = attribute(attrs, 'size')
-    const align = attribute(attrs, 'align')
-
-    if (width || height || size || align) {
-      let props = `src="${src}" alt="${alt}"`
-      if (caption) props += ` caption="${caption}"`
-      if (width) props += ` width="${width}"`
-      if (height) props += ` height="${height}"`
-      if (size) props += ` size="${size}"`
-      if (align) props += ` align="${align}"`
-      return `:::image{${props}}\n:::`
-    }
-
-    return src ? `![${alt}](${src}${caption ? ` "${caption}"` : ''})` : ''
-  })
-
-  normalized = normalized.replace(/<ImageGrid([^>]*)>\s*([\s\S]*?)\s*<\/ImageGrid>/gi, (_match, attrs, body) => {
-    const columns = attribute(attrs, 'columns') || '2'
-    return `::::imagegrid{columns="${columns}"}\n${body.trim()}\n::::`
-  })
-
-  normalized = normalized.replace(/<Quiz([^>]*)>\s*([\s\S]*?)\s*<\/Quiz>/gi, (_match, attrs, body) => {
-    const question = attribute(attrs, 'question') || 'Pregunta'
-    return `:::quiz{question="${question}"}\n${body.trim()}\n:::`
-  })
-
-  normalized = normalized.replace(/<TableGrid\b([^>]*)>\s*([\s\S]*?)\s*<\/TableGrid>/gi, (_match, attrs, body) => {
-    const columns = attribute(attrs, 'columns') || '2'
-    return `\n\n:::::tablegrid{columns="${columns}"}\n\n${body.trim()}\n\n:::::\n\n`
-  })
-
-  normalized = normalized.replace(/<Table([^>]*)>\s*([\s\S]*?)\s*<\/Table>/gi, (_match, attrs, body) => {
-    const title = attribute(attrs, 'title') || attribute(attrs, 'caption')
-    const options = { title, align: attribute(attrs, 'align'), width: attribute(attrs, 'width'), columnWidths: attribute(attrs, 'columnWidths'), position: attribute(attrs, 'position') }
-    const properties = Object.entries(options).filter(([, value]) => value).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(' ')
-    return `\n\n::::table{${properties}}\n\n${body.trim()}\n\n::::\n\n`
-  })
-
-  for (const tag of ['Definition', 'Note', 'Example', 'Problem', 'Summary']) {
-    const pattern = new RegExp(`<(${tag})([^>]*)>\\s*([\\s\\S]*?)\\s*<\\/${tag}>`, 'gi')
-    normalized = normalized.replace(pattern, (_match, _name, attrs, body) => {
-      const kind = tag.toLowerCase()
-      const title = attribute(attrs, 'title')
-      const number = attribute(attrs, 'number')
-      const displayTitle = number ? `${tag} ${number}${title ? `: ${title}` : ''}` : title
-      return `\n\n::::${kind}${displayTitle ? `{title="${displayTitle}"}` : ''}\n\n${body.trim()}\n\n::::\n\n`
-    })
-  }
-
-  normalized = normalized.replace(/<Formula([^>]*)>\s*([\s\S]*?)\s*<\/Formula>/gi, (_match, attrs, body) => {
-    const label = attribute(attrs, 'label')
-    const latex = body.trim().replace(/^\$\$\s*/, '').replace(/\s*\$\$$/, '')
-    return `:::formula${label ? `{title="${label}"}` : ''}\n$$\n${latex}\n$$\n:::`
-  })
-
-  return normalized
-}
-
-function remarkCourseDirectives() {
+function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterNumber?: string; problemOffset?: number } = {}) {
   return (tree: unknown) => {
+    let problemIndex = problemOffset
     visit(tree as never, ['containerDirective', 'leafDirective'], (node: any) => {
       if (!allowedDirectives.has(node.name)) return
+      let title = node.attributes?.title || node.label || ''
+      let number = node.attributes?.number || ''
+      if (node.name === 'problem' || node.name === 'example') {
+        const legacyPrefix = /^(?:Problem|Problema|Example|Ejemplo)\s+(\d+(?:\.\d+)*)\s*:?\s*/i
+        while (legacyPrefix.test(title)) {
+          const match = title.match(legacyPrefix)
+          number ||= match[1]
+          title = title.replace(legacyPrefix, '')
+        }
+        if (node.name === 'problem') {
+          problemIndex++
+          number = chapterNumber ? `${Number(chapterNumber)}.${problemIndex}` : number || String(problemIndex)
+        }
+      }
       node.data ||= {}
       node.data.hName = 'div'
       node.data.hProperties = {
         'data-course-kind': node.name,
-        'data-course-title': node.attributes?.title || node.label || '',
+        'data-course-title': title,
+        'data-course-number': number,
+        'data-course-image': node.attributes?.image || '',
+        'data-course-image-alt': node.attributes?.imageAlt || '',
+        'data-course-image-caption': node.attributes?.imageCaption || '',
+        'data-course-image-width': node.attributes?.imageWidth || '',
+        'data-course-image-position': node.attributes?.imagePosition || '',
         'data-course-question': node.attributes?.question || '',
         'data-course-column-widths': node.attributes?.columnWidths || '',
         'data-course-columns': node.attributes?.columns || '',
@@ -142,6 +87,12 @@ function remarkCourseDirectives() {
 function CourseDirective({
   kind,
   title,
+  number,
+  image,
+  imageAlt,
+  imageCaption,
+  imageWidth,
+  imagePosition,
   question,
   columns,
   columnWidths,
@@ -157,6 +108,12 @@ function CourseDirective({
 }: {
   kind: string;
   title?: string;
+  number?: string;
+  image?: string;
+  imageAlt?: string;
+  imageCaption?: string;
+  imageWidth?: string;
+  imagePosition?: string;
   question?: string;
   columns?: string;
   columnWidths?: string;
@@ -196,14 +153,10 @@ function CourseDirective({
     return <section className="my-8 rounded-lg border border-[#e5c6c4] bg-[#f7e9e8] p-5"><p className="font-semibold text-[#4b1719]">{question || title || 'Pregunta'}</p><details className="group mt-3"><summary className="cursor-pointer text-xs font-semibold text-[#7f0303] underline underline-offset-4">Ver respuesta</summary><div className="mt-3 border-t border-[#e5c6c4] pt-3">{children}</div></details></section>
   }
   if (kind === 'example') {
-    const number = title?.match(/\d+/)?.[0]
-    const cleanTitle = title?.replace(/Ejemplo \d+:?/, '').trim()
-    return <Example title={cleanTitle || undefined} number={number}>{children}</Example>
+    return <Example title={title || undefined} number={number}>{children}</Example>
   }
   if (kind === 'problem') {
-    const number = title?.match(/\d+/)?.[0]
-    const cleanTitle = title?.replace(/Problema \d+:?/, '').trim()
-    return <Problem title={cleanTitle || undefined} number={number}>{children}</Problem>
+    return <Problem title={title || undefined} number={number} image={image} imageAlt={imageAlt} imageCaption={imageCaption} imageWidth={imageWidth} imagePosition={imagePosition === 'left' ? 'left' : 'right'}>{children}</Problem>
   }
   if (kind === 'summary') {
     return <Summary title={title}>{children}</Summary>
@@ -234,6 +187,7 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   const kind = String(rest['data-course-kind' as keyof typeof rest] || '')
   if (!kind) return <div {...rest}>{children}</div>
   const title = String(rest['data-course-title' as keyof typeof rest] || '')
+  const number = String(rest['data-course-number' as keyof typeof rest] || '')
   const question = String(rest['data-course-question' as keyof typeof rest] || '')
   const position = String(rest['data-course-position' as keyof typeof rest] || '')
   const columnWidths = String(rest['data-course-column-widths' as keyof typeof rest] || '')
@@ -249,6 +203,12 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
     <CourseDirective
       kind={kind}
       title={title}
+      number={number}
+      image={String(rest['data-course-image' as keyof typeof rest] || '')}
+      imageAlt={String(rest['data-course-image-alt' as keyof typeof rest] || '')}
+      imageCaption={String(rest['data-course-image-caption' as keyof typeof rest] || '')}
+      imageWidth={String(rest['data-course-image-width' as keyof typeof rest] || '')}
+      imagePosition={String(rest['data-course-image-position' as keyof typeof rest] || '')}
       question={question}
       columns={columns}
       columnWidths={columnWidths}
@@ -266,10 +226,10 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   )
 }
 
-export function ContentRenderer({ document }: { document: CourseDocument }) {
+export function ContentRenderer({ document, headingPrefix, problemOffset = 0 }: { document: CourseDocument; headingPrefix?: string; problemOffset?: number }) {
   return <article className="mdx-content">
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath, remarkDirective, remarkCourseDirectives]}
+      remarkPlugins={[remarkGfm, remarkMath, remarkDirective, [remarkCourseDirectives, { chapterNumber: headingPrefix?.split('.')[0], problemOffset }], [remarkNumberHeadings, { prefix: headingPrefix }]]}
       rehypePlugins={[rehypeKatex]}
       components={{
         img: ({ src, alt, title }: any) => <Image src={src || ''} alt={alt || ''} caption={title || undefined} />,

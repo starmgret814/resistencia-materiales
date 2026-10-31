@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode, CSSProperties, FC } from 'react'
-import { useMemo, useState } from 'react'
+import { Children, isValidElement, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
 
@@ -18,9 +18,20 @@ export function Example({ children, title, number }: { children: ReactNode; titl
   return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
-export function Problem({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {
+export function Problem({ children, title, number, image, imageAlt, imageCaption, imageWidth = '38%', imagePosition = 'right' }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageWidth?: string; imagePosition?: 'left' | 'right' }) {
   const displayTitle = number ? `Problema ${number}${title ? `: ${title}` : ''}` : (title || 'Problema propuesto')
-  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
+  const parts = Children.toArray(children)
+  const isSolution = (child: ReactNode) => isValidElement<{ 'data-course-kind'?: string }>(child) && (child.type === Solution || child.props['data-course-kind'] === 'solution')
+  const width = /^(?:\d+(?:\.\d+)?)(?:px|%|rem|em)$/.test(imageWidth) ? imageWidth : '38%'
+  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">
+    {image ? <>
+      <div className={`problem-illustrated problem-image-${imagePosition}`} style={{ '--problem-image-width': width } as CSSProperties}>
+        <div className="min-w-0">{parts.filter(child => !isSolution(child))}</div>
+        <div className="problem-figure min-w-0 [&>figure]:my-0"><Image src={image} alt={imageAlt || title || 'Figura del problema'} caption={imageCaption} /></div>
+      </div>
+      {parts.filter(isSolution)}
+    </> : children}
+  </div></section>
 }
 
 export function Solution({ children }: { children?: ReactNode }) {

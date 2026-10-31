@@ -126,7 +126,7 @@ import Layout from '@/src/layouts/Layout.astro';
               <tbody class="divide-y divide-[#f2e1e0] dark:divide-[#2e191b] text-[#553b3c] dark:text-[#d3bcbb]">
                 <tr>
                   <td class="py-2.5 px-4 font-semibold">Título principal</td>
-                  <td class="py-2.5 px-4 font-mono text-xs text-[#7f0303] dark:text-[#fca5a5]"># 1.1 Título</td>
+                  <td class="py-2.5 px-4 font-mono text-xs text-[#7f0303] dark:text-[#fca5a5]"># Título</td>
                   <td class="py-2.5 px-4">Solo uno al inicio de cada subtema.</td>
                 </tr>
                 <tr>
@@ -174,6 +174,7 @@ import Layout from '@/src/layouts/Layout.astro';
           </div>
 
           <div class="mt-4 rounded-lg border border-[#e8d5d4] dark:border-[#382022] p-4 bg-[#fdf9f8] dark:bg-[#1c0f11]">
+            <p class="mb-4 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">La numeración de títulos es automática. En la sección 5.2, escribe <code># Título</code>, <code>## Subtítulo</code> y <code>### Detalle</code>: se mostrarán como <strong>5.2</strong>, <strong>5.2.1</strong> y <strong>5.2.1.1</strong>. Los títulos siguientes siguen el orden del contenido. No necesitas escribir los números; la vista previa y el índice también los incluyen.</p>
             <p class="font-bold text-xs uppercase tracking-wider text-[#7f0303] dark:text-[#fca5a5]">Regla de oro para tablas:</p>
             <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">
               En Markdown es <strong>obligatorio dejar una línea en blanco</strong> antes y después de la tabla. Si la tabla está pegada al párrafo anterior, el compilador no la reconocerá.
@@ -271,7 +272,8 @@ Una barra de $20\text{ mm}$ soporta $40\text{ kN}$. Calcule el esfuerzo.
             <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Problem&gt;</p>
               <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">Problema propuesto con borde punteado para práctica del alumno.</p>
-              <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Problem number={1} title="Diseño por cortante"&gt;
+              <p class="mt-2 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">La numeración es automática y continua por capítulo: 5.1, 5.2, 5.3, aunque los problemas estén en secciones diferentes. No necesitas escribir <code>number</code>. Para una imagen junto al enunciado, agrega <code>image="figura.png" imageAlt="Descripción" imageWidth="38%" imagePosition="right"</code>. También acepta <code>left</code>; en móviles se apila y la solución queda debajo a ancho completo.</p>
+              <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Problem title="Diseño por cortante"&gt;
 Determine el diámetro mínimo para un perno sometido a $V = 30\text{ kN}$ si $\tau_{adm} = 90\text{ MPa}$.
 
 &lt;Solution&gt;

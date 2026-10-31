@@ -2,8 +2,10 @@
 import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
 import ContentRenderer from '@/components/content-renderer';
-import { findSectionBySlug } from '@/lib/course-data';
-import { getLiveChapters, getApprovedSubtopic } from '@/lib/course-service';
+import { chapters, findSectionBySlug } from '@/lib/course-data';
+import { getLiveChapters, getApprovedSubtopic, getChapterProblemOffset } from '@/lib/course-service';
+import { findSubtopicNumber } from '@/lib/course-titles';
+import { getCourseHeadings } from '@/lib/course-headings';
 import { ContentProvider } from '@/lib/content-context';
 
 const { slug } = Astro.params;
@@ -40,20 +42,15 @@ const { section, previous, next } = sectionData;
 const rawSlug = section.slug?.includes('/') ? section.slug.split('/').pop()! : (section.slug || section.id);
 const approvedDoc = await getApprovedSubtopic(section.chapterNumber, rawSlug);
 
-let mappedHeadings: { level: number; id: string; text: string }[] = [];
+const headingPrefix = findSubtopicNumber(liveChapters, section.chapterNumber, section.slug || section.id)
+  || findSubtopicNumber(chapters, section.chapterNumber, section.slug || section.id);
+const mappedHeadings = approvedDoc
+  ? await getCourseHeadings(approvedDoc.contentMarkdown, headingPrefix)
+  : [];
+const currentChapter = liveChapters.find(chapter => chapter.number === section.chapterNumber)
+  || chapters.find(chapter => chapter.number === section.chapterNumber);
+const problemOffset = currentChapter ? await getChapterProblemOffset(currentChapter, section.slug || section.id) : 0;
 
-if (approvedDoc && approvedDoc.contentMarkdown) {
-  // Extraer encabezados de Markdown para el índice "En esta página"
-  const regex = /^(#{2,3})\s+(.+)$/gm;
-  let match;
-  while ((match = regex.exec(approvedDoc.contentMarkdown)) !== null) {
-    mappedHeadings.push({
-      level: match[1].length,
-      id: match[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      text: match[2].trim(),
-    });
-  }
-}
 ---
 
 <Layout title={`${section.title} | Resistencia de Materiales — UNI`} description={`Capítulo ${section.chapterNumber}: ${section.chapterTitle}`}>
@@ -71,6 +68,8 @@ if (approvedDoc && approvedDoc.contentMarkdown) {
     >
       {approvedDoc ? (
         <ContentRenderer
+          headingPrefix={headingPrefix}
+          problemOffset={problemOffset}
           client:load
           document={{
             schemaVersion: 2,

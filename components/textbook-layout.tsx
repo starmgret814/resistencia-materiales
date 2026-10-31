@@ -13,15 +13,15 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { chapters, type Chapter, type Section } from '@/lib/course-data'
+import { chapters, type Chapter } from '@/lib/course-data'
 import CourseSearch from '@/components/course-search'
 
 // ─── Logo ──────────────────────────────────────────────────────────────
 function LogoMark() {
   return (
-    <div className="flex size-9 items-center justify-center rounded-lg bg-[#7f0303] text-[#fff8f4] shadow-sm" aria-label="Universidad Nacional de Ingeniería">
+    <a href="/" className="flex size-9 items-center justify-center rounded-lg bg-[#7f0303] text-[#fff8f4] shadow-sm" aria-label="Universidad Nacional de Ingeniería">
       <span className="font-serif text-lg font-semibold tracking-tight">UNI</span>
-    </div>
+    </a>
   )
 }
 
@@ -64,7 +64,6 @@ function Header({ onMenu, onSearch }: { onMenu: () => void; onSearch: () => void
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <a href="/examenes" className="inline-flex items-center gap-2 rounded-md px-2 py-2 text-xs font-semibold text-[#7f0303] hover:bg-[#f2dddd] dark:text-[#fca5a5] dark:hover:bg-[#2d181a]"><FileText className="size-4" /><span className="hidden sm:inline">Exámenes pasados</span><span className="sm:hidden">Exámenes</span></a>
           <button onClick={onSearch} className="hidden h-9 items-center gap-2 rounded-md border border-[#d5c0c0] dark:border-[#422527] bg-white/70 dark:bg-[#231416] px-3 text-sm text-[#765e5e] dark:text-[#cbb0ae] shadow-sm hover:border-[#b78383] hover:text-[#7f0303] dark:hover:text-[#f87171] md:flex transition-colors" aria-label="Buscar en el curso">
             <Search className="size-4" /><span>Buscar en el curso</span><kbd className="ml-3 rounded border border-[#e3caca] dark:border-[#422527] bg-[#f7f5f0] dark:bg-[#150c0d] px-1.5 py-0.5 text-[10px] text-[#967070] dark:text-[#a08282]">⌘ K</kbd>
           </button>
@@ -86,6 +85,7 @@ function Sidebar({
   customChapters,
   navigatingSlug,
   onNavigate,
+  examsActive,
 }: {
   open: boolean
   onClose: () => void
@@ -93,11 +93,12 @@ function Sidebar({
   customChapters?: Chapter[]
   navigatingSlug?: string | null
   onNavigate?: (slug: string) => void
+  examsActive: boolean
 }) {
   const courseChapters = customChapters && customChapters.length > 0 ? customChapters : chapters
   const [expanded, setExpanded] = useState(() => {
     // Auto-expand the chapter that contains the active section
-    if (!activeSlug) return '01'
+    if (!activeSlug) return ''
     for (const ch of courseChapters) {
       if (ch.sections.some((s) => s.slug === activeSlug)) return ch.number
     }
@@ -110,7 +111,7 @@ function Sidebar({
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-[#3a1718]/40 lg:hidden" onClick={onClose} aria-label="Cerrar navegación" />}
-      <aside className={cn('fixed inset-y-0 left-0 z-50 flex w-[292px] flex-col border-r border-[#e3caca] dark:border-[#382022] bg-[#f8efed] dark:bg-[#1a0f10] pt-[68px] transition-transform duration-200 lg:sticky lg:top-[68px] lg:z-0 lg:h-[calc(100vh-68px)] lg:translate-x-0', open ? 'translate-x-0' : '-translate-x-full')}>
+      <aside className={cn('fixed inset-y-0 left-0 z-50 flex w-[292px] shrink-0 flex-col border-r border-[#e3caca] dark:border-[#382022] bg-[#f8efed] dark:bg-[#1a0f10] pt-[68px] transition-transform duration-200 lg:sticky lg:top-[68px] lg:z-0 lg:pt-0 lg:h-[calc(100vh-68px)] lg:translate-x-0', open ? 'translate-x-0' : '-translate-x-full')}>
         <div className="flex items-center justify-between px-5 pb-4 pt-6">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-[#967070] dark:text-[#ab8e8e]">Contenido del curso</p>
@@ -119,7 +120,12 @@ function Sidebar({
           <button onClick={onClose} className="inline-flex size-8 items-center justify-center rounded-md text-[#795e5e] dark:text-[#cbb0ae] hover:bg-[#f2dddd] dark:hover:bg-[#2d181a] lg:hidden transition-colors" aria-label="Cerrar navegación"><X className="size-4" /></button>
         </div>
         <nav className="scrollbar-none flex-1 overflow-y-auto px-3 pb-8" aria-label="Capítulos del curso">
-          <a href="/examenes" onClick={onClose} className="mb-5 flex items-center gap-3 rounded-lg border border-[#dfc5c3] bg-white/60 px-3 py-3 text-sm font-semibold text-[#7f0303] hover:bg-[#f2dddd] dark:border-[#422527] dark:bg-[#231416] dark:text-[#fca5a5]"><FileText className="size-4 shrink-0" />Exámenes pasados</a>
+          <div className="mb-5 border-b border-[#e3caca] pb-5 dark:border-[#382022]">
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#967070] dark:text-[#ab8e8e]">Recursos de estudio</p>
+            <a href="/examenes" onClick={onClose} aria-current={examsActive ? 'page' : undefined} className={cn('flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7f0303]', examsActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}>
+              <FileText className="size-4 shrink-0" aria-hidden="true" /><span className="flex-1">Exámenes pasados</span><ChevronRight className="size-3.5 opacity-50" aria-hidden="true" />
+            </a>
+          </div>
           {courseChapters.map((chapter) => {
             const isExpanded = expanded === chapter.number
             return (
@@ -226,6 +232,7 @@ export interface TextbookLayoutProps {
   previous?: { slug: string; title: string } | null
   next?: { slug: string; title: string } | null
   customChapters?: Chapter[]
+  variant?: 'course' | 'archive' | 'exam'
   children: React.ReactNode
 }
 
@@ -238,6 +245,7 @@ export default function TextbookLayout({
   previous,
   next,
   customChapters,
+  variant = 'course',
   children,
 }: TextbookLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -261,11 +269,12 @@ export default function TextbookLayout({
           customChapters={customChapters}
           navigatingSlug={navigatingSlug}
           onNavigate={setNavigatingSlug}
+          examsActive={variant !== 'course'}
         />
         <main className="min-w-0 flex-1">
           <div className="flex justify-center">
             {/* ─── Content area ─── */}
-            <article className="mx-auto max-w-[760px] px-5 pb-20 pt-10 sm:px-8 sm:pt-14 lg:px-10">
+            <article className={cn('mx-auto w-full min-w-0 px-5 pb-20 pt-8 sm:px-8 sm:pt-12 lg:px-10', variant === 'archive' ? 'max-w-[1100px]' : 'max-w-[840px]')}>
               {/* Breadcrumb */}
               {chapterNumber && chapterTitle && (
                 <div className="mb-8 flex items-center gap-2 text-[11px] font-medium text-[#866b6b] dark:text-[#ab8e8e]">
@@ -276,11 +285,7 @@ export default function TextbookLayout({
               )}
 
               {/* MDX content slot */}
-              {chapterNumber && <a href="/examenes" className="mb-8 flex items-start gap-3 rounded-xl border border-[#e3caca] bg-[#f8eaea] p-4 text-[#7f0303] transition-colors hover:bg-[#f2dddd] dark:border-[#422527] dark:bg-[#281517] dark:text-[#fca5a5]">
-                <FileText className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-                <div><p className="text-sm font-semibold">Practica con exámenes pasados →</p><p className="mt-1 text-xs leading-5 text-[#765e5e] dark:text-[#cbb0ae]">Prácticas calificadas, parciales, finales y sustitutorios organizados por periodo.</p></div>
-              </a>}
-              <div className="mdx-content">
+              <div className={variant === 'course' ? 'mdx-content' : undefined}>
                 {children}
               </div>
 

@@ -2,6 +2,14 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+.problem-illustrated { display: grid; gap: 1.5rem; align-items: start; }
+@media (min-width: 640px) {
+  .problem-illustrated { grid-template-columns: minmax(0, 1fr) minmax(0, min(60%, var(--problem-image-width, 38%))); }
+  .problem-image-left { grid-template-columns: minmax(0, min(60%, var(--problem-image-width, 38%))) minmax(0, 1fr); }
+  .problem-image-left > .problem-figure { grid-column: 1; grid-row: 1; }
+  .problem-image-left > :first-child { grid-column: 2; grid-row: 1; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
