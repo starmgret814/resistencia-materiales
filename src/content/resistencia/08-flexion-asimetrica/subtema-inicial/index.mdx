@@ -1,3 +1,210 @@
-# Subtema inicial
+# 8.1 Doble simetría
 
-Empieza a escribir aquí...
+Hasta ahora, en flexión, el momento flector actuaba siempre en un plano de simetría de la viga. En la práctica, el momento muchas veces apunta en otra dirección: una correa de techo inclinada, una viga con la carga desalineada, un eje con cargas en dos planos. Ese caso se llama **flexión asimétrica**, tambien llamado **flexión biaxial**, **flexión desviada** u **oblicua**, son nombres distintos para lo mismo, un momento flector con componentes en dos ejes a la vez.
+
+En este subtema se estudian las secciones con **doble simetría** tales como rectángulo, círculo y perfil I, donde los ejes de simetría ya son los ejes principales y el análisis es más sencillo.
+
+<Definition title="Flexión asimétrica (biaxial)">
+Es la flexión en la que el vector momento flector $M$ no coincide con un eje principal de la sección. El momento se descompone en dos componentes, $M_y$ y $M_z$, y cada una produce una flexión simple.
+</Definition>
+
+## Idea base: Superponer dos flexiones simples
+
+Una sola idea sostiene todo el capítulo: si el material trabaja en el régimen elástico lineal, los efectos se suman.
+
+1. Se descompone el momento $M$ en una componente $M_z$ que flecta la viga en el plano vertical y una componente $M_y$ que la flecta en el plano horizontal.
+2. Cada componente produce su propia distribución lineal de esfuerzos, que ya se conoce de la flexión simple.
+3. Se suman los esfuerzos de los dos efectos, punto por punto.
+
+<image
+src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792682930/r0vgtgprrfn5vzmqfq3v.svg" 
+ alt="Tres secciones rectangulares: solo Mz, solo My y la suma de ambos, con zonas de tracción y compresión" 
+ caption="Figura 8.1: Superposición de los efectos de Mz y My. El eje neutro (verde) separa la zona de tracción de la de compresión."
+/>
+
+**Convención de ejes que se usa en todo el capítulo:**
+
+- $x$ es el eje de la viga y sale de la hoja hacia el lector.
+- $y$ es el eje vertical, positivo hacia arriba.
+- $z$ es el eje horizontal, positivo hacia la **izquierda**.
+- $M_y$ es el momento con vector a lo largo de $y$; $M_z$ es el momento con vector a lo largo de $z$.
+
+## Esfuerzo normal
+
+Cada componente aporta un término. Con los signos de la convención anterior, $M_z$ positivo produce tracción en la parte baja de la sección ($y<0$) y $M_y$ positivo produce tracción en el lado izquierdo ($z>0$).
+
+<Formula label="Esfuerzo normal en flexión asimétrica">
+$$\sigma_x = \frac{M_y \, z}{I_y} - \frac{M_z \, y}{I_z}$$
+</Formula>
+Donde:
+- $\sigma_x$ es el esfuerzo normal en el punto $(z, y)$ ($\text{Pa}$ o $\text{MPa}$); positivo es tracción.
+- $M_y$, $M_z$ son las componentes del momento flector ($\text{N}\cdot\text{m}$).
+- $I_y = \int z^2\, dA$ es el momento de inercia de la sección respecto al eje $y$ ($\text{m}^4$).
+- $I_z = \int y^2\, dA$ es el momento de inercia de la sección respecto al eje $z$ ($\text{m}^4$).
+- $y$, $z$ son las coordenadas del punto, medidas desde el centroide $C$ ($\text{m}$).
+
+## Eje neutro
+El **eje neutro** es la recta de la sección donde el esfuerzo vale cero. Separa la zona en tracción de la zona en compresión. Se obtiene haciendo $\sigma_x = 0$:
+<Formula label="Ecuación del eje neutro">
+$$\frac{M_y}{I_y}\, z - \frac{M_z}{I_z}\, y = 0$$
+</Formula>
+Es una recta que pasa por el centroide $C$. Su inclinación $\beta$ se mide desde el eje $z$:
+<Formula label="Inclinación del eje neutro">
+$$\tan\beta = \frac{y}{z} = \frac{M_y\, I_z}{M_z\, I_y}$$
+</Formula>
+Donde $\beta$ es el ángulo entre el eje neutro y el eje $z$ ($\text{grados}$ o $\text{rad}$).
+
+Si el vector $M$ forma un ángulo $\theta$ con el eje $z$, entonces $M_y = M\sin\theta$ y $M_z = M\cos\theta$, y la inclinación queda:
+
+$$
+\tan\beta = \frac{I_z}{I_y}\,\tan\theta
+$$
+
+**Lo importante:** el eje neutro **no** sigue la dirección del momento. Solo coincide con ella ($\beta=\theta$) cuando $I_z = I_y$, como en el círculo. En una sección alargada, el eje neutro se acerca al eje de menor inercia. La animación muestra este efecto en un rectángulo con $h = 2b$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792688658/orugqb1dyy3j7yzwb6iy.svg"
+ alt="Animación de un rectángulo con el vector M girando y el eje neutro girando más rápido" 
+ caption="Figura 8.2: Al girar M un ángulo θ, el eje neutro gira un ángulo β > θ. Rojo: tracción; azul: compresión."
+/>
+
+Valores de la animación (rectángulo con $h = 2b$, es decir $I_z/I_y = 4$):
+
+| $\theta$ | $\quad 10° \quad$ | $\quad 20° \quad$ | $\quad 30° \quad$ | $\quad 45° \quad$ | $\quad 60° \quad$ |
+|---|---|---|---|---|---|
+| $\beta$ | $\quad 35.2° \quad$ | $\quad 55.5° \quad$ | $\quad 66.6° \quad$ | $\quad 76.0° \quad$ | $\quad 81.8° \quad$ |
+
+Una pequeña desviación del momento cambia mucho la posición del eje neutro.
+
+## Sección rectangular
+
+Para un rectángulo de ancho $b$ (a lo largo de $z$) y alto $h$ (a lo largo de $y$), $I_z = bh^3/12$ e $I_y = hb^3/12$. Al sustituir:
+
+<Formula label="Esfuerzo en una sección rectangular">
+$$
+\sigma(z,y) = -\frac{12\, M_z\, y}{b\, h^3} + \frac{12\, M_y\, z}{h\, b^3}
+$$
+</Formula>
+
+El esfuerzo es lineal, así que el máximo está en la esquina más alejada del eje neutro, donde $z = b/2$ y $y = h/2$ (en valor absoluto). Allí los dos efectos se suman:
+
+<Formula label="Esfuerzo máximo (rectángulo)">
+$$
+\sigma_{max} = \frac{6\, M_z}{b\, h^2} + \frac{6\, M_y}{h\, b^2} = \frac{6\, M}{b\, h}\left(\frac{\cos\theta}{h} + \frac{\sin\theta}{b}\right)
+$$
+</Formula>
+
+Donde $b$ y $h$ son las dimensiones de la sección en $z$ y en $y$ ($\text{m}$) y $M = \sqrt{M_y^2 + M_z^2}$ es el momento resultante ($\text{N}\cdot\text{m}$).
+
+<Example number={1} title="Rectángulo con dos momentos">
+Una viga de sección rectangular de $b = 60\text{ mm}$ y $h = 120\text{ mm}$ soporta $M_z = 3\text{ kN}\cdot\text{m}$ y $M_y = 1\text{ kN}\cdot\text{m}$. Determine la inclinación del eje neutro y el esfuerzo máximo.
+
+<Solution>
+1. **Inercias:**
+   $$
+   I_z = \frac{b h^3}{12} = 8.64\times 10^{-6}\text{ m}^4, \qquad I_y = \frac{h b^3}{12} = 2.16\times 10^{-6}\text{ m}^4
+   $$
+2. **Eje neutro:**
+   $$
+   \tan\beta = \frac{M_y I_z}{M_z I_y} = \frac{1\times 8.64}{3\times 2.16} = 1.333 \implies \beta = 53.1°
+   $$
+3. **Esfuerzo máximo:**
+   $$
+   \sigma_{max} = \frac{6(3000)}{0.06(0.12)^2} + \frac{6(1000)}{0.12(0.06)^2} = 20.83\text{ MPa} + 13.89\text{ MPa} = 34.7\text{ MPa}
+   $$
+4. **Conclusión:**
+   La tracción máxima ($34.7\text{ MPa}$) ocurre en la esquina inferior izquierda ($z>0$, $y<0$). La compresión máxima, del mismo valor, ocurre en la esquina opuesta.
+</Solution>
+</Example>
+
+## Sección circular
+
+En un círculo, **todos los diámetros son ejes principales** y tienen la misma inercia, $I_y = I_z = I = \pi d^4/64$. Entonces el momento resultante $M = \sqrt{M_y^2 + M_z^2}$ flecta la sección como si fuera una flexión simple alrededor del diámetro perpendicular a $M$, sin importar el ángulo $\alpha$ del vector.
+
+Paso a paso: con $M_z = M\cos\alpha$ y $M_y = M\sin\alpha$, el punto más esforzado está a una distancia $d/2$ del eje neutro, en $z = \tfrac{d}{2}\sin\alpha$ e $y = -\tfrac{d}{2}\cos\alpha$. Sustituyendo en la fórmula del esfuerzo:
+
+$$
+\sigma_{max} = \frac{1}{I}\left(M\sin\alpha\cdot\frac{d}{2}\sin\alpha + M\cos\alpha\cdot\frac{d}{2}\cos\alpha\right) = \frac{M\, d}{2\, I}\left(\sin^2\alpha + \cos^2\alpha\right)
+$$
+
+Como $\sin^2\alpha + \cos^2\alpha = 1$, el ángulo desaparece:
+
+<Formula label="Esfuerzo máximo (círculo)">
+$$
+\sigma_{max} = \frac{M\, d}{2\, I} = \frac{32\, M}{\pi\, d^3}, \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+</Formula>
+
+Donde $d$ es el diámetro ($\text{m}$), $I$ es la inercia ($\text{m}^4$) y $M$ es el momento resultante ($\text{N}\cdot\text{m}$). También se escribe $\sigma_{max} = \tfrac{d}{2I}\sqrt{M_z^2 + M_y^2}$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792685456/repg99avzpiln29kvfzm.svg" 
+ alt="Sección circular con el vector M, sus componentes, el eje neutro en la dirección de M y los puntos de tracción y compresión máximas" 
+ caption="Figura 8.3: En la sección circular el eje neutro coincide con la dirección de M; los puntos A y B están a 90° de M."
+/>
+
+<Example number={2} title="Eje circular con momentos en dos planos">
+Un eje de $d = 50\text{ mm}$ soporta $M_y = 300\text{ N}\cdot\text{m}$ y $M_z = 400\text{ N}\cdot\text{m}$. Calcule el esfuerzo máximo.
+
+<Solution>
+1. **Momento resultante:**
+   $$
+   M = \sqrt{300^2 + 400^2} = 500\text{ N}\cdot\text{m}
+   $$
+2. **Esfuerzo máximo:**
+   $$
+   \sigma_{max} = \frac{32(500)}{\pi(0.05)^3} = 40.7\text{ MPa}
+   $$
+3. **Conclusión:**
+   El eje neutro es el diámetro en la dirección de $M$, a $\alpha = \arctan(300/400) = 36.9°$ de $z$. El esfuerzo es el mismo que si todo el momento actuara en un solo plano.
+</Solution>
+</Example>
+
+## Flexo-tracción
+
+Si además de los momentos actúa una fuerza axial $F$ de tracción en el centroide, se suma un esfuerzo uniforme:
+
+<Formula label="Flexo-tracción">
+$$
+\sigma_x = \frac{F}{A} + \frac{M_y\, z}{I_y} - \frac{M_z\, y}{I_z}
+$$
+</Formula>
+
+Donde $F$ es la fuerza axial, positiva si es de tracción ($\text{N}$), y $A$ es el área de la sección ($\text{m}^2$).
+
+El eje neutro es ahora la recta $\dfrac{F}{A} + \dfrac{M_y z}{I_y} - \dfrac{M_z y}{I_z} = 0$. Tiene la **misma inclinación** $\beta$ que sin fuerza axial, pero ya **no pasa por el centroide**: se desplaza hacia el lado de compresión.
+
+<Example number={3} title="Rectángulo con fuerza axial">
+A la viga del Ejemplo 1 se le añade una fuerza axial de tracción $F = 36\text{ kN}$. Calcule los esfuerzos máximo y mínimo.
+
+<Solution>
+1. **Esfuerzo axial:**
+   $$
+   \frac{F}{A} = \frac{36\,000}{0.06 \times 0.12} = 5\text{ MPa}
+   $$
+2. **Superposición:** el efecto de la flexión es $\pm 34.7\text{ MPa}$ en las esquinas críticas (Ejemplo 1).
+   $$
+   \sigma_{max} = 5 + 34.7 = 39.7\text{ MPa}, \qquad \sigma_{min} = 5 - 34.7 = -29.7\text{ MPa}
+   $$
+3. **Conclusión:**
+   La tracción máxima sube a $39.7\text{ MPa}$ y la compresión máxima baja a $29.7\text{ MPa}$. El eje neutro conserva $\beta = 53.1°$ pero se corre hacia el lado comprimido.
+</Solution>
+</Example>
+
+## Ejercicio de autoevaluación
+
+<Quiz question="En una sección circular, ¿el esfuerzo máximo cambia si el momento resultante M gira (con el mismo valor)?">
+No. Todos los diámetros son ejes principales con la misma inercia, así que $\sigma_{max} = 32M/(\pi d^3)$ depende solo del valor de $M$ y no de su ángulo.
+</Quiz>
+
+<Quiz question="¿Por qué en un rectángulo el eje neutro no sigue la dirección del vector M?">
+Porque $\tan\beta = (I_z/I_y)\tan\theta$. Como $I_z \neq I_y$, el ángulo del eje neutro es distinto al de $M$; solo coinciden cuando $I_z = I_y$.
+</Quiz>
+
+<Summary title="Resumen">
+- La flexión asimétrica (biaxial) se resuelve superponiendo dos flexiones simples: $\sigma_x = M_y z/I_y - M_z y/I_z$.
+- El eje neutro pasa por el centroide y cumple $\tan\beta = (M_y I_z)/(M_z I_y) = (I_z/I_y)\tan\theta$; solo sigue a $M$ cuando $I_z = I_y$.
+- En el rectángulo, $\sigma_{max} = 6M_z/(bh^2) + 6M_y/(hb^2)$, en la esquina más alejada del eje neutro.
+- En el círculo, $\sigma_{max} = 32M/(\pi d^3)$ con $M = \sqrt{M_y^2 + M_z^2}$, sin depender del ángulo.
+- Con fuerza axial $F$ se suma $F/A$ y el eje neutro se desplaza, manteniendo su inclinación.
+</Summary>
