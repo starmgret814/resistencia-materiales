@@ -1,0 +1,136 @@
+# Esfuerzos en elementos y conexiones
+
+Las cargas transmitidas por los elementos y sus conexiones producen esfuerzos sobre las secciones y superficies de contacto. Para analizarlos, se relacionan las fuerzas internas resultantes con las áreas que las transmiten. Las expresiones de esta sección permiten calcular esfuerzos promedio; la distribución real puede variar dentro de cada área.
+
+## 1.2.1. Esfuerzo normal
+
+Cuando un elemento está sometido a una carga axial, la fuerza interna actúa perpendicularmente a su sección transversal y produce esfuerzo normal. Si la fuerza axial resultante es $P$ y el área de la sección es $A$, el esfuerzo normal promedio es:
+
+$$
+\sigma_{\mathrm{prom}}=\frac{P}{A}.
+$$
+
+En una barra de armadura, por ejemplo, primero se determina la fuerza axial que soporta el miembro. Luego, al dividirla entre el área de su sección transversal, se obtiene el esfuerzo normal promedio. Si la carga tiende a alargar el elemento, el esfuerzo es de tensión; si tiende a acortarlo, es de compresión.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793411265/rqpwnilohnehayh63rra.png"
+  alt="Miembro de una armadura sometido a una fuerza axial; se muestra su sección transversal de área A y la distribución de fuerzas normales sobre ella."
+  caption="Figura 5. Fuerza axial y esfuerzo normal promedio en la sección de un miembro."
+/>
+
+## 1.2.2. Principio de Saint-Venant
+
+La forma en que una carga se aplica puede afectar la distribución de esfuerzos en la zona cercana. Por ejemplo, si una fuerza axial $P$ actúa a una distancia $d$ del centro de una sección, su efecto puede representarse en el centro mediante la misma fuerza y un momento:
+
+$$
+M=Pd.
+$$
+
+Por ello, las distribuciones de esfuerzo pueden ser distintas cerca de la zona de aplicación de la carga. El **principio de Saint-Venant** establece que, a suficiente distancia de esa zona, las diferencias debidas a la forma particular de aplicar la carga pierden importancia cuando los sistemas comparados tienen las mismas resultantes de fuerza y momento. La distancia necesaria depende de la geometría y de las condiciones del elemento.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793412564/aoqzljz9n8ggupvsnwc7.png"
+  alt="Elemento sometido a una fuerza axial aplicada con excentricidad d y representación equivalente de la fuerza aplicada en el centro junto con el momento M igual a Pd; se indica una sección alejada de la aplicación."
+  caption="Figura 6. La distribución local depende de la aplicación de la carga, pero su influencia disminuye al alejarse de ella."
+/>
+
+## 1.2.3. Esfuerzo cortante
+
+El **esfuerzo cortante** aparece cuando las fuerzas internas actúan paralelamente a la sección y tienden a producir el deslizamiento relativo de una parte del elemento respecto de otra. Si la fuerza cortante resultante es $V$ y actúa sobre un área $A$, el esfuerzo cortante promedio se calcula como:
+
+$$
+\tau_{\mathrm{prom}}=\frac{V}{A}.
+$$
+
+En las conexiones con pernos o pasadores, la sección del conector puede quedar sometida a cortante. Si la fuerza se reparte por igual entre $n$ planos de corte, el esfuerzo cortante promedio en cada plano es:
+
+$$
+\tau_{\mathrm{prom}}=\frac{V}{nA_s},
+$$
+
+donde $A_s$ es el área del conector en un plano de corte. En corte simple, $n=1$; en doble corte, $n=2$. Esta distribución igual de la carga corresponde a conexiones con una geometría que permite repartirla simétricamente entre los planos.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793417155/zxd4fysfinysdxtvzoaf.png"
+  alt="Comparación de una conexión con perno en corte simple y otra en doble corte; se señalan uno y dos planos de corte, respectivamente."
+  caption="Figura 7. Planos de corte en conexiones de corte simple y doble."
+/>
+
+## 1.2.4. Esfuerzo de aplastamiento
+
+En una conexión, el perno también ejerce presión sobre las superficies de contacto de las piezas unidas. El esfuerzo promedio asociado con esta acción se denomina **esfuerzo de aplastamiento**. En general, se calcula dividiendo la fuerza transmitida entre el área proyectada de contacto:
+
+$$
+\sigma_{\mathrm{ap,prom}}=\frac{P}{A_{\mathrm{proy}}},
+$$
+
+donde $A_{\mathrm{proy}}$ es el área proyectada de la zona de contacto. Para una placa de espesor $t$ conectada mediante un perno de diámetro $d$, el área proyectada es:
+
+$$
+A_b=A_{\mathrm{proy}}=td.
+$$
+
+Por tanto, el esfuerzo de aplastamiento promedio para esta placa es:
+
+$$
+\sigma_{\mathrm{ap,prom}}=\frac{P}{A_b}
+=\frac{P}{td}.
+$$
+
+El área $td$ es la proyección de la zona de contacto sobre un plano; no corresponde a la superficie curva real del perno.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793417909/ahrypkyouwpnsf8ptnpd.png"
+  alt="Perno que transmite una fuerza P a una placa de espesor t; se destaca el área proyectada de contacto, de dimensiones t por d."
+  caption="Figura 8. Área proyectada utilizada para calcular el esfuerzo promedio de aplastamiento."
+/>
+
+## 1.2.5. Esfuerzos en planos inclinados
+
+La sección de un elemento no tiene que ser perpendicular a su eje. Al analizar un corte inclinado en una barra sometida a una carga axial $P$, la fuerza se descompone en una componente normal al plano y otra paralela a él. Por eso, sobre el plano inclinado pueden actuar simultáneamente esfuerzo normal y esfuerzo cortante.
+
+Sea $A_0$ el área de una sección perpendicular al eje de la barra y sea $\theta$ el ángulo entre el eje y la normal al plano inclinado. El área de dicho plano es:
+
+$$
+A_{\theta}=\frac{A_0}{\cos\theta}.
+$$
+
+Las componentes de la fuerza axial normal y paralela al plano son:
+
+$$
+P_n=P\cos\theta,
+\qquad
+P_t=P\sin\theta.
+$$
+
+Al dividir cada componente entre el área inclinada, se obtienen las magnitudes de los esfuerzos promedio:
+
+$$
+\sigma_{n,\mathrm{prom}}
+=\frac{P_n}{A_{\theta}}
+=\frac{P}{A_0}\cos^2\theta,
+$$
+
+$$
+\tau_{\mathrm{prom}}
+=\frac{P_t}{A_{\theta}}
+=\frac{P}{A_0}\sin\theta\cos\theta.
+$$
+
+El ángulo $\theta$ se mide entre el eje de la barra y la normal al plano, no entre el eje y el plano mismo.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793419937/rudvuqhkuagvaa2y3whv.png"
+  alt="Barra sometida a carga axial P con un plano de corte inclinado; se muestran el área perpendicular A cero, el área inclinada A theta, el ángulo theta entre el eje y la normal al plano y las componentes de fuerza normal y tangencial."
+  caption="Figura 9. Componentes de la carga axial sobre un plano inclinado."
+/>
+
+<Summary title="Resumen">
+
+- El esfuerzo normal promedio en un elemento sometido a carga axial es $\sigma_{\mathrm{prom}}=P/A$.
+- El principio de Saint-Venant explica por qué la forma de aplicación de una carga influye principalmente en una zona cercana a ella.
+- El esfuerzo cortante promedio se calcula como $\tau_{\mathrm{prom}}=V/A$; en una conexión, el número de planos de corte determina cómo se reparte la fuerza.
+- El esfuerzo de aplastamiento promedio se calcula como $\sigma_{\mathrm{ap,prom}}=P/A_{\mathrm{proy}}$; para una placa conectada mediante un perno, $A_{\mathrm{proy}}=td$.
+- En un plano inclinado respecto del eje de una barra cargada axialmente aparecen componentes normal y tangencial.
+
+</Summary>
