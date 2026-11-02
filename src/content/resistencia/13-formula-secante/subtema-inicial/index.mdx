@@ -1,3 +1,262 @@
 # Subtema inicial
 
-Empieza a escribir aquí...
+---
+
+## Parte 1: Columnas con Carga Excéntrica y la Fórmula de la Secante
+
+### 1.1. ¿Por qué existe este tema? 
+
+Cuando estudiamos la fórmula clásica de Euler, asumimos un escenario idealizado: la columna es perfectamente recta, el material es totalmente homogéneo y la carga axial $P$ se aplica **exactamente en el centroide** de la sección transversal. Sin embargo, en la ingeniería real esto rara vez ocurre: siempre existen imperfecciones de fabricación o la carga termina apoyándose a unos milímetros del eje central.
+
+Esa distancia desde el centroide de la sección hasta el punto real de aplicación de la fuerza se denomina **excentricidad ($e$)**. A diferencia de una columna ideal céntrica —que permanece completamente recta hasta que de repente "salta" y se pandea al alcanzar la carga crítica $P_{cr}$—, una columna con carga excéntrica **empieza a doblarse (flexionarse) desde el primer instante** en que se le aplica cualquier carga $P$, por pequeña que sea.
+
+![Diagrama de cuerpo libre de una columna con carga excéntrica](col_excentrica_dcl.png)
+
+---
+
+### 1.2. Procedimiento Paso a Paso de la Deducción
+
+Para deducir la **Fórmula de la Secante** y comprender cómo se comporta la columna, seguimos el análisis mecánico del equilibrio en su posición deformada:
+
+#### Paso 1: Transformar la carga excéntrica en un sistema equivalente
+Consideremos una columna biarticulada en sus extremos $A$ y $B$ de longitud $L$. Si aplicamos una fuerza compresiva $P$ a una distancia $e$ del eje centroidal, podemos trasladar dicha fuerza $P$ directamente al centroide siempre y cuando agreguemos un **momento flector concentrado** en los extremos igual a:
+
+$$M_A = M_B = P \cdot e$$
+
+Este momento inicial es el culpable de que la columna tome una forma curva apenas entra en carga.
+
+#### Paso 2: Hacer un corte y hallar el Momento Flector Interno ($M$)
+Realizamos un corte imaginario en un punto $Q$ a una distancia vertical $x$ desde el extremo superior $A$, donde la columna ya ha sufrido una deflexión lateral $y$. Al plantear el equilibrio de momentos en el corte, notamos que la fuerza $P$ tiene un brazo de palanca total igual a la excentricidad original más la deformación ($e + y$). Como este momento curva la viga hacia el lado cóncavo (disminuyendo la pendiente respecto a nuestros ejes), el momento interno es negativo:
+
+$$M = -P y - M_A = -P y - P e = -P(y + e)$$
+
+#### Paso 3: Plantear la Ecuación Diferencial de la Elástica
+De la teoría de deflexión de vigas sabemos que $EI \frac{d^2y}{dx^2} = M$. Sustituyendo nuestra expresión del momento interno:
+
+$$EI \frac{d^2y}{dx^2} = -P y - P e \implies \frac{d^2y}{dx^2} + \frac{P}{EI} y = -\frac{P}{EI} e$$
+
+Para simplificar la escritura algebraica, aplicamos el cambio de variable clásico definiendo $p^2 = \frac{P}{EI}$ (donde $p = \sqrt{\frac{P}{EI}}$). Obtenemos así una ecuación diferencial ordinaria lineal de segundo orden no homogénea:
+
+$$\frac{d^2y}{dx^2} + p^2 y = -p^2 e$$
+
+#### Paso 4: Resolver la ecuación diferencial y aplicar condiciones de contorno
+La solución general de esta ecuación diferencial es la suma de la solución homogénea ($y_h$) y la solución particular ($y_p = -e$):
+
+$$y(x) = C_1 \sin(px) + C_2 \cos(px) - e$$
+
+Para encontrar las constantes $C_1$ y $C_2$, evaluamos las condiciones de apoyo en los extremos articulados:
+
+* **Condición 1 (En $x = 0$, la deflexión es $y = 0$):**
+  $$0 = C_1 \sin(0) + C_2 \cos(0) - e \implies C_2 = e$$
+
+* **Condición 2 (En $x = L$, la deflexión es $y = 0$):**
+  $$0 = C_1 \sin(pL) + e \cos(pL) - e \implies C_1 = e \left( \frac{1 - \cos(pL)}{\sin(pL)} \right)$$
+
+Recordando las identidades trigonométricas de ángulo mitad ($1 - \cos(pL) = 2\sin^2(pL/2)$ y $\sin(pL) = 2\sin(pL/2)\cos(pL/2)$), simplificamos la fracción como $\tan\left(\frac{pL}{2}\right)$. Por lo tanto, $C_1 = e \tan\left(\frac{pL}{2}\right)$. Reemplazando $C_1$, $C_2$ y $p = \sqrt{\frac{P}{EI}}$, llegamos a la **Ecuación de la Curva Elástica**:
+
+$$y = e \left[ \tan\left(\frac{L}{2}\sqrt{\frac{P}{EI}}\right) \sin\left(\sqrt{\frac{P}{EI}}x\right) + \cos\left(\sqrt{\frac{P}{EI}}x\right) - 1 \right]$$
+
+#### Paso 5: Calcular la Deflexión Máxima ($y_{\max}$)
+Por simetría, el desplazamiento lateral máximo ocurre exactamente a la mitad de la columna ($x = L/2$). Evaluando $x = L/2$ en la ecuación de la elástica:
+
+$$y_{\max} = e \left[ \tan\left(\frac{pL}{2}\right) \sin\left(\frac{pL}{2}\right) + \cos\left(\frac{pL}{2}\right) - 1 \right]$$
+
+Sabiendo que $\frac{\sin^2(\theta)}{\cos(\theta)} + \cos(\theta) = \frac{\sin^2(\theta) + \cos^2(\theta)}{\cos(\theta)} = \frac{1}{\cos(\theta)} = \sec(\theta)$ y generalizando $L$ por la **longitud efectiva $L_e$** (para que sea aplicable a cualquier condición de sujeción), obtenemos la fórmula de la **Deflexión Máxima**:
+
+$$y_{\max} = e \left[ \sec\left( \frac{L_e}{2} \sqrt{\frac{P}{EI}} \right) - 1 \right]$$
+
+Si introducimos la carga crítica de Euler $P_{cr} = \frac{\pi^2 EI}{L_e^2}$, podemos sustituir $\frac{L_e}{2}\sqrt{\frac{P}{EI}} = \frac{\pi}{2}\sqrt{\frac{P}{P_{cr}}}$ y expresarla en función de la carga crítica:
+
+$$y_{\max} = e \left[ \sec\left( \frac{\pi}{2} \sqrt{\frac{P}{P_{cr}}} \right) - 1 \right]$$
+
+> **Interpretación física importante:** Observa que si la carga $P$ alcanza el valor de $P_{cr}$, el término dentro de la secante se vuelve $\frac{\pi}{2}$, y como $\sec(\pi/2) = \infty$, la deflexión tiende teóricamente al infinito. Asimismo, como la ecuación no es lineal respecto a $P$, **no se puede aplicar el principio de superposición** (duplicar la carga $P$ produce más del doble de deflexión).
+
+#### Paso 6: Obtener el Esfuerzo Máximo ($\sigma_{\max}$) — La Fórmula de la Secante
+En cualquier sección de la columna actúan simultáneamente un esfuerzo de compresión axial directo y un esfuerzo de flexión. El **esfuerzo máximo de compresión** ocurre en la sección media ($x = L/2$) en la fibra más comprimida a una distancia $c$ del centroide:
+
+$$\sigma_{\max} = \frac{P}{A} + \frac{M_{\max} c}{I}$$
+
+El momento flector máximo en el centro es igual a la fuerza por el brazo total:
+
+$$M_{\max} = P(y_{\max} + e) = P \cdot e \sec\left( \frac{L_e}{2} \sqrt{\frac{P}{EI}} \right)$$
+
+Recordando que el momento de inercia se relaciona con el área y el radio de giro mediante $I = A r^2$, reemplazamos $M_{\max}$ e $I$ en la ecuación del esfuerzo:
+
+$$\sigma_{\max} = \frac{P}{A} + \frac{P e \sec\left( \frac{L_e}{2} \sqrt{\frac{P}{E A r^2}} \right) c}{A r^2}$$
+
+Factorizando el esfuerzo axial promedio $\frac{P}{A}$ y sacando $r$ de la raíz cuadrada, obtenemos finalmente la **Fórmula de la Secante**:
+
+$$\sigma_{\max} = \frac{P}{A} \left[ 1 + \frac{ec}{r^2} \sec\left( \frac{L_e}{2r} \sqrt{\frac{P}{EA}} \right) \right]$$
+
+O también escrita en términos de la carga crítica $P_{cr}$ o despejada para la carga unitaria $P/A$:
+
+$$\sigma_{\max} = \frac{P}{A} \left[ 1 + \frac{ec}{r^2} \sec\left( \frac{\pi}{2} \sqrt{\frac{P}{P_{cr}}} \right) \right] \iff \frac{P}{A} = \frac{\sigma_{\max}}{1 + \frac{ec}{r^2} \sec\left( \frac{1}{2} \sqrt{\frac{P}{EA}} \left(\frac{L_e}{r}\right) \right)}$$
+
+![Gráficas de la Fórmula de la Secante para distintos valores de relación de excentricidad](grafica_secante.png)
+
+---
+
+### 1.3. Guía Práctica para Resolver Problemas con la Fórmula de la Secante
+
+Para no cometer errores al resolver ejercicios, ten siempre presentes estas reglas operativas:
+
+1. **Identificación de variables y ejes:**
+   * $e$: Excentricidad de la carga medida desde el eje centroidal.
+   * $c$: Distancia desde el eje neutro (centroidal) hasta la fibra extrema más comprimida (del mismo lado hacia donde está desplazada la carga $P$).
+   * $r$: Radio de giro ($r = \sqrt{I/A}$) **calculado respecto al eje de flexión** alrededor del cual la excentricidad $e$ genera el momento $M = Pe$.
+   * $\frac{ec}{r^2}$: Se denomina **relación de excentricidad**.
+2. **Calculadora en Radianes (`RAD`):** El ángulo $\theta = \frac{L_e}{2r}\sqrt{\frac{P}{EA}}$ es adimensional, es decir, está en **radianes**. Recuerda que $\sec(\theta) = \frac{1}{\cos(\theta)}$.
+3. **Resolución según lo que pida el problema:**
+   * **Problema Tipo 1 (Te dan $P$ y piden $\sigma_{\max}$ o $y_{\max}$):** Es un reemplazo directo. Calculas $A$, $I$, $r$, $c$, hallas $L_e$ según los apoyos y evalúas la ecuación.
+   * **Problema Tipo 2 (Te dan $\sigma_{\text{adm}} = \frac{\sigma_Y}{FS}$ y piden hallar la carga máxima $P$):** Como $P$ está tanto fuera como dentro de la función secante, **no se puede despejar algebraicamente**. Debes plantear la ecuación igualada a $\sigma_{\text{adm}}$ y resolverla usando la función `SOLVE` de la calculadora o mediante iteraciones numéricas.
+   * **Verificación de pandeo lateral fuera del plano:** Si una columna (como un perfil W) tiene la excentricidad sobre su eje más fuerte ($I_x$), la fórmula de la secante evalúa la flexocompresión en ese plano. Sin embargo, si no hay cables ni apoyos laterales, **siempre debes comprobar aparte** que la carga $P$ no supere la carga crítica de Euler pura en el eje débil perpendicular ($P_{cr,y} = \frac{\pi^2 E I_y}{L_e^2}$).
+
+---
+
+## Parte 2: Diseño de Columnas bajo Carga Céntrica 
+
+### 2.1. Comportamiento Real y Clasificación de Columnas
+
+Los ensayos de laboratorio demuestran que la hipérbola de Euler solo predice con exactitud el fallo cuando la relación de esbeltez ($L_e/r$) es alta. En columnas más cortas, las imperfecciones geométricas y los esfuerzos residuales hacen que el material ceda antes. Por ello, las columnas se dividen en tres categorías:
+
+![Dispersión de datos experimentales y clasificación en columnas cortas, intermedias y largas](dispersion_columnas.png)
+
+* **Columnas Cortas ($L_e/r < 30$ aprox.):** No sufren pandeo; fallan por **aplastamiento puro** cuando el esfuerzo axial alcanza el límite de fluencia del material ($\sigma_{cr} = \sigma_Y$).
+* **Columnas Intermedias:** Fallan por una combinación de **aplastamiento y pandeo inelástico** (parte de la sección transversal entra en fluencia antes de que ocurra la inestabilidad lateral). Como se supera el límite de proporcionalidad, la ecuación de Euler pierde validez y se recurre a ecuaciones empíricas.
+* **Columnas Largas (Esbeltas):** Fallan por **pandeo elástico puro** y siguen fielmente la ecuación de Euler ($\sigma_{cr} = \frac{\pi^2 E}{(L_e/r)^2}$).
+
+Para modelar el tramo intermedio a lo largo de la historia de la resistencia de materiales se han utilizado tres tipos de curvas empíricas:
+
+![Modelos empíricos para columnas intermedias: línea recta, parábola y Gordon-Rankine](modelos_empiricos.png)
+
+1. **Modelo de Línea Recta:** $\sigma_{cr} = \sigma_1 - k_1 \left(\frac{L_e}{r}\right)$
+2. **Modelo Parabólico:** $\sigma_{cr} = \sigma_2 - k_2 \left(\frac{L_e}{r}\right)^2$
+3. **Fórmula de Gordon-Rankine:** $\sigma_{cr} = \frac{\sigma_3}{1 + k_3 \left(\frac{L_e}{r}\right)^2}$
+
+---
+
+### 2.2. Diseño en Acero Estructural (Norma AISC)
+
+El *American Institute of Steel Construction* (AISC) establece una metodología continua dividida en dos tramos (pandeo inelástico en el tramo AB y pandeo elástico en el tramo BC), separados por una relación de esbeltez de transición donde el esfuerzo crítico es igual a $0.39\sigma_Y$:
+
+![Curva de diseño para columnas de acero según el AISC](aisc_acero.png)
+
+#### Procedimiento de cálculo AISC:
+1. **Calcular la esbeltez de la columna ($\frac{KL}{r}$) usando el radio de giro mínimo ($r_{\min}$) y hallar la esbeltez límite:**
+   $$\left(\frac{KL}{r}\right)_c = 4.71 \sqrt{\frac{E}{\sigma_Y}}$$
+
+2. **Calcular el esfuerzo de pandeo elástico de Euler ($\sigma_e$):**
+   $$\sigma_e = \frac{\pi^2 E}{(KL/r)^2}$$
+
+3. **Determinar el esfuerzo crítico ($\sigma_{cr}$) según el tramo correspondiente:**
+   * **Tramo AB (Columnas cortas e intermedias — $\frac{KL}{r} \le 4.71\sqrt{\frac{E}{\sigma_Y}}$):**
+     $$\sigma_{cr} = \left[ 0.658^{(\sigma_Y / \sigma_e)} \right] \sigma_Y$$
+   * **Tramo BC (Columnas largas — $\frac{KL}{r} > 4.71\sqrt{\frac{E}{\sigma_Y}}$):**
+     $$\sigma_{cr} = 0.877 \sigma_e$$
+
+4. **Calcular el esfuerzo o carga admisible:** En el método ASD (*Allowable Stress Design*), se divide entre el factor de seguridad normativo ($FS = 1.67$):
+   $$\sigma_{\text{allow}} = \frac{\sigma_{cr}}{1.67} \implies P_{\text{allow}} = \sigma_{\text{allow}} \cdot A$$
+
+> **Nota sobre códigos clásicos en unidades técnicas ($\text{kg/cm}^2$):** En reglamentos tradicionales para aceros de $\sigma_{\text{prop}} = 2100\text{ kg/cm}^2$ (donde la esbeltez se denota como $\epsilon = L/\rho$), se emplean ecuaciones directas de esfuerzo de trabajo $\sigma_T$:
+> * **AISC Clásico:** $\sigma_T = 1195 - 0.034\epsilon^2\text{ kg/cm}^2$ (para $\epsilon < 120$) y $\sigma_T = \frac{1265}{1 + \epsilon^2/18000}\text{ kg/cm}^2$ (para $120 < \epsilon < 200$).
+> * **NYC Building Code:** $\sigma_T = 1055\text{ kg/cm}^2$ ($\epsilon < 60$) y $\sigma_T = \frac{1265}{1 + \epsilon^2/18000}\text{ kg/cm}^2$ ($60 < \epsilon < 120$).
+> * **AASHO:** $\sigma_T = 1050 - 0.0175\epsilon^2\text{ kg/cm}^2$ (extremos remachados) y $\sigma_T = 1050 - 0.0233\epsilon^2\text{ kg/cm}^2$ (extremos articulados).
+> * **ASCE (Aceros de alta resistencia):** $\sigma_T = \frac{1687}{1 + \epsilon^2/9000}\text{ kg/cm}^2$.
+
+---
+
+### 2.3. Diseño en Aleaciones de Aluminio
+
+La *Aluminum Association* define fórmulas específicas de **esfuerzo admisible ($\sigma_{\text{allow}}$ o $\sigma_{\text{perm}}$)** para cada aleación, combinando un tramo constante (o lineal) para bajas esbelteces, una recta para columnas intermedias y una curva tipo Euler para columnas largas:
+
+#### A) Aleación de Aluminio 6061-T6 ($E \approx 69\text{ GPa}$, $\sigma_Y \approx 240\text{--}276\text{ MPa}$)
+![Curva de esfuerzo admisible para el Aluminio 6061-T6](aluminio_6061.png)
+
+* **Columnas Cortas ($\frac{KL}{r} \le 9.5$):**
+  $$\sigma_{\text{allow}} = 19\text{ ksi} = 131\text{ MPa}$$
+* **Columnas Intermedias ($9.5 < \frac{KL}{r} \le 66$):**
+  $$\sigma_{\text{allow}} = \left[ 20.2 - 0.125\left(\frac{KL}{r}\right) \right]\text{ ksi} = \left[ 139 - 0.868\left(\frac{KL}{r}\right) \right]\text{ MPa}$$
+* **Columnas Largas ($\frac{KL}{r} > 66$):**
+  $$\sigma_{\text{allow}} = \frac{51,000}{(KL/r)^2}\text{ ksi} = \frac{351,000}{(KL/r)^2}\text{ MPa}$$
+
+#### B) Aleación de Aluminio 2014-T6 ($E \approx 70\text{--}72\text{ GPa}$, $\sigma_Y \approx 365\text{--}420\text{ MPa}$)
+![Curva de esfuerzo admisible para el Aluminio 2014-T6](aluminio_2014.png)
+
+* **Columnas Cortas e Intermedias ($\frac{KL}{r} < 55$):**
+  $$\sigma_{\text{perm}} = \left[ 30.7 - 0.23\left(\frac{KL}{r}\right) \right]\text{ ksi} = \left[ 212 - 1.585\left(\frac{KL}{r}\right) \right]\text{ MPa}$$
+* **Columnas Largas ($\frac{KL}{r} \ge 55$):**
+  $$\sigma_{\text{perm}} = \frac{54,000}{(KL/r)^2}\text{ ksi} = \frac{372 \times 10^3}{(KL/r)^2}\text{ MPa}$$
+
+---
+
+### 2.4. Diseño en Columnas de Madera
+
+En columnas de madera de sección rectangular $b \times d$, la relación de esbeltez se define directamente usando la **menor dimensión transversal ($d$ o $b$)**: $\frac{KL}{d}$. Las especificaciones prohíben diseñar columnas de madera cuya esbeltez supere el valor de 50 ($\frac{KL}{d} \le 50$).
+
+![Curva de esfuerzo admisible para columnas de madera según NDS](madera_nds.png)
+
+#### 1. Método Moderno Continuo (NDS — *National Design Specification*)
+Para una columna de sección sólida o laminada con esfuerzo admisible de compresión paralelo al grano $F_c$ y módulo de elasticidad reducido $E'_{\min}$:
+
+1. Se calcula el parámetro de pandeo elástico de Euler:
+   $$F_{cE} = \frac{0.822 E'_{\min}}{(KL/d)^2}$$
+2. Se evalúa la ecuación continua de esfuerzo admisible:
+   $$\sigma_{\text{allow}} = F_c \left\{ \frac{1 + (F_{cE}/F_c)}{2c} - \sqrt{\left[ \frac{1 + (F_{cE}/F_c)}{2c} \right]^2 - \frac{F_{cE}/F_c}{c}} \right\}$$
+   *Donde el coeficiente $c = 0.80$ para columnas de madera maciza aserrada y $c = 0.90$ para columnas de madera laminada encolada (Glulam).*
+
+#### 2. Método Clásico por Tramos (*Forest Products Laboratory*)
+Utilizando la menor dimensión lateral $b$, la tensión de seguridad en compresión $\sigma_c$ y la constante de transición $k = \frac{\pi}{2}\sqrt{\frac{E}{6\sigma_c}}$:
+* **Columnas Cortas ($L/b < 10$):** $\frac{P}{A} = \sigma_c$
+* **Columnas Intermedias ($10 < L/b \le k$):** $\frac{P}{A} = \sigma_c \left[ 1 - \frac{1}{3}\left(\frac{L}{kb}\right)^4 \right]$
+* **Columnas Largas ($k < L/b < 50$):** $\frac{P}{A} = \frac{\pi^2 E}{36 (L/b)^2}$
+
+---
+
+## Parte 3: Diseño de Columnas bajo Carga Excéntrica (Flexocompresión)
+
+Cuando se requiere dimensionar una columna o seleccionar un perfil comercial sometido a una carga excéntrica $P$ (equivalente a una carga axial céntrica $P$ más momentos flectores $M = P \cdot e$), se utilizan dos criterios de diseño basados en las especificaciones del material:
+
+### 3.1. Método del Esfuerzo Admisible (Esfuerzo Centrado)
+
+Establece que la suma directa del esfuerzo de compresión céntrica más el esfuerzo de flexión no debe sobrepasar el esfuerzo admisible a compresión pura de la columna $(\sigma_{\text{all}})_{\text{centric}}$:
+
+![Superposición de esfuerzo céntrico y esfuerzo de flexión](esfuerzos_admisibles.png)
+
+$$\sigma_{\max} = \sigma_{\text{centric}} + \sigma_{\text{bending}} = \frac{P}{A} + \frac{Mc}{I} \le (\sigma_{\text{all}})_{\text{centric}}$$
+
+* **Criterio importante:** Para hallar $(\sigma_{\text{all}})_{\text{centric}}$ con las fórmulas de la Parte 2, se debe usar **la mayor relación de esbeltez $(KL/r)_{\max}$** de la sección, independientemente del plano en el que actúe el momento flector $M$.
+* *(Variante empírica de Rankine para cargas excéntricas):* $\sigma = \frac{P}{A}\left( 1 + \frac{\epsilon^2}{18000} + \frac{ev}{\rho^2} \right)$.
+
+---
+
+### 3.2. Método de Interacción (Flexión Uniaxial y Biaxial)
+
+Dado que el esfuerzo admisible en compresión axial $(\sigma_{\text{all}})_{\text{centric}}$ suele ser menor que el esfuerzo admisible en flexión pura $(\sigma_{\text{all}})_{\text{bending}}$, el **Método de Interacción** pondera qué fracción de su capacidad máxima está consumiendo cada efecto por separado. La suma total de estas fracciones no debe exceder la unidad ($1.0$):
+
+![Equivalencia de una carga excéntrica general en carga axial y momentos biaxiales](metodo_interaccion.png)
+
+Para el caso general de flexión biaxial (momentos en los ejes $x$ y $z$):
+
+$$\frac{P/A}{(\sigma_{\text{all}})_{\text{centric}}} + \frac{|M_x| z_{\max} / I_x}{(\sigma_{\text{all}})_{\text{bending}}} + \frac{|M_z| x_{\max} / I_z}{(\sigma_{\text{all}})_{\text{bending}}} \le 1$$
+
+#### Reglas clave para aplicar el Método de Interacción sin errores:
+1. **Primer término (Compresión Axial):** El denominador $(\sigma_{\text{all}})_{\text{centric}}$ se calcula siempre con el **radio de giro mínimo ($r_{\min}$)** o la esbeltez máxima $(KL/r)_{\max}$ de la sección, ya que el pandeo global buscará ocurrir alrededor del eje más débil.
+2. **Segundos términos (Flexión):** Los esfuerzos de flexión $\frac{|M_x|z_{\max}}{I_x} = \frac{|M_x|}{S_x}$ y $\frac{|M_z|x_{\max}}{I_z} = \frac{|M_z|}{S_z}$ se calculan estrictamente respecto a los ejes donde se produce el giro por la excentricidad ($M_x = P \cdot e_z$ y $M_z = P \cdot e_x$).
+3. **Selección de perfiles comerciales (ej. Perfiles W):** Como el área $A$, los módulos de sección $S$ y el radio de giro $r$ dependen del perfil que elijas, el diseño de selección se hace por **tanteo (iteración)**: propones un perfil ligero de la tabla, verificas que la suma de la fórmula de interacción sea $\le 1.0$, y eliges el perfil de menor peso por metro/pie que cumpla la desigualdad.
+
+---
+
+## Síntesis y Criterio de Selección de Métodos
+
+El análisis y diseño de columnas exige ir más allá de la simple resistencia a la compresión axial ($\sigma = P/A$), ya que la estabilidad geométrica suele gobernar el fallo antes de que el material alcance su límite de fluencia. 
+
+Para elegir la herramienta correcta al resolver un problema o diseñar un elemento real, basta con identificar las condiciones de carga y el objetivo del cálculo:
+
+| Escenario de Análisis / Diseño | Método Recomendado | Ecuación / Criterio Clave |
+| :--- | :--- | :--- |
+| **Columna esbelta con carga céntrica ideal** | Fórmula de Euler | $\sigma_{cr} = \frac{\pi^2 E}{(L_e/r)^2}$ *(Solo si $\sigma_{cr} \le \sigma_{\text{prop}}$)* |
+| **Columna con carga excéntrica (Análisis exacto de $\sigma_{\max}$ y $y_{\max}$)** | Fórmula de la Secante | $\sigma_{\max} = \frac{P}{A} \left[ 1 + \frac{ec}{r^2} \sec\left( \frac{L_e}{2r} \sqrt{\frac{P}{EA}} \right) \right]$ |
+| **Diseño de columnas reales con carga céntrica (Cortas, Intermedias y Largas)** | Normativas por Material (AISC, Aluminum Assoc., NDS) | Evaluación de $\sigma_{\text{allow}}$ en función de la esbeltez $(KL/r)_{\max}$ o $KL/d$ |
+| **Dimensionamiento de perfiles bajo flexocompresión (Carga excéntrica)** | Esfuerzos Admisibles / Método de Interacción | $\frac{P/A}{(\sigma_{\text{all}})_{\text{centric}}} + \frac{M_x c_x / I_x}{(\sigma_{\text{all}})_{\text{bending}}} + \frac{M_z c_z / I_z}{(\sigma_{\text{all}})_{\text{bending}}} \le 1$ |
+
+Dominar la transición entre el comportamiento elástico teórico (Euler y la Fórmula de la Secante) y los criterios empíricos de diseño normativo garantiza estructuras seguras frente a los dos enemigos principales de todo miembro a compresión: **el aplastamiento del material y la inestabilidad por pandeo**.
