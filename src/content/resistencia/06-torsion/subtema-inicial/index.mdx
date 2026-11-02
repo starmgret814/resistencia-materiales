@@ -1,3 +1,131 @@
-# Subtema inicial
+# Fundamentos y Deformación Geométrica
 
-Empieza a escribir aquí...
+La torsión es el efecto producido cuando se aplican momentos que tienden a hacer girar un cuerpo alrededor de su eje longitudinal[cite: 3]. En la ingeniería mecánica y civil, este fenómeno ocurre en ejes de transmisión, turbinas, estructuras tubulares y trenes de engranajes[cite: 2, 3, 12].
+
+---
+
+## 1.1 ¿Qué es la Torsión y el Par Torsor?
+
+Un **par de torsión** o **momento torsor ($T$)** es un vector momento orientado a lo largo del eje longitudinal de la barra. Según la regla de la mano derecha, este momento produce un par de fuerzas de igual magnitud pero en direcciones opuestas que actúan sobre un plano perpendicular al eje.
+
+<Definition title="Momento Torsor (T)">
+Es una medida numérica del efecto de giro producido por una fuerza $F$ aplicada a una distancia perpendicular $r$ con respecto al eje de rotación:
+
+$$
+T = F \cdot r
+$$
+
+Su unidad en el Sistema Internacional es el Newton-metro ($\text{N}\cdot\text{m}$) y en el Sistema Inglés es la libra-pulgada ($\text{lb}\cdot\text{in}$ o $\text{kip}\cdot\text{in}$).
+</Definition>
+
+---
+
+## 1.2 Determinación del Torque Interno mediante DCL
+
+Para analizar los esfuerzos internos en cualquier punto de un eje, es necesario realizar un corte imaginario perpendicular al eje longitudinal y aplicar las ecuaciones de **equilibrio estático** sobre el Diagrama de Cuerpo Libre (DCL).
+
+<Formula label="Ecuación de Equilibrio Torsional">
+$$
+\sum M_x = 0 \implies T_{\text{interno}} - \sum T_{\text{externos}} = 0
+$$
+</Formula>
+
+<Definition title="Metodología para Determinar el Torque Interno">
+1. **Paso 1:** Realizar un corte perpendicular en la sección transversal de interés.
+2. **Paso 2:** Dibujar el Diagrama de Cuerpo Libre (DCL) de cualquiera de los dos segmentos (izquierdo o derecho).
+3. **Paso 3:** Dibujar el torque interno de reacción $T_{\text{int}}$ saliendo de la superficie cortada (siguiendo la regla de la mano derecha).
+4. **Paso 4:** Aplicar $\sum M_x = 0$ para despejar la magnitud y sentido del torque interno.
+</Definition>
+
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792812491/heagp9scebq6s3cr8kjf.png" 
+  alt="Momento torsor y diagrama de cuerpo libre en una barra circular" 
+  caption="Figura 6.1.1: Aplicación de par torsor T y determinación del torque interno de reacción en una sección de corte."
+/>
+
+---
+
+## 1.3 Elementos Sometidos a Torsión en la Ingeniería
+
+Los componentes sometidos a torsión se diseñan principalmente para transmitir par motor y potencia rotacional:
+
+### 1. Ejes de Transmisión y Árboles de Motor
+Son barras de sección circular (macizas o huecas) que conectan una fuente de energía (como un motor) con una máquina de trabajo.
+- **Ejes de transmisión de vehículos:** Conectan la caja de cambios con el diferencial y las ruedas motrices.
+- **Turbinas de energía:** Grandes árboles de transmisión en turbinas de vapor, hidráulicas o eólicas que accionan generadores eléctricos.
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792812958/maizbltldgkpc0ql017g.png" 
+  alt="Trenes de engranajes y transmisión de torque" 
+  caption="Figura 6.1.2: Transmisión de torques a través de engranajes acoplados a ejes rotativos."
+/>
+
+### 2. Trenes de Engranajes y Poleas
+Se montan sobre ejes para modificar la velocidad de rotación o cambiar el torque transmitido.
+- **Engranajes:** Al transmitir fuerzas normales entre sus dientes en contacto, generan torques directos sobre sus ejes de soporte.
+- **Poleas y Correas:** Las tensiones tangenciales de las correas aplican un par de torsión respecto al centro del eje.
+
+### 3. Acoplamientos y Bridas
+Conectan dos ejes alineados para transferir el par torsor de forma rígida o flexible sin deslizamiento.
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792814456/o3fnu5aid3e8pofeze5a.png" 
+  alt="Acoplamientos rígidos con pernos" 
+  caption="Figura 6.1.3: Acoplamiento con brida y pernos sometidos a corte para transferir el par torsor."
+/>
+
+### 4. Tubos y Ductos de Pared Delgada
+Estructuras huecas de sección circular o no circular (rectangulares, cerradas) sometidas a torsión.
+- **Chasis tubulares:** Soportan torsión ante cargas asimétricas de suspensión o terreno.
+- **Ductos aeronáuticos y no circulares:** Tubos livianos de sección no circular sometidos a flujo cortante.
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792814684/wxytd0foqqgfqoltd70o.png" 
+  alt="Ducto no circular de pared delgada" 
+  caption="Figura 6.1.4: Ducto no circular de pared delgada sometido a momento torsor."
+/>
+
+---
+
+## Ejemplo Resuelto
+
+<Example number={1} title="Cálculo de Torques Internos en un Eje Tramado">
+Sobre un eje sólido se ejercen los torques mostrados: $T_A = 300\text{ N}\cdot\text{m}$ en el extremo libre $A$ y $T_B = 400\text{ N}\cdot\text{m}$ en la polea $B$ en la misma dirección de giro. Determine el torque interno de reacción en los tramos $AB$ y $BC$.
+
+<Solution>
+1. **Análisis del Tramo AB (Corte entre A y B):**
+   - Hacemos un corte en el tramo $AB$ y tomamos el DCL del extremo superior $A$:
+   - Aplicando la suma de momentos torsionales:
+     $$
+     \sum M_x = 0 \implies T_{AB} - T_A = 0 \implies T_{AB} = 300\text{ N}\cdot\text{m}
+     $$
+
+2. **Análisis del Tramo BC (Corte entre B y C):**
+   - Hacemos un corte entre $B$ y el empotramiento $C$, incluyendo los puntos $A$ y $B$ en el DCL:
+   - Como ambos torques aplicados giran en el mismo sentido:
+     $$
+     \sum M_x = 0 \implies T_{BC} - T_A - T_B = 0 
+     $$
+     $$
+     T_{BC} = 300\text{ N}\cdot\text{m} + 400\text{ N}\cdot\text{m} = 700\text{ N}\cdot\text{m}
+     $$
+
+3. **Conclusión:**
+   El tramo $AB$ transmite un torque interno de $300\text{ N}\cdot\text{m}$, mientras que el tramo $BC$ soporta un torque acumulado de $700\text{ N}\cdot\text{m}$ hacia el soporte fijo.
+</Solution>
+</Example>
+
+---
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Cuál es la diferencia fundamental entre un momento flector y un momento torsor?">
+El momento flector actúa perpendicularmente al eje longitudinal provocando que la barra se curve (esfuerzo normal $\sigma$), mientras que el momento torsor actúa alrededor del eje longitudinal provocando que las secciones transversales giren una respecto a otra (esfuerzo cortante $\tau$).
+</Quiz>
+
+<Summary title="Resumen">
+- Un par de torsión es un momento cuya orientación coincide con el eje longitudinal del elemento.
+- Para calcular el torque interno en cualquier tramo de un eje, es indispensable aplicar el método de secciones y equilibrio estático ($\sum M_x = 0$).
+- Los ejes circulares son los más eficientes para transmitir torsión debido a la simetría de la distribución de esfuerzos.
+</Summary>
