@@ -1,0 +1,124 @@
+# Cambios de temperaturas
+
+Cuando la temperatura de un cuerpo cambia, sus dimensiones también cambian, aunque no actúe ninguna carga. En ingeniería este efecto es importante porque, si la deformación está impedida por los apoyos, aparecen esfuerzos internos de origen térmico.
+
+<Definition title="Coeficiente de expansión térmica">
+Propiedad del material, representada por $\alpha$, que mide cuánto se deforma por unidad de longitud al variar la temperatura en un grado. Se expresa en $\text{ }^\circ\text{C}^{-1}$ o $\text{K}^{-1}$.
+</Definition>
+
+## Deformación por cambio de temperatura
+
+Una barra de longitud $L$, libre de apoyos, se somete a un cambio de temperatura $\Delta T$. Si $\Delta T > 0$ la barra se alarga, y si $\Delta T < 0$ se acorta.
+
+<Image
+  src=src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793589265/d8xuxxicyvquwunmo4qm.png"
+  alt="Barra de longitud L antes y después de un cambio de temperatura"
+  caption="Figura 1.1: Barra sometida a un cambio de temperatura. (a) Estado inicial. (b) Barra alargada una cantidad δT."
+/>
+
+<Formula label="Deformación por cambio de temperatura">
+$$
+\delta_T = \alpha \, (\Delta T) \, L
+$$
+</Formula>
+
+Dividiendo entre la longitud inicial se obtiene la deformación unitaria térmica:
+
+<Formula label="Deformación unitaria por cambio de temperatura">
+$$
+\varepsilon_T = \frac{\delta_T}{L} = \alpha \, (\Delta T)
+$$
+</Formula>
+
+Donde:
+- $\delta_T$ es el cambio de longitud por temperatura ($\text{mm}$).
+- $\alpha$ es el coeficiente de expansión térmica ($\text{ }^\circ\text{C}^{-1}$).
+- $\Delta T$ es la variación de temperatura ($^\circ\text{C}$).
+- $L$ es la longitud inicial de la barra ($\text{mm}$).
+- $\varepsilon_T$ es la deformación unitaria térmica (adimensional).
+
+Valores típicos del coeficiente de expansión térmica:
+
+| Material | $\alpha$ ($\times 10^{-6}\text{ }^\circ\text{C}^{-1}$) |
+|:---|:---:|
+| Acero | 12 |
+| Cobre | 17 |
+| Aluminio | 23 |
+
+## Barra con extremos empotrados
+
+Si la barra está empotrada en ambos extremos $A$ y $B$, no puede dilatarse libremente. El apoyo ejerce una fuerza $P$ que impide el cambio de longitud, y por eso aparece un esfuerzo en la barra.
+
+Este es un problema estáticamente indeterminado. Se resuelve por superposición:
+
+1. **Liberar un apoyo:** se retira el apoyo $B$ y la barra se alarga libremente una cantidad $\delta_T = \alpha(\Delta T)L$.
+2. **Aplicar la reacción:** se aplica la fuerza $P$ en $B$ para devolver el extremo a su posición original, lo que produce una deformación $\delta_P = \dfrac{PL}{AE}$.
+3. **Compatibilidad:** como el extremo $B$ no se mueve, la deformación total es nula.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793589685/ylkag8wtj2g0kqcj7gd3.png" alt="Descripción de la imagen"
+  alt="Barra empotrada en ambos extremos y descomposición por superposición"
+  caption="Figura 1.2: Barra restringida. (a) Barra empotrada. (b) Alargamiento térmico libre δT. (c) Fuerza P que restituye el extremo B."
+/>
+
+<Formula label="Ecuación de compatibilidad">
+$$
+\delta = \delta_T + \delta_P = \alpha (\Delta T) L + \frac{P L}{A E} = 0
+$$
+</Formula>
+
+Despejando la fuerza y dividiendo entre el área:
+
+<Formula label="Fuerza y esfuerzo térmico">
+$$
+P = -A E \alpha (\Delta T)
+\qquad\qquad
+\sigma = \frac{P}{A} = -E \alpha (\Delta T)
+$$
+</Formula>
+
+El signo negativo indica que, si la barra se calienta ($\Delta T > 0$), el esfuerzo es de **compresión**. Si se enfría, el esfuerzo es de **tracción**. Observa que $\sigma$ no depende de la longitud $L$ ni del área $A$.
+
+## Ejemplo Resuelto
+
+<Example number={1} title="Barra de acero empotrada">
+Una barra de acero de $L = 2\text{ m}$ y área $A = 500\text{ mm}^2$ está empotrada en ambos extremos. Su temperatura aumenta $\Delta T = 40\text{ }^\circ\text{C}$. Considere $E = 200\text{ GPa}$ y $\alpha = 12 \times 10^{-6}\text{ }^\circ\text{C}^{-1}$. Calcule (a) el alargamiento que tendría si estuviera libre y (b) el esfuerzo y la fuerza que aparecen al estar empotrada.
+
+<Solution>
+1. **Alargamiento libre:**
+   $$
+   \delta_T = \alpha (\Delta T) L = (12 \times 10^{-6})(40)(2000) = 0.96\text{ mm}
+   $$
+
+2. **Esfuerzo con la barra empotrada:**
+   $$
+   \sigma = -E \alpha (\Delta T) = -(200 \times 10^{3})(12 \times 10^{-6})(40) = -96\text{ MPa}
+   $$
+
+3. **Fuerza de reacción:**
+   $$
+   P = \sigma A = -(96)(500) = -48\,000\text{ N} = -48\text{ kN}
+   $$
+
+4. **Conclusión:**
+   La barra queda sometida a **compresión** de $96\text{ MPa}$. Una barra libre solo se alargaría $0.96\text{ mm}$, pero al impedirse esa dilatación aparece una fuerza de $48\text{ kN}$.
+</Solution>
+</Example>
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Qué esfuerzo aparece en una barra que se calienta si puede dilatarse libremente?">
+Ninguno. Si la barra no tiene restricciones, solo se deforma ($\delta_T = \alpha \Delta T L$) y no genera esfuerzo. El esfuerzo térmico aparece únicamente cuando los apoyos impiden la deformación.
+</Quiz>
+
+<Summary title="Resumen">
+- La deformación térmica de una barra libre es $\delta_T = \alpha (\Delta T) L$, y la deformación unitaria es $\varepsilon_T = \alpha (\Delta T)$.
+- Una barra libre no desarrolla esfuerzo por temperatura, solo cambia de longitud.
+- Si la barra está empotrada en ambos extremos, la compatibilidad $\delta_T + \delta_P = 0$ da $\sigma = -E \alpha (\Delta T)$.
+- Un aumento de temperatura produce compresión y una disminución produce tracción en una barra restringida.
+- El esfuerzo térmico no depende de la longitud ni del área de la barra.
+</Summary>
+
+
+
+
