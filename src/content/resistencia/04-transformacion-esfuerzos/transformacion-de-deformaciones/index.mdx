@@ -1,0 +1,65 @@
+# Transformación de Deformaciones
+
+
+
+La transformación de deformaciones es el procedimiento matemático y gráfico utilizado para determinar las deformaciones normales ($\epsilon$) y cortantes ($\gamma$) en un punto de un material, evaluadas en cualquier sistema de ejes coordenados rotado respecto al original. 
+
+### Importancia
+
+Es crítico en ingeniería para encontrar las deformaciones principales (las máximas y mínimas) que pueden provocar la falla de un material, así como para interpretar datos experimentales medidos con galgas extensiométricas.
+
+## Fundamento Teórico
+
+**Estado de Deformación Plana (Plane Strain)**
+
+En la mayoría de aplicaciones, este análisis se simplifica a un estado bidimensional. Si conocemos las deformaciones de un elemento en los ejes ortogonales $x$ e $y$ ($\epsilon_x$, $\epsilon_y$) y la deformación cortante en ese plano ($\gamma_{xy}$), podemos calcular el estado de deformación para unos nuevos ejes $x'$ e $y'$ que han sido rotados un ángulo $\theta$ en sentido antihorario.
+
+**Ecuaciones Generales de Transformación**
+
+Las ecuaciones que rigen este cambio de coordenadas son matemáticamente análogas a las de transformación de esfuerzos, con una diferencia estructural fundamental: la deformación cortante $\gamma$ siempre se divide entre 2.
+
+**Deformación normal en $x'$:**
+
+$$\epsilon_{x'} = \frac{\epsilon_x + \epsilon_y}{2} + \frac{\epsilon_x - \epsilon_y}{2}\cos(2\theta) + \frac{\gamma_{xy}}{2}\sin(2\theta)$$
+
+**Deformación normal en $y'$:**
+
+$$\epsilon_{y'} = \frac{\epsilon_x + \epsilon_y}{2} - \frac{\epsilon_x - \epsilon_y}{2}\cos(2\theta) - \frac{\gamma_{xy}}{2}\sin(2\theta)$$
+
+**Deformación cortante en el plano $x'y'$:**
+
+$$\frac{\gamma_{x'y'}}{2} = -\frac{\epsilon_x - \epsilon_y}{2}\sin(2\theta) + \frac{\gamma_{xy}}{2}\cos(2\theta)$$
+
+**Deformaciones Principales y Cortante Máxima**
+
+Al derivar las ecuaciones anteriores respecto al ángulo $\theta$ e igualar a cero, se obtienen las orientaciones donde las deformaciones son máximas o mínimas.
+
+**Deformaciones Principales ($\epsilon_1$ y $\epsilon_2$):**
+
+Son las deformaciones normales máxima y mínima absolutas en el plano. En los planos donde actúan estas deformaciones (llamados planos principales), la deformación cortante es estrictamente cero ($\gamma = 0$).
+
+$$\epsilon_{1,2} = \frac{\epsilon_x + \epsilon_y}{2} \pm \sqrt{\left(\frac{\epsilon_x - \epsilon_y}{2}\right)^2 + \left(\frac{\gamma_{xy}}{2}\right)^2}$$
+
+**Deformación Cortante Máxima en el plano ($\gamma_{max}$):**
+
+Ocurre en planos orientados a $45^\circ$ respecto a los ejes principales. A diferencia de los planos principales, en este plano de cortante máxima la deformación normal no es cero, sino que equivale a la deformación normal promedio ($\epsilon_{prom}$).
+
+$$\frac{\gamma_{max}}{2} = \sqrt{\left(\frac{\epsilon_x - \epsilon_y}{2}\right)^2 + \left(\frac{\gamma_{xy}}{2}\right)^2}$$
+
+**Círcunferencia de Mohr para Deformaciones**
+
+El Círculo de Mohr es la representación geométrica directa de las ecuaciones de transformación. Permite visualizar cómo varían $\epsilon$ y $\gamma$ simultáneamente al rotar el elemento, evitando la memorización de las fórmulas trigonométricas.La construcción es idéntica a la del círculo de esfuerzos, aplicando las siguientes reglas:
+
+**Ejes coordenados:**
+
+El eje horizontal representa la deformación normal ($\epsilon$) y el eje vertical representa la mitad de la deformación cortante ($\frac{\gamma}{2}$). Convencionalmente, el eje $\frac{\gamma}{2}$ se dibuja positivo hacia abajo.
+
+**Centro del círculo ($C$):** Se ubica siempre sobre el eje horizontal, en el valor de la deformación promedio:
+
+$$C = \left(\frac{\epsilon_x + \epsilon_y}{2}, 0\right)$$
+
+**Radio del círculo ($R$):** Es matemáticamente igual a la mitad de la deformación cortante máxima ($\frac{\gamma_{max}}{2}$):
+
+$$R = \sqrt{\left(\frac{\epsilon_x - \epsilon_y}{2}\right)^2 + \left(\frac{\gamma_{xy}}{2}\right)^2}$$
+
+**Equivalencia angular:** Un ángulo de rotación física $\theta$ en el material equivale a un ángulo geométrico de $2\theta$ trazado sobre el Círculo de Mohr.
