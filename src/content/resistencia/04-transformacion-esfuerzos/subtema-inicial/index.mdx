@@ -1,3 +1,145 @@
-# Subtema inicial
+# Transformación de Esfuerzos
 
-Empieza a escribir aquí...
+La Transformación de esfuerzos es es una técnica analítica que permite determinar los esfuerzos normales y cortantes que actúan sobre un elemento dentro de un cuerpo cuando este se analiza en cualquier orientación o plano inclinado.
+
+### Importancia
+
+- **Identificar Esfuerzos Principales:** Nos permiite calcular esfuerzos normales maximo y mínimo ($\sigma_{min}, \sigma_{máx}$) , ademas del esfuerzo cortante máximo $\tau_{máx}$ que son las solicitaciones críticas del material.
+
+- **Criterios de Diseño:** Es indispensable para aplicar teorías de falla estructural como Tresca (esfuerzo cortante máximo) o Von Mises (energía de distorsión), fundamentales para determinar el factor de seguridad en ejes, vigas, tanques a presión y estructuras mecánicas.
+
+
+
+## Fundamento Teórico
+
+Calcular la distribución de esfuerzos implica obtener los esfuerzos en cada elementro diferencial del cuerpo. Estos se definen por el tensor de esfuerzos de Cauchy.
+
+<ImageGrid columns={2}>
+  <Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792702283/qpjxgy3piuwa98uczwno.svg" 
+  width="150" height="150"
+   alt="Esfuerzo en un objeto deformado bajo cargas" 
+   caption="Figura 1" /> 
+
+  <Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792696541/mpmb8lpccivb7crfxhev.svg" alt="Descripción de la imagen" caption="Figura 2" />
+</ImageGrid>
+
+
+<Formula label="Tensor de esfuerzos de Cauchy">
+$$
+\boldsymbol{\sigma} = \begin{bmatrix} \sigma_{11} & \sigma_{12} & \sigma_{13} \\ \sigma_{21} & \sigma_{22} & \sigma_{23} \\ \sigma_{31} & \sigma_{32} & \sigma_{33} \end{bmatrix}
+\equiv
+\begin{bmatrix} \sigma_x & \tau_{xy} & \tau_{xz} \\ \tau_{yx} & \sigma_y & \tau_{yz} \\ \tau_{zx} & \tau_{zy} & \sigma_z \end{bmatrix}
+$$
+</Formula>
+
+
+En dos dimensiones, el tensor de esfuerzos en un punto P del material esta definido unicamente por los esfuerzos normales ($\sigma_x,\sigma_y$) y el esfuerzo cortante ($\tau_{xy}$).
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792697319/l7xjvkupnurtaou5ec30.svg" alt="Descripción de la imagen" caption="Figura" 
+width={10}/>
+
+Del equilibro de Momentos se obtiene que $\tau_{xy}$=$\tau_{yx}$, por lo que el tensor de esfueroz se reescribe como:
+
+<Formula label="Tensor de esfuerzos de Cauchy en 2D">
+$$\boldsymbol{\sigma} = \begin{bmatrix} \sigma_x & \tau_{xy} & 0 \\ \tau_{yx} & \sigma_y & 0 \\ 0 & 0 & 0 \end{bmatrix}$$
+</Formula>
+
+Para determinar los esfuerzos en cualquier plano inclinado que atraviesa un elemento material, se realiza un corte imaginario a un ángulo $\theta$ respecto al eje vertical. Esto genera un elemento en forma de cuña.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792697419/jxo3imhmznzhqsn7f6pp.svg" alt="Descripción de la imagen" caption="Figura3" />
+
+
+Si el área del plano inclinado (cara normal al nuevo eje $x'$) es $\Delta A$, por geometría geométrica simple, las áreas de las caras vertical y horizontal originales son $\Delta A \cos\theta$ y $\Delta A \sin\theta$, respectivamente.
+
+Para mantener el equilibrio estático de esta cuña, la suma de fuerzas en las nuevas direcciones $x'$ (normal) e $y'$ (tangencial) debe ser igual a cero. Multiplicando los esfuerzos por sus respectivas áreas para convertirlos en fuerzas, obtenemos:
+
+
+$\sum F_{x'} = \sigma_{x'} \Delta A - (\sigma_x \Delta A \cos\theta)\cos\theta - (\sigma_y \Delta A \sin\theta)\sin\theta - (\tau_{xy} \Delta A \cos\theta)\sin\theta - (\tau_{xy} \Delta A \sin\theta)\cos\theta = 0$
+
+Dividiendo entre $\Delta A$ y reordenando, obtenemos el esfuerzo normal en el plano inclinado:
+
+$$\sigma_{x'} = \sigma_x \cos^2\theta + \sigma_y \sin^2\theta + 2\tau_{xy} \sin\theta \cos\theta$$
+
+Sumatoria de fuerzas en la dirección $y'$:
+
+$$\sum F_{y'} = \tau_{x'y'} \Delta A + (\sigma_x \Delta A \cos\theta)\sin\theta - (\sigma_y \Delta A \sin\theta)\cos\theta - (\tau_{xy} \Delta A \cos\theta)\cos\theta + (\tau_{xy} \Delta A \sin\theta)\sin\theta = 0$$
+
+$$\tau_{x'y'} = -(\sigma_x - \sigma_y) \sin\theta \cos\theta + \tau_{xy} (\cos^2\theta - \sin^2\theta)$$
+
+Para simplificar estas expresiones y facilitar su uso, aplicamos las identidades trigonométricas del ángulo doble ($\cos^2\theta = \frac{1 + \cos 2\theta}{2}$, $\sin^2\theta = \frac{1 - \cos 2\theta}{2}$ y $2\sin\theta\cos\theta = \sin 2\theta$). 
+
+El resultado son las **Ecuaciones Generales de Transformación**:
+<Formula>
+   $$\sigma_{x'} = \frac{\sigma_x + \sigma_y}{2} + \frac{\sigma_x - \sigma_y}{2} \cos 2\theta + \tau_{xy} \sin 2\theta$$
+</Formula>
+
+<Formula>
+   $$\tau_{x'y'} = -\frac{\sigma_x - \sigma_y}{2} \sin 2\theta + \tau_{xy} \cos 2\theta$$
+</Formula>
+(Nota: El esfuerzo normal perpendicular a este plano, $\sigma_{y'}$, se obtiene evaluando la primera ecuación con $\theta + 90^\circ$).
+
+
+## Esfuerzos Principales y Esfuerzo Cortante Máximo
+
+
+### 1. Esfuerzos Principales ($\sigma_1, \sigma_2$)
+
+Para maximizar o minimizar $\sigma_{x'}$, derivamos su ecuación respecto a $\theta$ e igualamos a cero:
+
+$$\frac{d\sigma_{x'}}{d\theta} = -(\sigma_x - \sigma_y) \sin 2\theta + 2\tau_{xy} \cos 2\theta = 0$$
+
+Despejando, obtenemos el ángulo de los planos principales ($\theta_p$):
+
+$$\tan 2\theta_p = \frac{2\tau_{xy}}{\sigma_x - \sigma_y}$$
+
+Si sustituimos $\sin 2\theta_p$ y $\cos 2\theta_p$ de vuelta en la ecuación de $\sigma_{x'}$, obtenemos los esfuerzos principales (máximo y mínimo). En estos planos principales, el esfuerzo cortante siempre es cero.
+
+<Formula label="Ecuacion para hallar los efuerzos principales">
+$$\sigma_{1,2} = \frac{\sigma_x + \sigma_y}{2} \pm \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}$$
+</Formula>
+
+### 2. Esfuerzo Cortante Máximo ($\tau_{máx}$)
+2. 
+De forma análoga, derivando la ecuación de $\tau_{x'y'}$ e igualando a cero, encontramos los planos de cortante máximo ($\theta_s$):
+
+$$\tan 2\theta_s = -\frac{\sigma_x - \sigma_y}{2\tau_{xy}}$$
+
+La magnitud del esfuerzo cortante máximo en el plano se define por:
+
+
+<Formula label="Ecuacion para hallar el cortante máximo">
+$$\tau_{máx} = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}$$
+</Formula>
+
+## Circulo de Mohr de Esfuerzos
+
+El ingeniero alemán Christian Otto Mohr demostró que las ecuaciones de transformación pueden representarse gráficamente como un círculo. Esta es la herramienta más poderosa para visualizar estados de esfuerzo.
+
+Partimos de las ecuaciones de transformación y reordenamos agrupando los términos independientes del ángulo:
+
+$$\sigma_{x'} - \left(\frac{\sigma_x + \sigma_y}{2}\right) = \frac{\sigma_x - \sigma_y}{2} \cos 2\theta + \tau_{xy} \sin 2\theta$$
+
+$$\tau_{x'y'} = -\frac{\sigma_x - \sigma_y}{2} \sin 2\theta + \tau_{xy} \cos 2\theta$$
+
+Elevando al cuadrado ambas ecuaciones y sumándolas, los términos cruzados se cancelan dando como resultado:
+
+$$\left[ \sigma_{x'} - \left(\frac{\sigma_x + \sigma_y}{2}\right) \right]^2 + \tau_{x'y'}^2 = \left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2$$
+
+Esta expresión tiene la forma algebraica exacta de la ecuación de una circunferencia en el plano cartesiano $(\sigma - h)^2 + (\tau - k)^2 = R^2$, donde las variables son el esfuerzo normal ($\sigma_{x'}$) en las abscisas y el cortante ($\tau_{x'y'}$) en las ordenadas.
+
+
+### Propiedades del circulo de Mohr
+
+- Centro del círculo ($C$): Se ubica en el eje normal horizontal en el punto del esfuerzo promedio.
+
+$$C = \left( \sigma_{prom}, 0 \right) \quad $$donde$$ \quad \sigma_{prom} = \frac{\sigma_x + \sigma_y}{2}$$
+
+- Radio ($R$): Corresponde exactamente al esfuerzo cortante máximo en el plano.
+
+$$R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2} = \tau_{máx}$$
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792696571/knzbdeoclkrpiegwhx6y.webp" alt="-" caption="Figura" />
+
+
+
