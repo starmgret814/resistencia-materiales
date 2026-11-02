@@ -1,0 +1,148 @@
+# Diseño de Ejes y Transmisión de Potencia
+
+Una de las aplicaciones más importantes de la torsión en ingeniería mecánica es el diseño de ejes rotativos destinados a transferir energía mecánica desde una fuente motriz (como un motor eléctrico, una turbina hidráulica o de vapor) hacia una máquina impulsada (como una bomba, un compresor o las ruedas de un vehículo).
+
+---
+
+## 4.1 Relación Fundamental entre Potencia, Velocidad y Torque
+
+La **potencia ($P$)** se define como el trabajo realizado por unidad de tiempo. Cuando un par torsor $T$ constante actúa sobre un eje que gira a una velocidad angular constante $\omega$, la potencia transmitida por el eje equivale al producto del torque por la velocidad angular.
+
+<Formula label="Ecuación General de Potencia Mecánica">
+$$
+P = T \cdot \omega
+$$
+</Formula>
+
+Donde:
+- $P$ es la potencia transmitida ($\text{W}$ o $\text{ft}\cdot\text{lb/s}$).
+- $T$ es el momento torsor o torque interno ($\text{N}\cdot\text{m}$ o $\text{lb}\cdot\text{ft}$).
+- $\omega$ is la velocidad angular de rotación ($\text{rad/s}$).
+
+### Expresión en Función de la Frecuencia ($f$) y Velocidad de Rotación ($\text{rpm}$)
+
+En la práctica industrial, la velocidad de rotación se suele expresar en frecuencia de giros por segundo ($f$ en Hertz, $\text{Hz}$) o en revoluciones por minuto ($N$ en $\text{rpm}$).
+
+Sabiendo que $\omega = 2\pi f$, la potencia en términos de la frecuencia viene dada por:
+
+<Formula label="Potencia en Función de la Frecuencia (Hz)">
+$$
+P = 2 \pi f T \implies T = \frac{P}{2 \pi f}
+$$
+</Formula>
+
+Si la velocidad se mide en revoluciones por minuto ($N$ en $\text{rpm}$), convirtiendo a radianes por segundo ($\omega = \frac{2\pi N}{60}$), la relación resulta:
+
+$$
+P = \frac{2 \pi N T}{60} \implies T = \frac{60 P}{2 \pi N}
+$$
+
+---
+
+## 4.2 Factores de Conversión de Unidades Frecuentes
+
+Para garantizar la precisión en los cálculos de diseño, es fundamental dominar las equivalencias de unidades entre el Sistema Internacional (SI) y el Sistema Inglés (US Customary):
+
+<Definition title="Factores de Conversión Críticos">
+1. **Unidades de Frecuencia y Velocidad Angular:**
+   $$1\text{ rpm} = \frac{1}{60}\text{ s}^{-1} = \frac{1}{60}\text{ Hz} = \frac{2\pi}{60}\text{ rad/s}$$
+
+2. **Unidades de Potencia:**
+   - **Caballos de Fuerza (Horsepower, hp):**
+     $$1\text{ hp} = 550\text{ ft}\cdot\text{lb/s} = 6600\text{ in}\cdot\text{lb/s}$$
+     $$1\text{ hp} = 745.7\text{ W} = 0.7457\text{ kW}$$
+   - **Kilowatts (kW):**
+     $$1\text{ kW} = 1000\text{ W} = 1000\text{ N}\cdot\text{m/s}$$
+</Definition>
+
+---
+
+## 4.3 Criterios Geométrica de Diseño ($\frac{J}{c}$)
+
+El objetivo del diseño de un eje es determinar la sección transversal adecuada ($J/c$) para que el esfuerzo cortante máximo provocado por el torque requerido no supere el **esfuerzo cortante admisible ($\tau_{\text{adm}}$)** del material.
+
+A partir de la fórmula de torsión ($\tau_{\max} = \frac{T c}{J}$), despejamos el parámetro de diseño geométrico $J/c$:
+
+<Formula label="Criterio Dimensional de Diseño Torsional">
+$$
+\frac{J}{c} = \frac{T}{\tau_{\text{adm}}}
+$$
+</Formula>
+
+<Definition title="Deducción del Diámetro Mínimo Requerido">
+1. **Para un Eje Sólido de Radio $c$ ($J = \frac{\pi}{2} c^4$):**
+   $$\frac{\frac{\pi}{2} c^4}{c} = \frac{\pi}{2} c^3 = \frac{T}{\tau_{\text{adm}}} \implies c = \sqrt[3]{\frac{2 T}{\pi \tau_{\text{adm}}}}$$
+   Expresado en términos del **diámetro $d = 2c$**:
+   $$d = \sqrt[3]{\frac{16 T}{\pi \tau_{\text{adm}}}}$$
+
+2. **Para un Eje Hueco de Radios $c_1$ (interior) y $c_2$ (exterior):**
+   $$\frac{J}{c_2} = \frac{\pi (c_2^4 - c_1^4)}{2 c_2} = \frac{T}{\tau_{\text{adm}}}$$
+   Si definimos la razón entre radios internos y externos como $n = \frac{c_1}{c_2}$, la ecuación se simplifica a:
+   $$c_2^3 (1 - n^4) = \frac{2 T}{\pi \tau_{\text{adm}}}$$
+</Definition>
+
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793490358/x5n79u6jlvjtjcqqnfki.png" alt="Descripción de la imagen"
+  caption="Figura 6.4.1: Transmisión de potencia a través de un eje sometido a momento torsor constante T a velocidad angular ω."
+/>
+
+
+---
+
+## Ejemplos Resueltos
+
+<Example number={1} title="Diseño de Diámetro para Transmisión de Potencia en kW">
+Diseñe un eje sólido de acero con un esfuerzo cortante admisible de $\tau_{\text{adm}} = 58\text{ MPa}$ para transmitir una potencia de $P = 18\text{ kW}$ a una frecuencia de rotación de $f = 30\text{ Hz}$.
+
+<Solution>
+1. **Cálculo del Torque Requerido ($T$):**
+   $$T = \frac{P}{2\pi f} = \frac{18 \times 10^3\text{ W}}{2\pi \times 30\text{ s}^{-1}} = \frac{18000}{188.496} \approx 95.49\text{ N}\cdot\text{m}$$
+
+2. **Cálculo de la Razón Geométrica ($J/c$):**
+   $$\frac{J}{c} = \frac{T}{\tau_{\text{adm}}} = \frac{95.49\text{ N}\cdot\text{m}}{58 \times 10^6\text{ Pa}} = 1.646 \times 10^{-6}\text{ m}^3$$
+
+3. **Determinación del Diámetro Mínimo ($d$):**
+   $$d = \sqrt[3]{\frac{16 T}{\pi \tau_{\text{adm}}}} = \sqrt[3]{\frac{16 \times 95.49}{\pi \times 58 \times 10^6}} = \sqrt[3]{8.385 \times 10^{-6}} \approx 0.02032\text{ m} = 20.32\text{ mm}$$
+
+4. **Conclusión:**
+   El eje debe tener un diámetro comercial mínimo de $21\text{ mm}$ para transmitir $18\text{ kW}$ de manera segura sin superar el esfuerzo permitido de $58\text{ MPa}$.
+</Solution>
+</Example>
+
+<Example number={2} title="Análisis de Esfuerzo Cortante en Sistema Inglés (hp y rpm)">
+Determine el esfuerzo cortante máximo en un eje sólido de $1.4\text{ in}$ de diámetro mientras transmite $P = 66\text{ hp}$ a una velocidad de $N = 750\text{ rpm}$.
+
+<Solution>
+1. **Conversión de Potencia a $\text{in}\cdot\text{lb/s}$:**
+   $$P = 66\text{ hp} \times 6600\text{ in}\cdot\text{lb/s per hp} = 435,600\text{ in}\cdot\text{lb/s}$$
+
+2. **Cálculo de la Velocidad Angular ($\omega$):**
+   $$\omega = \frac{2\pi N}{60} = \frac{2\pi \times 750}{60} = 78.54\text{ rad/s}$$
+
+3. **Cálculo del Torque Transmitido ($T$):**
+   $$T = \frac{P}{\omega} = \frac{435,600\text{ in}\cdot\text{lb/s}}{78.54\text{ rad/s}} = 5546.2\text{ in}\cdot\text{lb}$$
+
+4. **Cálculo del Esfuerzo Cortante Máximo ($\tau_{\max}$):**
+   Radio $c = \frac{1.4}{2} = 0.7\text{ in}$.
+   $$J = \frac{\pi}{2} (0.7)^4 = 0.3770\text{ in}^4$$
+   $$\tau_{\max} = \frac{T \cdot c}{J} = \frac{5546.2 \times 0.7}{0.3770} = 10,298\text{ psi} \approx 10.30\text{ ksi}$$
+
+5. **Conclusión:**
+   El esfuerzo cortante inducido en el eje durante la operación normal a $750\text{ rpm}$ es de $10.30\text{ ksi}$.
+</Solution>
+</Example>
+
+---
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="Si se duplica la velocidad de rotación (rpm) de un eje que transmite la misma potencia constante, ¿qué ocurre con el esfuerzo cortante inducido en el eje?">
+Al duplicar la velocidad angular ($\omega$), el torque requerido se reduce a la mitad ($T = P/\omega$). Como el esfuerzo cortante es directamente proporcional al torque ($\tau \propto T$), el esfuerzo cortante en el eje también se reduce a la mitad.
+</Quiz>
+
+<Summary title="Resumen del Subtema">
+- La potencia transmitida es directamente proporcional al torque y a la velocidad angular ($P = T \omega = 2\pi f T$).
+- A mayor velocidad de rotación ($\text{rpm}$ o $\text{Hz}$), menor es el torque necesario para transmitir la misma cantidad de potencia, permitiendo diseñar ejes de menor diámetro y peso.
+- El parámetro clave de diseño torsional es la relación entre el momento polar de inercia y el radio exterior ($J/c \ge T/\tau_{\text{adm}}$).
+</Summary>
