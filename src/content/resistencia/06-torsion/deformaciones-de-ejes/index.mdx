@@ -1,0 +1,160 @@
+# Deformaciones de Ejes y Deformación Cortante
+
+Cuando un eje o barra de sección circular se somete a un momento torsor, experimenta una deformación angular a lo largo de su estructura. Comprender cómo se distribuyen estas deformaciones y esfuerzos es esencial para calcular la rigidez torsional del material.
+
+---
+
+## 2.1 Deformación en Ejes Circulares
+
+Al aplicar un torque en un eje fijo en un extremo, las secciones transversales permanecen planas y paralelas entre sí, pero giran un ángulo $\phi$ (ángulo de giro) respecto al eje longitudinal.
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792837825/ko2lwz0lxyymde21z0mo.png" 
+  alt="Deformación característica en ejes de sección circular" 
+  caption="Figura 6.2.1: Elemento cilíndrico bajo la acción de un momento torsor T."
+/>
+
+<Formula label="Relación Fundamental de Deformación">
+$$
+\rho \cdot \phi = L \cdot \gamma
+$$
+</Formula>
+
+Donde:
+- $\rho$ es la distancia radial desde el centro neutro de la sección ($\text{m}$).
+- $\phi$ es el ángulo de giro total ($\text{rad}$).
+- $L$ es la longitud del eje ($\text{m}$).
+- $\gamma$ es la deformación unitaria por cortante ($\text{rad}$).
+
+<Definition title="Demostración de la Relación Geométrica">
+Consideremos una barra circular de longitud $L$ fija en un extremo y sometida a torsión en el otro:
+
+1. Un punto sobre la superficie a una distancia radial $\rho$ se desplaza una distancia lineal de arco $s$.
+2. **Desde la sección transversal (giro angular):** 
+   $$s = \rho \cdot \phi$$
+3. **Desde la vista longitudinal (deformación cortante):** 
+   Para pequeñas deformaciones, la tangente del ángulo equivale al ángulo mismo ($\tan \gamma \approx \gamma$):
+   $$s = \gamma \cdot L$$
+4. **Igualando ambas expresiones para el arco $s$:**
+   $$\rho \cdot \phi = L \cdot \gamma \implies \gamma = \frac{\rho \phi}{L}$$
+</Definition>
+
+---
+
+## 2.2 Ley de Hooke y Distribución del Esfuerzo Cortante
+
+Dado que la deformación cortante ($\gamma$) varía linealmente a lo largo del radio desde cero en el centro neutro ($\rho = 0$) hasta un máximo en la superficie ($\rho = c$), el esfuerzo cortante ($\tau$) sigue este mismo comportamiento en el rango elástico.
+
+<Formula label="Deformación Cortante a una Distancia Radial">
+$$
+\gamma = \frac{\rho}{c} \gamma_{\max}
+$$
+</Formula>
+
+Aplicando la **Ley de Hooke para corte** ($\tau = G \gamma$), sustituimos la deformación para obtener la relación del esfuerzo cortante:
+
+$$
+\tau = \frac{G \phi}{L} \rho
+$$
+
+<Formula label="Relación Proporcional de Esfuerzos">
+$$
+\tau = \frac{\rho}{c} \tau_{\max}
+$$
+</Formula>
+
+<Definition title="Demostración de la Fórmula de Torsión τ_max = T·c / J">
+El torque interno resultante $T$ es la suma de los momentos generados por las fuerzas cortantes elementales $\tau \cdot dA$ que actúan sobre la sección transversal:
+
+1. **Ecuación del torque interno:**
+   $$T = \int \tau \cdot \rho \, dA$$
+2. **Sustituyendo $\tau = \frac{\rho}{c} \tau_{\max}$:**
+   $$T = \int \left( \frac{\rho}{c} \tau_{\max} \right) \rho \, dA = \frac{\tau_{\max}}{c} \int \rho^2 \, dA$$
+3. **Sabiendo que la integral representa el Momento Polar de Inercia ($J = \int \rho^2 \, dA$):**
+   $$T = \frac{\tau_{\max}}{c} J \implies \tau_{\max} = \frac{T \cdot c}{J}$$
+</Definition>
+
+
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793489761/pk3qtvir9kmclsnhofgq.png" alt="Descripción de la imagen" caption="Figura" />
+  "Figura 6.2.2: Distribución del esfuerzo cortante τ en secciones circulares sólidas y huecas."
+
+
+---
+
+## 2.3 Deducción del Ángulo de Giro (ϕ)
+
+Relacionando la expresión del esfuerzo máximo dada por la Ley de Hooke ($\tau_{\max} = \frac{G \phi c}{L}$) con la fórmula torsional ($\tau_{\max} = \frac{T c}{J}$), despejamos el ángulo de giro para un eje de sección uniforme:
+
+$$
+\frac{G \phi c}{L} = \frac{T c}{J}
+$$
+
+<Formula label="Ángulo de Giro por Torsión (Eje Prismático)">
+$$
+\phi = \frac{T L}{G J}
+$$
+</Formula>
+
+Donde:
+- $\phi$ es el ángulo de giro en radianes ($\text{rad}$).
+- $T$ es el momento torsor interno ($\text{N}\cdot\text{m}$).
+- $L$ es la longitud del eje ($\text{m}$).
+- $G$ es el módulo de rigidez al corte del material ($\text{Pa}$).
+- $J$ es el momento polar de inercia ($\text{m}^4$).
+
+---
+
+## Ejemplos Resueltos
+
+<Example number={1} title="Cálculo del Esfuerzo Cortante Máximo en un Eje Sólido">
+Un eje cilíndrico sólido de acero con un radio de $18\text{ mm}$ está sometido a un torque $T = 800\text{ N}\cdot\text{m}$. Determine el esfuerzo cortante máximo desarrollado en la superficie del eje.
+
+<Solution>
+1. **Identificación de Datos:**
+   - Torque aplicado: $T = 800\text{ N}\cdot\text{m}$
+   - Radio exterior: $c = 18\text{ mm} = 0.018\text{ m}$
+
+2. **Momento Polar de Inercia ($J$):**
+   Para una sección circular sólida:
+   $$J = \frac{\pi}{2} c^4 = \frac{\pi}{2} (0.018\text{ m})^4 = 1.6496 \times 10^{-7}\text{ m}^4$$
+
+3. **Cálculo de $\tau_{\max}$:**
+   $$\tau_{\max} = \frac{T \cdot c}{J} = \frac{800\text{ N}\cdot\text{m} \times 0.018\text{ m}}{1.6496 \times 10^{-7}\text{ m}^4} = 87.29 \times 10^6\text{ Pa} = 87.29\text{ MPa}$$
+
+4. **Conclusión:**
+   El esfuerzo cortante alcanza su valor máximo en el borde exterior con $87.29\text{ MPa}$.
+</Solution>
+</Example>
+
+<Example number={2} title="Cálculo del Ángulo de Giro en un Tubo Hueco">
+Un tubo de aluminio ($G = 27\text{ GPa}$) de $2.5\text{ m}$ de longitud tiene un radio exterior de $50\text{ mm}$ y un radio interior de $40\text{ mm}$. Determine el torque $T_0$ que produce un ángulo de giro de $2^\circ$.
+
+<Solution>
+1. **Conversión del Ángulo a Radianes:**
+   $$\phi = 2^\circ \times \left( \frac{\pi}{180^\circ} \right) \approx 0.03491\text{ rad}$$
+
+2. **Momento Polar de Inercia ($J$) para Sección Hueca:**
+   $$J = \frac{\pi}{2} (c_2^4 - c_1^4) = \frac{\pi}{2} \left( (0.050)^4 - (0.040)^4 \right) = 5.796 \times 10^{-7}\text{ m}^4$$
+
+3. **Cálculo del Torque ($T_0$):**
+   $$T_0 = \frac{\phi \cdot G \cdot J}{L} = \frac{0.03491\text{ rad} \times (27 \times 10^9\text{ Pa}) \times (5.796 \times 10^{-7}\text{ m}^4)}{2.5\text{ m}} \approx 218.42\text{ N}\cdot\text{m}$$
+
+4. **Conclusión:**
+   Se requiere aplicar $218.42\text{ N}\cdot\text{m}$ para lograr una rotación angular de $2^\circ$.
+</Solution>
+</Example>
+
+---
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Dónde se ubica la fibra o punto neutro dentro de un eje circular sometido a torsión pura?">
+Se ubica exactamente en el centro geométrico del eje ($\rho = 0$), donde la deformación cortante y el esfuerzo cortante son iguales a cero.
+</Quiz>
+
+<Summary title="Resumen del Subtema">
+- La deformación unitaria por corte ($\gamma$) y el esfuerzo cortante ($\tau$) aumentan linealmente desde cero en el centro hasta un máximo en la superficie.
+- La fórmula del esfuerzo cortante máximo en torsión es $\tau_{\max} = \frac{T c}{J}$.
+- El ángulo de giro $\phi = \frac{TL}{GJ}$ mide el desplazamiento angular total de la barra en radianes.
+</Summary>
