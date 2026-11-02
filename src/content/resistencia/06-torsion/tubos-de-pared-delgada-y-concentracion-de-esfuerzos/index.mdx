@@ -1,0 +1,145 @@
+# Tubos de Pared Delgada y Concentración de Esfuerzos
+
+En el diseño de estructuras livianas (como chasis tubulares, fuselajes y ductos de ventilación o transporte), es común emplear tubos de pared delgada de sección circular o no circular. Un tubo se considera de pared delgada cuando su espesor $t$ es muy pequeño respecto a las dimensiones globales de su sección transversal.
+
+---
+
+## 5.1 Concepto de Flujo Cortante ($f$)
+
+En un tubo de pared delgada sometido a torsión pura, el esfuerzo cortante $\tau$ se distribuye uniformemente a lo largo del espesor de la pared. Para analizar el equilibrio de fuerzas sobre un elemento diferencial de la cubierta, se define el **flujo cortante ($f$)**:
+
+<Formula label="Flujo Cortante Constante">
+$$
+f = \tau \cdot t = \text{constante}
+$$
+</Formula>
+
+Donde:
+- $f$ es el flujo cortante ($\text{N/m}$ o $\text{lb/in}$).
+- $\tau$ es el esfuerzo cortante inducido en la pared ($\text{Pa}$ o $\text{psi}$).
+- $t$ es el espesor local de la pared ($\text{m}$ o $\text{in}$).
+
+---
+
+## 5.2 Esfuerzo Cortante (Fórmula de Bredt)
+
+Para determinar la relación entre el torque aplicado $T$ y el esfuerzo cortante $\tau$, se analiza el momento producido por las fuerzas cortantes elementales $dF = f \cdot ds$ respecto a un punto interno $O$:
+
+<Definition title="Deducción de la Fórmula de Torsión para Pared Delgada">
+1. **Fuerza y Momento Diferencial:**
+   $$dF = \tau \cdot t \cdot ds = f \cdot ds$$
+   $$dT = r \cdot dF = r \cdot f \cdot ds = f (r \cdot ds)$$
+
+2. **Área Media Encomendada ($A_m$):**
+   El término $r \cdot ds$ representa el doble del área del triángulo diferencial $dS_{OAB}$ formado con respecto al centro $O$:
+   $$r \cdot ds = 2 \, dS_{OAB}$$
+
+3. **Integración sobre la Línea Media ($L_m$):**
+   $$T = f \oint r \, ds = f \oint 2 \, dS_{OAB} = 2 f A_m$$
+
+4. **Despeje de Flujo y Esfuerzo Cortante:**
+   $$f = \frac{T}{2 A_m} \implies \tau = \frac{T}{2 t A_m}$$
+</Definition>
+
+<Formula label="Esfuerzo Cortante en Pared Delgada">
+$$
+\tau = \frac{T}{2 t A_m}
+$$
+</Formula>
+
+Donde:
+- $T$ es el momento torsor aplicado ($\text{N}\cdot\text{m}$).
+- $t$ es el espesor de la pared en el punto evaluado ($\text{m}$).
+- $A_m$ es el área encerrada por la línea media de la sección transversal ($\text{m}^2$).
+
+---
+
+## 5.3 Ángulo de Giro e Inercia Polar Equivalente ($J_e$)
+
+A partir del principio del trabajo y la energía ($W_{\text{ext}} = U_T$), donde la energía de deformación por torsión es $U_T = \frac{T^2 L}{8 G A_m^2} \oint \frac{ds}{t}$, se deriva el ángulo de giro $\theta$ para una sección no circular de pared delgada:
+
+<Formula label="Ángulo de Giro por Torsión">
+$$
+\theta = \frac{T L}{4 G A_m^2} \int_0^{L_m} \frac{ds}{t}
+$$
+</Formula>
+
+Esta ecuación puede reescribirse en forma análoga a la relación clásica ($\theta = \frac{TL}{G J_e}$) definiendo un **momento polar de inercia equivalente ($J_e$)**:
+
+<Formula label="Momento Polar de Inercia Equivalente">
+$$
+J_e = \frac{4 A_m^2}{\int_0^{L_m} \frac{ds}{t}}
+$$
+</Formula>
+
+### Integrales de Línea Frecuentes ($\int \frac{ds}{t}$):
+
+1. **Tubo Circular de Radio Medio $r$ y Espesor Uniforme $t$:**
+   $$\int_0^{L_m} \frac{ds}{t} = \frac{2\pi r}{t} \implies J_e = 2\pi r^3 t$$
+
+2. **Tubo Rectangular de Ancho $b$, Alto $h$ y Espesores $t_1, t_2$:**
+   $$\int_0^{L_m} \frac{ds}{t} = 2 \left( \frac{b}{t_2} + \frac{h}{t_1} \right)$$
+
+<!-- Búsqueda de Imagen Recomendada: "Tubos de pared delgada seccion circular y rectangular torsion" -->
+<Image 
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793491063/jphswfhiph7csfrlc0uk.png" alt="Descripción de la imagen"
+  caption="Figura 6.5.1: Geometría de líneas medias para secciones transversales tubulares circulares y rectangulares."
+/>
+
+
+
+## Ejemplos Resueltos
+
+<Example number={1} title="Análisis Torsional en Tubo Rectangular de Aluminio">
+Un tubo de aluminio de pared delgada de sección rectangular tiene dimensiones medias de $b = 50\text{ mm}$ y $h = 20\text{ mm}$, con un espesor constante de $t = 3\text{ mm}$. Para un torque aplicado $T = 90\text{ N}\cdot\text{m}$, determine:
+1. El esfuerzo cortante en la pared.
+2. El ángulo de giro para una longitud $L = 0.25\text{ m}$ ($G = 26\text{ GPa}$).
+
+<Solution>
+1. **Cálculo del Área Media ($A_m$):**
+   $$A_m = b \cdot h = (0.050\text{ m}) \times (0.020\text{ m}) = 0.001\text{ m}^2$$
+
+2. **Cálculo del Esfuerzo Cortante ($\tau$):**
+   $$\tau = \frac{T}{2 t A_m} = \frac{90\text{ N}\cdot\text{m}}{2 \times (0.003\text{ m}) \times (0.001\text{ m}^2)} = 15 \times 10^6\text{ Pa} = 15.0\text{ MPa}$$
+
+3. **Cálculo de la Integral de Línea ($\int \frac{ds}{t}$):**
+   $$\int_0^{L_m} \frac{ds}{t} = \frac{2 (b + h)}{t} = \frac{2 (50\text{ mm} + 20\text{ mm})}{3\text{ mm}} = \frac{140}{3} \approx 46.67$$
+
+4. **Cálculo del Ángulo de Giro ($\theta$):**
+   $$\theta = \frac{T L}{4 G A_m^2} \left( \int_0^{L_m} \frac{ds}{t} \right) = \frac{90 \times 0.25}{4 \times (26 \times 10^9) \times (0.001)^2} \times 46.67$$
+   $$\theta = \frac{22.5}{104,000} \times 46.67 \approx 0.0101\text{ rad} = 0.578^\circ$$
+</Solution>
+</Example>
+
+<Example number={2} title="Comparación entre Teoría Aprox. de Pared Delgada y Teoría Exacta">
+Un tubo circular hueco con diámetro interior de $230\text{ mm}$ y espesor de pared $t = 30\text{ mm}$ está sometido a un torque $T = 136\text{ kN}\cdot\text{m}$.
+Determine el esfuerzo cortante máximo mediante la teoría de tubos de pared delgada.
+
+<Solution>
+1. **Radio Medio ($r_m$):**
+   Diámetro medio $d_m = 230 + 30 = 260\text{ mm} \implies r_m = 130\text{ mm} = 0.13\text{ m}$.
+
+2. **Área Media ($A_m$):**
+   $$A_m = \pi r_m^2 = \pi (0.13\text{ m})^2 \approx 0.05309\text{ m}^2$$
+
+3. **Esfuerzo Cortante ($\tau$):**
+   $$\tau = \frac{T}{2 t A_m} = \frac{136 \times 10^3\text{ N}\cdot\text{m}}{2 \times (0.030\text{ m}) \times (0.05309\text{ m}^2)} \approx 42.69 \times 10^6\text{ Pa} = 42.69\text{ MPa}$$
+
+4. **Conclusión:**
+   La formulación aproximada de pared delgada entrega una estimación rápida y precisa ($42.69\text{ MPa}$) para secciones tubulares.
+</Solution>
+</Example>
+
+---
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Por qué el flujo cortante f = τ·t permanece constante en cualquier punto del contorno de un tubo de pared delgada bajo torsión?">
+Por condición de equilibrio de fuerzas cortantes longitudinales sobre la cubierta diferencial del tubo. Para asegurar que $\sum F_x = 0$, el producto del esfuerzo por el espesor local debe mantenerse constante a lo largo de todo el contorno cerrado.
+</Quiz>
+
+<Summary title="Resumen del Subtema">
+- Para secciones tubulares de pared delgada, el flujo cortante $f = \tau t = \frac{T}{2A_m}$ es constante[cite: 12, 14].
+- El esfuerzo cortante depende inversamente del área media encerrada $A_m$ y del espesor $t$: $\tau = \frac{T}{2 t A_m}$[cite: 14].
+- El ángulo de giro $\theta$ se calcula integrando la geometría del contorno mediante $\theta = \frac{TL}{GJ_e}$, donde $J_e = \frac{4A_m^2}{\int \frac{ds}{t}}$[cite: 18].
+</Summary>
