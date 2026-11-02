@@ -1,0 +1,111 @@
+# Ejes Compuestos y Estáticamente Indeterminados
+
+En aplicaciones mecánicas e industriales es común encontrar sistemas donde el torque se transmite a través de múltiples tramos con diferentes diámetros, materiales o ejes concéntricos conectados en paralelo.
+
+---
+
+## 3.1 Ejes en Serie (Torques Discretos)
+
+Cuando un eje está formado por varios tramos de distintas secciones transversales o materiales, y sobre él actúan múltiples torques aplicados en diferentes puntos, el ángulo de giro total ($\phi$) del extremo libre respecto al apoyo se obtiene mediante la suma algebraica de los giros de cada tramo.
+
+<Formula label="Ángulo de Giro para Torques Discretos">
+$$
+\phi = \sum_{i} \frac{T_i L_i}{J_i G_i}
+$$
+</Formula>
+
+Donde:
+- $T_i$ es el torque interno en el tramo $i$ (obtenido mediante un corte DCL).
+- $L_i$, $J_i$, $G_i$ son la longitud, momento polar de inercia y módulo de rigidez del tramo $i$, respectivamente.
+
+---
+
+## 3.2 Ejes Estáticamente Indeterminados
+
+Un eje sometido a torsión es **estáticamente indeterminado** cuando las ecuaciones de la estática ($\sum T = 0$) no son suficientes para determinar las reacciones en los apoyos o los torques internos en sus componentes. Esto ocurre típicamente cuando el eje está empotrado en ambos extremos o cuando está compuesto por materiales concéntricos unidos entre sí.
+
+<Definition title="Metodología de Resolución">
+Para resolver un sistema indeterminado se requieren dos tipos de ecuaciones:
+
+1. **Ecuación de Equilibrio (Estática):**
+   $$
+   \sum T = 0 \implies T_{\text{aplicado}} = T_1 + T_2
+   $$
+2. **Ecuación de Compatibilidad (Geometría de Deformación):**
+   Garantiza que la deformación angular sea consistente en los puntos de acoplamiento o apoyos fijos.
+   - **Ejes empotrados en ambos extremos:** El giro total de un extremo respecto al otro debe ser cero ($\phi_{A/B} = 0$).
+   - **Ejes concéntricos unidos (Barra y Tubo):** El giro en ambos materiales es idéntico ($\phi_1 = \phi_2$).
+</Definition>
+
+
+<Image 
+  src=src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793490153/wpkgyyxd0w8jqlt471in.png" alt="Descripción de la imagen" caption="Figura"
+  caption="Figura 6.3.1: Eje compuesto estáticamente indeterminado sometido a un torque externo T en el extremo libre."
+/>
+
+
+
+---
+
+## Ejemplos Resueltos
+
+<Example number={1} title="Distribución de Torque en Eje Compuesto (Aluminio y Latón)">
+Los cilindros macizos $AB$ (Aluminio, $G_{\text{al}} = 3.7 \times 10^6\text{ psi}$) y $BC$ (Latón, $G_{\text{lat}} = 5.6 \times 10^6\text{ psi}$) están unidos en $B$ y fijos en sus extremos $A$ y $C$. Se aplica un torque $T = 12.5\text{ kip}\cdot\text{in}$ en la unión $B$.
+
+- Diámetro de $AB$: $d_1 = 1.5\text{ in}$, Longitud $L_1 = 12\text{ in}$.
+- Diámetro de $BC$: $d_2 = 2.0\text{ in}$, Longitud $L_2 = 18\text{ in}$.
+
+Determine el esfuerzo cortante máximo en el cilindro $AB$.
+
+<Solution>
+1. **Momentos Polares de Inercia ($J$):**
+   - $J_{AB} = \frac{\pi}{2} (0.75\text{ in})^4 = 0.497\text{ in}^4$
+   - $J_{BC} = \frac{\pi}{2} (1.0\text{ in})^4 = 1.571\text{ in}^4$
+
+2. **Ecuación de Equilibrio en B:**
+   Sea $T_1$ el torque que absorbe el tramo $AB$ y $T_2$ el que absorbe el tramo $BC$:
+   $$
+   T_1 + T_2 = 12.5\text{ kip}\cdot\text{in}
+   $$
+
+3. **Ecuación de Compatibilidad:**
+   Dado que ambos extremos están fijos, el ángulo de giro en la unión $B$ desde el soporte $A$ debe ser igual al giro desde el soporte $C$ ($\phi_1 = \phi_2$):
+   $$
+   \frac{T_1 L_1}{G_{\text{al}} J_{AB}} = \frac{T_2 L_2}{G_{\text{lat}} J_{BC}}
+   $$
+   Sustituyendo valores:
+   $$
+   \frac{T_1 (12)}{(3.7 \times 10^6)(0.497)} = \frac{T_2 (18)}{(5.6 \times 10^6)(1.571)} \implies 6.526 \times 10^{-6} T_1 = 2.046 \times 10^{-6} T_2
+   $$
+   $$
+   T_2 = 3.190 \, T_1
+   $$
+
+4. **Resolución del Sistema:**
+   Sustituyendo en la ecuación de equilibrio:
+   $$
+   T_1 + 3.190 \, T_1 = 12.5 \implies 4.190 \, T_1 = 12.5 \implies T_1 = 2.983\text{ kip}\cdot\text{in}
+   $$
+
+5. **Esfuerzo Cortante Máximo en AB:**
+   $$
+   \tau_{\max(AB)} = \frac{T_1 \cdot c_1}{J_{AB}} = \frac{2.983\text{ kip}\cdot\text{in} \times 0.75\text{ in}}{0.497\text{ in}^4} = 4.50\text{ ksi}
+   $$
+
+6. **Conclusión:**
+   El tramo $AB$ soporta un torque interno de $2.983\text{ kip}\cdot\text{in}$, lo que genera un esfuerzo cortante máximo de $4.50\text{ ksi}$ en su superficie exterior.
+</Solution>
+</Example>
+
+---
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="En un eje compuesto por dos materiales concéntricos rígidamente unidos sometidos a torsión, ¿qué condición geométrica se debe cumplir obligatoriamente?">
+Ambos materiales deben experimentar exactamente el mismo ángulo de giro ($\phi_1 = \phi_2$) a lo largo de la longitud acoplada, ya que no existe deslizamiento en la interfaz de unión.
+</Quiz>
+
+<Summary title="Resumen del Subtema">
+- Para tramos en serie, el giro total es la suma de los giros individuales: $\phi = \sum \frac{TL}{GJ}$.
+- Para ejes indeterminados, es indispensable plantear la ecuación de compatibilidad geométrica ($\phi_1 = \phi_2$ o $\phi_{\text{total}} = 0$) junto a la ecuación de equilibrio estático.
+</Summary>
