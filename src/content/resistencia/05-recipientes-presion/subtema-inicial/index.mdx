@@ -1,3 +1,862 @@
-# Subtema inicial
+# Recipientes a presión
 
-Empieza a escribir aquí...
+## 1. Recipientes Esféricos Sometidos a Presión
+
+Los recipientes esféricos son ampliamente utilizados para el almacenamiento de fluidos a alta presión debido a su eficiencia estructural. Sus aplicaciones principales incluyen:
+* Almacenamiento de aplicaciones criogénicas (oxígeno y nitrógeno líquidos).
+* Almacenamiento de gases licuados (propano, butano, amoníaco, cloro).
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793598379/chv8pwqlwyjdrtk9dbhk.jpg" alt="Descripción de la imagen" />
+
+
+### Ecuaciones Fundamentales
+Al analizar un corte diametral del recipiente esférico, se establece el equilibrio entre la fuerza producida por la presión interna ($\rho$) y la fuerza de resistencia debida al esfuerzo ($\sigma$) en el material del recipiente:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793597601/njswnv4kdm4aq07il9vz.svg" alt="Descripción de la imagen" />
+
+el esfuerzo en será:
+
+<Formula>
+$$ \sigma_l = \frac{pr}{2t} $$
+</Formula>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793599693/ook0lzaxhbiowdzdsda8.svg"  />
+
+<Formula>
+$$\tau_{max} = \frac{\sigma}{2}$$
+</Formula>
+
+## 2. Recipientes Cilíndricos Sometidos a Presión
+
+Los recipientes cilíndricos a presión (tanto horizontales como verticales) se utilizan comúnmente en la industria para el almacenamiento y transporte de fluidos presurizados (por ejemplo, tanques de gas GLP).
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793826243/t6wvoqw8rfsq3kznigu5.png"/>
+
+### Cálculo de los Esfuerzos
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793826712/ymp2ptp1hs8zil3c1ahm.svg"  />
+
+
+<Formula >
+$$
+\sigma_r = \frac{pr}{t}
+$$
+</Formula>
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793826893/bowxjie7jlom0nfn5018.svg"  />
+
+
+<Formula>
+$$
+\sigma_l = \frac{pr}{2t}
+$$
+</Formula>
+
+
+
+## 3. Estado Plano de Esfuerzos en Cilindros
+
+Analizando un elemento diferencial extraído de la pared del cilindro cilíndrico, este se encuentra en un estado plano de esfuerzos. 
+* Esfuerzo longitudinal: $\sigma_l$
+* Esfuerzo circunferencial (aro): $\sigma_r$
+
+En el plano principal (donde el cortante es cero), el Círculo de Mohr se traza entre los puntos $(\sigma_l, 0)$ y $(\sigma_r, 0)$.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793827343/waexlujehntqzjfgwaev.svg"   />
+
+
+
+El esfuerzo medio ($\sigma_m$) o centro del círculo es:
+
+
+<Formula >
+$$\sigma_m = \frac{\sigma_l + \sigma_r}{2}$$
+</Formula>
+
+
+
+El esfuerzo cortante máximo en el plano ocurre a $45^\circ$ y es igual al radio del círculo:
+
+
+<Formula>
+$$\tau_{max} = \frac{\sigma_l - \sigma_r}{2}$$
+</Formula>
+
+
+
+## 4. Problemas
+
+
+<Problem title="Problema propuesto">
+Un globo esférico está lleno de un gas. El diámetro exterior del globo es de 500 mm y el
+espesor es de 0,3 mm. Calcule la presión máxima permisible en el globo si el esfuerzo
+de tracción admisible y el esfuerzo cortante admisible en el material del globo son de 7
+MPa y 2 MPa, respectivamente.
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro exterior ($D_{ext}$): $500 \text{ mm}$
+* Espesor ($t$): $0,3 \text{ mm}$
+* Esfuerzo de tracción admisible ($\sigma_{adm}$): $7 \text{ MPa}$
+* Esfuerzo cortante admisible ($\tau_{adm}$): $2 \text{ MPa}$
+
+**2. Cálculo del radio interior ($r$)**
+
+Dado que las fórmulas para recipientes de pared delgada utilizan el radio interior, primero debemos calcularlo:
+
+Diámetro interior ($D_{int}$) = $D_{ext} - 2t$
+
+$$D_{int} = 500 \text{ mm} - 2(0,3 \text{ mm}) = 499,4 \text{ mm}$$
+
+Radio interior ($r$) = $\frac{D_{int}}{2} = 249,7 \text{ mm}$
+
+**3. Presión máxima basada en el esfuerzo de tracción**
+
+Para un recipiente esférico de pared delgada, el esfuerzo normal (tracción) se define como:
+
+$$\sigma = \frac{P \cdot r}{2t}$$
+
+Despejando la presión ($P_1$) y usando el límite admisible de tracción:
+
+$$P_1 = \frac{\sigma_{adm} \cdot 2t}{r}$$
+
+$$P_1 = \frac{7 \text{ MPa} \cdot 2 \cdot 0,3 \text{ mm}}{249,7 \text{ mm}}$$
+
+$$P_1 = \frac{4,2}{249,7} \text{ MPa} \approx 0,01682 \text{ MPa} \text{ (o } 16,82 \text{ kPa)}$$
+
+**4. Presión máxima basada en el esfuerzo cortante**
+
+En un globo esférico, los esfuerzos principales en la superficie son iguales ($\sigma_1 = \sigma_2 = \sigma$). El esfuerzo normal en la dirección radial es prácticamente cero ($\sigma_3 \approx 0$). 
+
+El esfuerzo cortante máximo absoluto se define como:
+
+$$\tau_{max} = \frac{\sigma_1 - \sigma_3}{2} = \frac{\sigma}{2} = \frac{P \cdot r}{4t}$$
+
+Despejando la presión ($P_2$) y usando el límite admisible cortante:
+
+$$P_2 = \frac{\tau_{adm} \cdot 4t}{r}$$
+
+$$P_2 = \frac{2 \text{ MPa} \cdot 4 \cdot 0,3 \text{ mm}}{249,7 \text{ mm}}$$
+
+$$P_2 = \frac{2,4}{249,7} \text{ MPa} \approx 0,00961 \text{ MPa} \text{ (o } 9,61 \text{ kPa)}$$
+
+**5. Conclusión**
+
+La presión máxima permisible dentro del globo debe ser el valor menor entre los dos calculados para evitar fallas.
+
+**Respuesta:** La presión máxima permisible es de **$0,00961 \text{ MPa}$** (o **$9,61 \text{ kPa}$**).
+
+</Solution>
+</Problem>
+
+
+<Problem title="Problema propuesto">
+Un globo esférico con un diámetro exterior de 500 mm y un espesor de 0,3 mm está
+lleno de un gas. Calcule la presión máxima permisible en el globo si la deformación
+normal admisible en la superficie exterior del globo es de 0,1. Suponga que E=4 Mpa y
+ν=0,45.
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro exterior ($D_{ext}$): $500 \text{ mm}$
+* Espesor ($t$): $0,3 \text{ mm}$
+* Deformación normal admisible ($\epsilon$): $0,1$
+* Módulo de elasticidad ($E$): $4 \text{ MPa}$
+* Relación de Poisson ($\nu$): $0,45$
+
+**2. Cálculo del radio interior ($r$)**
+
+Al igual que en el problema anterior, calculamos el radio interior para usarlo en las fórmulas de recipientes de pared delgada:
+
+$$D_{int} = D_{ext} - 2t$$
+
+$$D_{int} = 500 \text{ mm} - 2(0,3 \text{ mm}) = 499,4 \text{ mm}$$
+
+$$r = \frac{D_{int}}{2} = 249,7 \text{ mm}$$
+
+**3. Relación entre esfuerzo y presión**
+
+Para un recipiente esférico de pared delgada, los esfuerzos normales (tracción) en la superficie son iguales en cualquier dirección ($\sigma_1 = \sigma_2 = \sigma$). La ecuación del esfuerzo es:
+
+$$\sigma = \frac{P \cdot r}{2t}$$
+
+**4. Ley de Hooke generalizada (Deformación)**
+
+La deformación normal en la superficie exterior ($\epsilon$) está relacionada con los esfuerzos mediante la Ley de Hooke. Como el esfuerzo radial en la superficie exterior es cero ($\sigma_3 = 0$):
+
+$$\epsilon = \frac{1}{E} (\sigma_1 - \nu \sigma_2)$$
+
+Sabiendo que $\sigma_1 = \sigma_2 = \sigma$:
+
+$$\epsilon = \frac{\sigma}{E} (1 - \nu)$$
+
+**5. Cálculo de la presión máxima permisible ($P$)**
+
+Sustituimos la ecuación del esfuerzo en la ecuación de la deformación:
+
+$$\epsilon = \frac{\left( \frac{P \cdot r}{2t} \right)}{E} (1 - \nu)$$
+
+$$\epsilon = \frac{P \cdot r}{2 \cdot t \cdot E} (1 - \nu)$$
+
+Despejamos la presión ($P$):
+
+$$P = \frac{\epsilon \cdot 2 \cdot t \cdot E}{r \cdot (1 - \nu)}$$
+
+Reemplazamos con los datos del problema:
+
+$$P = \frac{0,1 \cdot 2 \cdot 0,3 \text{ mm} \cdot 4 \text{ MPa}}{249,7 \text{ mm} \cdot (1 - 0,45)}$$
+
+$$P = \frac{0,24}{249,7 \cdot 0,55} \text{ MPa}$$
+
+$$P = \frac{0,24}{137,335} \text{ MPa}$$
+
+$$P \approx 0,0017475 \text{ MPa} \text{ (o } 1,75 \text{ kPa)}$$
+
+**Respuesta:** La presión máxima permisible en el globo para no exceder la deformación admisible es de **$0,001747 \text{ MPa}$** (o **$1,75 \text{ kPa}$**).
+
+</Solution>
+</Problem>
+
+
+<Problem title="Problema propuesto">
+Un tanque esférico grande (ver figura)
+contiene gas a una presión de 3,5 MPa. El
+tanque tiene un diámetro de 20 m y está
+construido de acero de alta resistencia con un
+esfuerzo de fluencia a tensión de 550 MPa. (a)
+Determine el espesor requerido de la pared
+del tanque si se requiere un factor de
+seguridad de 3,5 con respecto a la fluencia. (b)
+Si el espesor de la pared del tanque es de 100
+mm, ¿cuál es la presión interna máxima
+permisible?
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793909658/fuot8t7amzqcg0hvjcuo.svg"   />
+
+
+<Solution>
+
+**1. Datos del problema**
+
+* Presión del gas ($P$): $3,5 \text{ MPa}$
+* Diámetro del tanque ($D$): $20 \text{ m}$
+* Esfuerzo de fluencia a tensión ($\sigma_Y$): $550 \text{ MPa}$
+* Factor de seguridad ($FS$): $3,5$
+* Espesor para la parte b ($t_b$): $100 \text{ mm}$
+
+**Cálculo del radio ($r$)**
+
+Asumiendo que el diámetro dado corresponde al diámetro interior (práctica estándar a menos que se indique lo contrario):
+
+$$r = \frac{D}{2} = \frac{20 \text{ m}}{2} = 10 \text{ m} = 10000 \text{ mm}$$
+
+**2. Esfuerzo admisible ($\sigma_{adm}$)**
+
+El esfuerzo admisible de diseño se calcula dividiendo el esfuerzo de fluencia entre el factor de seguridad:
+
+$$\sigma_{adm} = \frac{\sigma_Y}{FS}$$
+
+$$\sigma_{adm} = \frac{550 \text{ MPa}}{3,5} \approx 157,14 \text{ MPa}$$
+
+**3. Solución parte (a): Espesor requerido ($t$)**
+
+Para un tanque esférico de pared delgada, el esfuerzo normal se define como:
+
+$$\sigma = \frac{P \cdot r}{2t}$$
+
+Despejando el espesor ($t$) y usando el esfuerzo admisible:
+
+$$t = \frac{P \cdot r}{2 \cdot \sigma_{adm}}$$
+
+Reemplazando los datos:
+
+$$t = \frac{3,5 \text{ MPa} \cdot 10000 \text{ mm}}{2 \cdot 157,14 \text{ MPa}}$$
+
+$$t = \frac{35000}{314,28} \text{ mm}$$
+
+$$t \approx 111,36 \text{ mm}$$
+
+**4. Solución parte (b): Presión máxima permisible con $t = 100 \text{ mm}$**
+
+Usamos la misma fórmula del esfuerzo, pero ahora despejamos la presión ($P_{max}$), manteniendo el mismo esfuerzo admisible:
+
+$$P_{max} = \frac{\sigma_{adm} \cdot 2t}{r}$$
+
+Reemplazando con el nuevo espesor $t = 100 \text{ mm}$[cite: 4]:
+
+$$P_{max} = \frac{157,14 \text{ MPa} \cdot 2 \cdot 100 \text{ mm}}{10000 \text{ mm}}$$
+
+$$P_{max} = \frac{31428}{10000} \text{ MPa}$$
+
+$$P_{max} \approx 3,14 \text{ MPa}$$
+
+**Respuesta:**
+
+**(a)** El espesor requerido de la pared del tanque es de **$111,36 \text{ mm}$**.
+
+**(b)** La presión interna máxima permisible si el espesor es de 100 mm es de **$3,14 \text{ MPa}$**.
+
+</Solution>
+</Problem>
+
+<Problem title="Problema propuesto">
+Una ventana hemisférica (o mirilla) en una cámara
+de descompresión (ver figura) está sometida a una
+presión interna de aire de 575 kPa. La ventana está
+unidaa la pared de la cámara mediante 14 pernos.
+(a) Determine la fuerza de tracción F en cada perno
+y el esfuerzo de tracción σ en la ventana si
+el radio de la hemisfera es de 350 mm y su espesor es de 32 mm.
+(b) Si el esfuerzo de fluencia para
+cada uno de los 14 pernos es de 345 MPa,
+y el factor de seguridad es de 3, 0, determine el diámetro requerido del perno.
+(c) Si el esfuerzo en la ventana se limita a 3 MPa, determine el radio
+requerido de la hemisfera.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793909827/o97btpedffxk4sbdlg09.png" alt="Descripción de la imagen" />
+
+
+<Solution>
+
+**1. Datos del problema**
+
+* Presión interna ($P$): $575 \text{ kPa} = 0,575 \text{ MPa}$
+* Número de pernos ($n$): $14$
+* Radio de la hemisfera ($r$): $350 \text{ mm}$ (para la parte a)
+* Espesor de la ventana ($t$): $32 \text{ mm}$
+* Esfuerzo de fluencia pernos ($\sigma_Y$): $345 \text{ MPa}$
+* Factor de seguridad pernos ($FS$): $3,0$
+* Límite de esfuerzo en ventana (parte c): $3 \text{ MPa}$
+
+**2. Solución parte (a): Fuerza en cada perno y esfuerzo en la ventana**
+
+La fuerza total ($F_{total}$) que empuja la ventana hacia afuera es igual a la presión multiplicada por el área proyectada de la abertura:
+
+$$F_{total} = P \cdot A = P \cdot (\pi \cdot r^2)$$
+
+$$F_{total} = 0,575 \text{ MPa} \cdot \pi \cdot (350 \text{ mm})^2$$
+
+$$F_{total} \approx 221286 \text{ N} = 221,29 \text{ kN}$$
+
+Como la ventana está sujeta por 14 pernos, la fuerza de tracción en cada perno ($F$) es:
+
+$$F = \frac{F_{total}}{n} = \frac{221286 \text{ N}}{14} \approx 15806,1 \text{ N} = 15,81 \text{ kN}$$
+
+Para el esfuerzo de tracción en la ventana hemisférica ($\sigma$), aplicamos la fórmula de recipientes de pared delgada:
+
+$$\sigma = \frac{P \cdot r}{2t}$$
+
+$$\sigma = \frac{0,575 \text{ MPa} \cdot 350 \text{ mm}}{2 \cdot 32 \text{ mm}}$$
+
+$$\sigma = \frac{201,25}{64} \text{ MPa} \approx 3,14 \text{ MPa}$$
+
+**3. Solución parte (b): Diámetro requerido del perno**
+
+Primero calculamos el esfuerzo admisible para cada perno ($\sigma_{adm, perno}$):
+
+$$\sigma_{adm, perno} = \frac{\sigma_Y}{FS} = \frac{345 \text{ MPa}}{3,0} = 115 \text{ MPa}$$
+
+Sabemos que el esfuerzo es fuerza sobre área ($\sigma = F / A_b$), por lo que el área requerida del perno ($A_b$) es:
+
+$$A_b = \frac{F}{\sigma_{adm, perno}} = \frac{15806,1 \text{ N}}{115 \text{ MPa}} \approx 137,44 \text{ mm}^2$$
+
+Calculamos el diámetro ($d$) sabiendo que $A_b = \frac{\pi \cdot d^2}{4}$:
+
+$$d = \sqrt{\frac{4 \cdot A_b}{\pi}} = \sqrt{\frac{4 \cdot 137,44 \text{ mm}^2}{\pi}}$$
+
+$$d \approx 13,23 \text{ mm}$$
+
+**4. Solución parte (c): Radio requerido si el esfuerzo se limita a 3 MPa**
+
+Usamos la misma fórmula del esfuerzo en la esfera, pero limitando $\sigma = 3 \text{ MPa}$ y despejando el radio ($r$):
+
+$$\sigma = \frac{P \cdot r}{2t}$$
+
+$$r = \frac{\sigma \cdot 2t}{P}$$
+
+$$r = \frac{3 \text{ MPa} \cdot 2 \cdot 32 \text{ mm}}{0,575 \text{ MPa}}$$
+
+$$r = \frac{192}{0,575} \text{ mm}$$
+
+$$r \approx 333,91 \text{ mm}$$
+
+**Respuestas:**
+
+**(a)** La fuerza de tracción en cada perno es **$15,81 \text{ kN}$** y el esfuerzo de tracción en la ventana es **$3,14 \text{ MPa}$**.
+
+**(b)** El diámetro requerido del perno es **$13,23 \text{ mm}$**.
+
+**(c)** El radio requerido de la hemisfera es **$333,91 \text{ mm}$**.
+
+</Solution>
+</Problem>
+
+
+<Problem title="Problema propuesto">
+Un tanque esférico de 1,2 m de diámetro
+y 50 mm de espesor de pared contiene
+aire comprimido a una presión de 17
+MPa. El tanque está construido de dos
+semiesferas unidas por una costura
+soldada (ver figura).(a) ¿Cuál es la carga
+de tracción 𝑓 (en N por mm de longitud
+de soldadura) que soporta la
+soldadura?(b) ¿Cuál es el esfuerzo
+cortante máximo 𝜏 en la pared del
+tanque?(c) ¿Cuál es la deformación
+normal máxima 𝜀 en la pared? (Para el
+acero, suponga 𝐸=210 GPa y 𝜈=0,29.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794059070/gnyqes9ugcotstwqyryz.svg" alt="Descripción de la imagen" />
+
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro del tanque ($D$): $1,2 \text{ m} = 1200 \text{ mm}$ (Asumimos diámetro interior por convención estándar)
+* Espesor de la pared ($t$): $50 \text{ mm}$
+* Presión interna ($P$): $17 \text{ MPa}$
+* Módulo de elasticidad del acero ($E$): $210 \text{ GPa} = 210000 \text{ MPa}$
+* Relación de Poisson ($\nu$): $0,29$
+
+**Cálculo del radio interior ($r$)**
+
+$$r = \frac{D}{2} = \frac{1200 \text{ mm}}{2} = 600 \text{ mm}$$
+
+*(Nota: Dado que la relación $r/t = 600/50 = 12 > 10$, es válido aplicar la teoría de recipientes de pared delgada).*
+
+**2. Solución parte (a): Carga de tracción $f$ en la soldadura**
+
+La carga de tracción $f$ es la fuerza por unidad de longitud que soporta la costura. Se puede calcular multiplicando el esfuerzo normal de tracción por el espesor de la pared ($f = \sigma \cdot t$), o analizando el equilibrio global:
+
+$$f = \frac{\text{Fuerza total}}{\text{Perímetro}} = \frac{P \cdot (\pi \cdot r^2)}{2 \cdot \pi \cdot r} = \frac{P \cdot r}{2}$$
+
+Reemplazando los datos:
+
+$$f = \frac{17 \text{ MPa} \cdot 600 \text{ mm}}{2}$$
+
+$$f = 5100 \text{ N/mm}$$
+
+**3. Solución parte (b): Esfuerzo cortante máximo $\tau$ en la pared**
+
+Primero calculamos el esfuerzo normal principal (tracción) en la superficie de la esfera ($\sigma_1 = \sigma_2 = \sigma$):
+
+$$\sigma = \frac{P \cdot r}{2t} = \frac{17 \text{ MPa} \cdot 600 \text{ mm}}{2 \cdot 50 \text{ mm}} = 102 \text{ MPa}$$
+
+El esfuerzo cortante máximo absoluto ocurre en la superficie interior del tanque, donde el esfuerzo radial (el tercer esfuerzo principal $\sigma_3$) es igual a la presión de compresión ($-P$):
+
+$$\tau_{max} = \frac{\sigma_1 - \sigma_3}{2}$$
+
+$$\tau_{max} = \frac{102 \text{ MPa} - (-17 \text{ MPa})}{2}$$
+
+$$\tau_{max} = \frac{119 \text{ MPa}}{2} = 59,5 \text{ MPa}$$
+
+**4. Solución parte (c): Deformación normal máxima $\epsilon$ en la pared**
+
+Usando la Ley de Hooke generalizada para un estado de esfuerzo biaxial (membrana) en la superficie, la deformación normal tangencial máxima es:
+
+$$\epsilon = \frac{1}{E} (\sigma_1 - \nu \sigma_2)$$
+
+Como $\sigma_1 = \sigma_2 = \sigma$:
+
+$$\epsilon = \frac{\sigma}{E} (1 - \nu)$$
+
+Reemplazando con los datos:
+
+$$\epsilon = \frac{102 \text{ MPa}}{210000 \text{ MPa}} (1 - 0,29)$$
+
+$$\epsilon = \frac{102 \cdot 0,71}{210000}$$
+
+$$\epsilon = \frac{72,42}{210000}$$
+
+$$\epsilon \approx 0,0003448 \text{ (o } 344,8 \times 10^{-6} \text{)}$$
+
+**Respuestas:**
+
+**(a)** La carga de tracción $f$ que soporta la soldadura es **$5100 \text{ N/mm}$**.
+
+**(b)** El esfuerzo cortante máximo $\tau$ en la pared del tanque es **$59,5 \text{ MPa}$**.
+
+**(c)** La deformación normal máxima $\epsilon$ en la pared es **$344,8 \times 10^{-6}$** (adimensional).
+
+</Solution>
+</Problem>
+
+
+
+<Problem title="Problema propuesto">
+Un recipiente esférico de acero a
+presión (diámetro 500 mm, espesor
+10 mm) está recubierto con una laca
+frágil que se agrieta cuando la
+deformación alcanza 𝜀=150×10−6(ver
+figura).(a) ¿Qué presión interna 𝑝
+hará que la laca se agriete? (Suponga
+𝐸=205 GPa y 𝜈=0,30).(b) Si la
+deformación medida es
+de𝜀=125×10−6,¿cuál es la presión
+interna en ese punto?
+
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794059723/xtxuoee32zlee2nolxax.svg" alt="Descripción de la imagen"/>
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro del recipiente ($D$): $500 \text{ mm}$
+* Espesor de la pared ($t$): $10 \text{ mm}$
+* Módulo de elasticidad ($E$): $205 \text{ GPa} = 205000 \text{ MPa}$
+* Relación de Poisson ($\nu$): $0,30$
+* Deformación para agrietamiento (parte a): $\epsilon_a = 150 \times 10^{-6}$
+* Deformación medida (parte b): $\epsilon_b = 125 \times 10^{-6}$
+
+**Cálculo del radio ($r$)**
+
+$$r = \frac{D}{2} = \frac{500 \text{ mm}}{2} = 250 \text{ mm}$$
+
+**2. Ecuación general que relaciona presión y deformación**
+
+Para un recipiente esférico de pared delgada, el esfuerzo normal es igual en cualquier dirección de la superficie ($\sigma_1 = \sigma_2 = \sigma$). Su fórmula es:
+
+$$\sigma = \frac{p \cdot r}{2t}$$
+
+Por la Ley de Hooke generalizada para el estado de esfuerzo en la superficie, la deformación normal es:
+
+$$\epsilon = \frac{1}{E} (\sigma_1 - \nu \sigma_2) = \frac{\sigma}{E} (1 - \nu)$$
+
+Sustituyendo el esfuerzo $\sigma$ en la ecuación de deformación obtenemos:
+
+$$\epsilon = \frac{p \cdot r}{2 \cdot t \cdot E} (1 - \nu)$$
+
+Despejando la presión interna ($p$):
+
+$$p = \frac{\epsilon \cdot 2 \cdot t \cdot E}{r \cdot (1 - \nu)}$$
+
+**3. Solución parte (a): Presión para que la laca se agriete**
+
+Reemplazamos con $\epsilon_a = 150 \times 10^{-6}$:
+
+$$p_a = \frac{(150 \times 10^{-6}) \cdot 2 \cdot 10 \text{ mm} \cdot 205000 \text{ MPa}}{250 \text{ mm} \cdot (1 - 0,30)}$$
+
+$$p_a = \frac{615}{250 \cdot 0,70} \text{ MPa}$$
+
+$$p_a = \frac{615}{175} \text{ MPa} \approx 3,514 \text{ MPa}$$
+
+**4. Solución parte (b): Presión interna para la deformación medida**
+
+Reemplazamos con $\epsilon_b = 125 \times 10^{-6}$
+
+$$p_b = \frac{(125 \times 10^{-6}) \cdot 2 \cdot 10 \text{ mm} \cdot 205000 \text{ MPa}}{250 \text{ mm} \cdot (1 - 0,30)}$$
+
+$$p_b = \frac{512,5}{175} \text{ MPa} \approx 2,929 \text{ MPa}$$
+
+*(Nota: Como la presión es proporcional a la deformación, también se puede calcular directamente haciendo $p_b = p_a \cdot \frac{125}{150}$).*
+
+**Respuestas:**
+
+**(a)** La presión interna que hará que la laca se agriete es de **$3,51 \text{ MPa}$**.
+
+**(b)** La presión interna en el punto con la deformación medida es de **$2,93 \text{ MPa}$**.
+
+</Solution>
+</Problem>
+
+
+
+
+<Problem title="Problema propuesto">
+Un recipiente cilíndrico a presión de 2,50 m de diámetro se fabrica dando forma a
+dos placas de acero de 10 mm de espesor y soldando a tope las placas a lo largo de
+arcos helicoidales, como se muestra en la Fig. 1. La presión interna máxima en el
+recipiente a presión es de 1200 kPa. Para este nivel de presión, calcule las siguientes
+cantidades: (a) el esfuerzo axial y el esfuerzo circunferencial (esfuerzo de aro). (b) el
+esfuerzo cortante máximo absoluto. (c) el esfuerzo normal σn, perpendicular a la
+línea de soldadura, y el esfuerzo cortante τn, tangente a la línea de soldadura.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794060042/zml5nhfptja30vyzt3yz.svg" alt="Descripción de la imagen" />
+
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro del recipiente ($D$): $2,50 \text{ m} = 2500 \text{ mm}$
+* Espesor de las placas ($t$): $10 \text{ mm}$
+* Presión interna máxima ($P$): $1200 \text{ kPa} = 1,2 \text{ MPa}$
+* Ángulo entre la línea de soldadura ($t$) y el eje axial ($a$): $60^\circ$
+
+**Cálculo del radio ($r$)**
+
+$$r = \frac{D}{2} = \frac{2500 \text{ mm}}{2} = 1250 \text{ mm}$$
+
+**2. Solución parte (a): Esfuerzo axial y circunferencial**
+
+Para un recipiente cilíndrico de pared delgada, los esfuerzos principales son:
+
+Esfuerzo axial ($\sigma_{axial}$ o $\sigma_a$):
+
+$$\sigma_a = \frac{P \cdot r}{2t} = \frac{1,2 \text{ MPa} \cdot 1250 \text{ mm}}{2 \cdot 10 \text{ mm}} = \frac{1500}{20} \text{ MPa} = 75 \text{ MPa}$$
+
+Esfuerzo circunferencial o de aro ($\sigma_{circ}$):
+
+$$\sigma_{circ} = \frac{P \cdot r}{t} = \frac{1,2 \text{ MPa} \cdot 1250 \text{ mm}}{10 \text{ mm}} = \frac{1500}{10} \text{ MPa} = 150 \text{ MPa}$$
+
+**3. Solución parte (b): Esfuerzo cortante máximo absoluto**
+
+En la pared del cilindro, los esfuerzos principales son $\sigma_1 = 150 \text{ MPa}$ (circunferencial), $\sigma_2 = 75 \text{ MPa}$ (axial), y en la superficie exterior el esfuerzo radial es $\sigma_3 \approx 0 \text{ MPa}$.
+
+El esfuerzo cortante máximo absoluto se evalúa considerando los tres esfuerzos principales (ocurre en un plano rotado a $45^\circ$ respecto a la superficie):
+
+$$\tau_{max\_abs} = \frac{\sigma_1 - \sigma_3}{2} = \frac{150 \text{ MPa} - 0 \text{ MPa}}{2} = 75 \text{ MPa}$$
+
+*(Nota: El esfuerzo cortante máximo en el plano de la pared sería $(150 - 75)/2 = 37,5 \text{ MPa}$, pero el valor absoluto es $75 \text{ MPa}$).*
+
+**4. Solución parte (c): Esfuerzos normal ($\sigma_n$) y cortante ($\tau_n$) en la soldadura**
+
+De la figura, el eje $t$ (tangente a la soldadura) forma $60^\circ$ con el eje axial $a$[cite: 8]. La normal a la soldadura, eje $n$, es perpendicular al eje $t$. Por lo tanto, el ángulo que forma el eje $n$ con el eje axial es $\theta = 90^\circ - 60^\circ = 30^\circ$.
+
+Usamos las ecuaciones de transformación de esfuerzo plano (tomando el eje axial como $x$ y el circunferencial como $y$):
+* $\sigma_x = 75 \text{ MPa}$
+* $\sigma_y = 150 \text{ MPa}$
+* $\theta = 30^\circ$ (ángulo de la normal respecto al eje $x$)
+
+Esfuerzo normal ($\sigma_n$):
+
+$$\sigma_n = \frac{\sigma_x + \sigma_y}{2} + \frac{\sigma_x - \sigma_y}{2} \cos(2\theta)$$
+
+$$\sigma_n = \frac{75 + 150}{2} + \frac{75 - 150}{2} \cos(60^\circ)$$
+
+$$\sigma_n = 112,5 + (-37,5)(0,5) = 112,5 - 18,75 = 93,75 \text{ MPa}$$
+
+Esfuerzo cortante ($\tau_n$):
+
+$$\tau_n = -\frac{\sigma_x - \sigma_y}{2} \sin(2\theta)$$
+
+$$\tau_n = -\left( \frac{75 - 150}{2} \right) \sin(60^\circ)$$
+
+$$\tau_n = -(-37,5) \left( \frac{\sqrt{3}}{2} \right) \approx 37,5 \cdot 0,866 = 32,48 \text{ MPa}$$
+
+**Respuestas:**
+
+**(a)** El esfuerzo axial es **$75 \text{ MPa}$** y el esfuerzo circunferencial es **$150 \text{ MPa}$**.
+
+**(b)** El esfuerzo cortante máximo absoluto es **$75 \text{ MPa}$**.
+
+**(c)** El esfuerzo normal a la soldadura es **$93,75 \text{ MPa}$** y el esfuerzo cortante es **$32,48 \text{ MPa}$**.
+
+</Solution>
+</Problem>
+
+
+<Problem title="Problema propuesto">
+La porción cilíndrica de un tanque de aire
+comprimido está fabricada con una placa de acero
+que se suelda a lo largo de una hélice que forma
+un ángulo de θ=70∘ con respecto al eje
+longitudinal del tanque. El diámetro interior del
+cilindro es de 48 in., el espesor de pared es de 0,5
+in., y la presión interna es de 240 psi. Determine
+las siguientes cantidades para la porción cilíndrica
+del tanque: (a) el esfuerzo axial σa y el esfuerzo
+circunferencial (o de aro) σh. (b) el esfuerzo
+normal y el esfuerzo cortante en planos paralelos y
+perpendiculares a la soldadura. (c) el esfuerzo
+cortante máximo en el plano.(d) el esfuerzo
+cortante máximo absoluto.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794060258/jkv7toarybuecyimjrda.svg" alt="Descripción de la imagen"  />
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro interior ($d$): $48 \text{ in}$
+* Espesor de la pared ($t$): $0,5 \text{ in}$
+* Presión interna ($p$): $240 \text{ psi}$
+* Ángulo de la hélice con el eje longitudinal ($\theta_{hel}$): $70^\circ$
+
+**Cálculo del radio interior ($r$)**
+
+$$r = \frac{d}{2} = \frac{48 \text{ in}}{2} = 24 \text{ in}$$
+
+**2. Solución parte (a): Esfuerzo axial ($\sigma_a$) y circunferencial ($\sigma_h$)**
+
+Para un recipiente cilíndrico de pared delgada, los esfuerzos principales son:
+
+Esfuerzo axial ($\sigma_a$):
+
+$$\sigma_a = \frac{p \cdot r}{2t} = \frac{240 \text{ psi} \cdot 24 \text{ in}}{2 \cdot 0,5 \text{ in}} = \frac{5760}{1} \text{ psi} = 5760 \text{ psi}$$
+
+Esfuerzo circunferencial o de aro ($\sigma_h$):
+
+$$\sigma_h = \frac{p \cdot r}{t} = \frac{240 \text{ psi} \cdot 24 \text{ in}}{0,5 \text{ in}} = \frac{5760}{0,5} \text{ psi} = 11520 \text{ psi}$$
+
+**3. Solución parte (b): Esfuerzos en planos paralelos y perpendiculares a la soldadura**
+
+Definimos el eje $x$ como el eje longitudinal (donde actúa $\sigma_x = \sigma_a = 5760 \text{ psi}$) y el eje $y$ como el circunferencial (donde actúa $\sigma_y = \sigma_h = 11520 \text{ psi}$). 
+
+La soldadura forma un ángulo de $70^\circ$ con el eje $x$. El vector normal a la soldadura (que define el plano paralelo a la soldadura) forma un ángulo $\theta = 70^\circ - 90^\circ = -20^\circ$ respecto al eje longitudinal.
+
+Utilizamos las ecuaciones de transformación de esfuerzo plano:
+
+$$\sigma_{prom} = \frac{\sigma_x + \sigma_y}{2} = \frac{5760 + 11520}{2} = 8640 \text{ psi}$$
+
+$$\frac{\sigma_x - \sigma_y}{2} = \frac{5760 - 11520}{2} = -2880 \text{ psi}$$
+
+**Para el plano paralelo a la soldadura (normal en $\theta = -20^\circ$):**
+
+Esfuerzo normal ($\sigma_w$):
+
+$$\sigma_w = \sigma_{prom} + \left( \frac{\sigma_x - \sigma_y}{2} \right) \cos(2\theta)$$
+
+$$\sigma_w = 8640 - 2880 \cos(-40^\circ) = 8640 - 2880(0,7660)$$
+
+$$\sigma_w = 8640 - 2206,1 = 6433,9 \text{ psi}$$
+
+Esfuerzo cortante ($\tau_w$):
+
+$$\tau_w = -\left( \frac{\sigma_x - \sigma_y}{2} \right) \sin(2\theta)$$
+
+$$\tau_w = -(-2880) \sin(-40^\circ) = 2880(-0,6428) = -1851,3 \text{ psi}$$
+
+*(La magnitud del esfuerzo cortante en la soldadura es $1851,3 \text{ psi}$).*
+
+**Para el plano perpendicular a la soldadura (normal en $\theta = 70^\circ$):**
+
+Esfuerzo normal ($\sigma_p$):
+
+$$\sigma_p = 8640 - 2880 \cos(140^\circ) = 8640 - 2880(-0,7660)$$
+
+$$\sigma_p = 8640 + 2206,1 = 10846,1 \text{ psi}$$
+
+Esfuerzo cortante ($\tau_p$):
+
+$$\tau_p = -(-2880) \sin(140^\circ) = 2880(0,6428) = 1851,3 \text{ psi}$$
+
+**4. Solución parte (c): Esfuerzo cortante máximo en el plano**
+
+El esfuerzo cortante máximo en el plano de la pared se obtiene de la diferencia de los esfuerzos principales en la superficie:
+
+$$\tau_{max\_plano} = \frac{\sigma_h - \sigma_a}{2} = \frac{11520 - 5760}{2}$$
+
+$$\tau_{max\_plano} = \frac{5760}{2} = 2880 \text{ psi}$$
+
+**5. Solución parte (d): Esfuerzo cortante máximo absoluto**
+
+Para el esfuerzo cortante máximo absoluto, consideramos el tercer esfuerzo principal en la superficie exterior, que es $\sigma_3 \approx 0 \text{ psi}$. Los otros dos son $\sigma_1 = 11520 \text{ psi}$ y $\sigma_2 = 5760 \text{ psi}$.
+
+$$\tau_{max\_abs} = \frac{\sigma_1 - \sigma_3}{2} = \frac{11520 - 0}{2}$$
+
+$$\tau_{max\_abs} = 5760 \text{ psi}$$
+
+**Respuestas:**
+
+**(a)** Esfuerzo axial: **$5760 \text{ psi}$**; Esfuerzo circunferencial: **$11520 \text{ psi}$**.
+
+**(b)** Plano paralelo a la soldadura: $\sigma = \mathbf{6433,9 \text{ psi}}$, $\tau = \mathbf{1851,3 \text{ psi}}$. 
+Plano perpendicular a la soldadura: $\sigma = \mathbf{10846,1 \text{ psi}}$, $\tau = \mathbf{1851,3 \text{ psi}}$.
+
+**(c)** Esfuerzo cortante máximo en el plano: **$2880 \text{ psi}$**.
+
+**(d)** Esfuerzo cortante máximo absoluto: **$5760 \text{ psi}$**.
+
+</Solution>
+</Problem>
+
+
+
+<Problem title="Problema propuesto">
+Un tanque de propano de acero para una
+parrilla tiene un diámetro interior de 12 in. y un
+espesor de pared de 1/8 in. (dato faltante en el
+enunciado original). El tanque está presurizado
+a 200 psi. (a) Determine el esfuerzo axial σa y el
+esfuerzo circunferencial (o de aro) σh en el
+cuerpo cilíndrico del tanque. (b) Determine la
+fuerza de tracción por pulgada de longitud de la
+soldadura entre las secciones superior e
+inferior del tanque. (c) Determine el esfuerzo
+cortante máximo absoluto en la porción
+cilíndrica del tanque.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794060473/ewtmbmm6c9qeb4nzh6ub.svg" alt="Descripción de la imagen"  />
+
+<Solution>
+
+**1. Datos del problema**
+
+* Diámetro interior ($d$): $12 \text{ in.}$
+* Espesor de la pared ($t$): $1/8 \text{ in.} = 0,125 \text{ in.}$
+* Presión interna ($p$): $200 \text{ psi}$
+
+**Cálculo del radio interior ($r$)**
+
+$$r = \frac{d}{2} = \frac{12 \text{ in.}}{2} = 6 \text{ in.}$$
+
+**2. Solución parte (a): Esfuerzo axial ($\sigma_a$) y circunferencial ($\sigma_h$)**
+
+Para la porción cilíndrica de pared delgada, los esfuerzos principales se calculan así:
+
+Esfuerzo axial ($\sigma_a$):
+
+$$\sigma_a = \frac{p \cdot r}{2t}$$
+
+$$\sigma_a = \frac{200 \text{ psi} \cdot 6 \text{ in.}}{2 \cdot 0,125 \text{ in.}}$$
+
+$$\sigma_a = \frac{1200}{0,25} \text{ psi} = 4800 \text{ psi}$$
+
+Esfuerzo circunferencial o de aro ($\sigma_h$):
+
+$$\sigma_h = \frac{p \cdot r}{t}$$
+
+$$\sigma_h = \frac{200 \text{ psi} \cdot 6 \text{ in.}}{0,125 \text{ in.}}$$
+
+$$\sigma_h = \frac{1200}{0,125} \text{ psi} = 9600 \text{ psi}$$
+
+**3. Solución parte (b): Fuerza de tracción por pulgada de longitud de la soldadura**
+
+La soldadura une las secciones superior e inferior del tanque, por lo que es una costura circunferencial transversal[cite: 10]. La fuerza por unidad de longitud ($f$) que soporta esta soldadura está gobernada por el esfuerzo axial:
+
+$$f = \sigma_a \cdot t$$
+
+$$f = 4800 \text{ lb/in}^2 \cdot 0,125 \text{ in.}$$
+
+$$f = 600 \text{ lb/in.}$$
+
+*(Alternativamente, considerando el equilibrio global, la fuerza es $f = \frac{p \cdot r}{2} = \frac{200 \cdot 6}{2} = 600 \text{ lb/in.}$)*
+
+**4. Solución parte (c): Esfuerzo cortante máximo absoluto**
+
+En la superficie exterior del tanque cilíndrico, los esfuerzos principales son el circunferencial ($\sigma_1 = 9600 \text{ psi}$), el axial ($\sigma_2 = 4800 \text{ psi}$) y el radial ($\sigma_3 \approx 0 \text{ psi}$).
+
+El esfuerzo cortante máximo absoluto evalúa la diferencia máxima entre estos esfuerzos (en un plano rotado a $45^\circ$ respecto a la superficie):
+
+$$\tau_{max\_abs} = \frac{\sigma_1 - \sigma_3}{2}$$
+
+$$\tau_{max\_abs} = \frac{9600 \text{ psi} - 0 \text{ psi}}{2}$$
+
+$$\tau_{max\_abs} = 4800 \text{ psi}$$
+
+**Respuestas:**
+
+**(a)** El esfuerzo axial es **$4800 \text{ psi}$** y el esfuerzo circunferencial es **$9600 \text{ psi}$**.
+
+**(b)** La fuerza de tracción por pulgada de soldadura es **$600 \text{ lb/in.}$**
+
+**(c)** El esfuerzo cortante máximo absoluto es **$4800 \text{ psi}$**.
+
+</Solution>
+</Problem>
