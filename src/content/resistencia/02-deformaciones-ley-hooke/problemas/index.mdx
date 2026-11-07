@@ -1,0 +1,342 @@
+# Problemas
+
+<Problem image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794042314/lzowhf4qbonucm72vted.jpg" imageWidth="46%" imagePosition="right">
+La barra **BD** está hecha de acero ($E = 29 \times 10^6 \text{ psi}$) y se usa para reforzar el miembro **ABC**, que está sometido a compresión axial. La fuerza máxima que puede desarrollarse en el miembro **BD** es $0.02P$. Si el esfuerzo no debe exceder $18 \text{ ksi}$ y el cambio máximo en la longitud de **BD** no debe superar $0.001$ veces la longitud de **ABC**, determine el diámetro más pequeño de la barra que puede usarse para el miembro **BD**.
+
+<Solution>
+**Paso 1: Fuerza Axial en la Barra BD ($P_{BD}$)**
+
+A partir de la carga aplicada $P = 130 \text{ kips}$, calculamos la fuerza máxima en el miembro de refuerzo:
+
+$$
+P_{BD} = 0.02P = 0.02 \times 130 \text{ kips} = 2.6 \text{ kips}
+$$
+
+**Paso 2: Criterio de Esfuerzo Admisible**
+
+Con un esfuerzo límite de $18 \text{ ksi}$, determinamos el área mínima requerida ($A_\sigma$):
+$$
+A_\sigma \ge \frac{P_{BD}}{\sigma_{\text{allow}}} = \frac{2.6 \text{ kips}}{18 \text{ ksi}} = 0.1444 \text{ in}^2
+$$
+
+**Paso 3: Criterio de Deformación Máxima**
+
+La deformación permitida es $\delta_{\text{max}} = 0.001 L_{ABC}$ donde $L_{ABC} = 72 + 72 = 144 \text{ in}$:
+$$
+\delta_{\text{max}} = 0.001 \times 144 \text{ in.} = 0.144 \text{ in.}
+$$
+
+Calculamos el área mínima por desplazamiento ($A_\delta$) usando $L_{BD} = 54 \text{ in.}$ y $E = 29 \times 10^3 \text{ ksi}$:
+$$
+A_\delta \ge \frac{P_{BD} L_{BD}}{\delta_{\text{max}} E} = \frac{(2.6 \text{ kips})(54 \text{ in.})}{(0.144 \text{ in.})(29 \times 10^3 \text{ ksi})} = 0.0336 \text{ in}^2
+$$
+
+**Paso 4: Diámetro Mínimo de la Barra ($d_{\text{min}}$)**
+
+Seleccionamos el área crítica (el valor mayor entre los criterios evaluados):
+$$
+A_{\text{req}} = \max(A_\sigma, A_\delta) = 0.1444 \text{ in}^2
+$$
+
+Despejamos el diámetro de la sección circular ($A = \frac{\pi d^2}{4}$):
+$$
+d_{\text{min}} = \sqrt{\frac{4 A_{\text{req}}}{\pi}} = \sqrt{\frac{4 \times 0.1444 \text{ in}^2}{\pi}} = 0.429 \text{ in.}
+$$
+
+**Respuesta:** 
+
+El diámetro más pequeño que puede usarse para la barra **BD** es **$0.429 \text{ in.}$**
+</Solution>
+
+</Problem>
+
+<Problem  image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794044560/iueibzarad4kydrygdpw.jpg" imageAlt="Diagrama del problema" imageWidth="34%" imagePosition="right">
+
+El cable $BC$, de $4\text{ mm}$ de diámetro, está hecho de acero con $E = 200\text{ GPa}$. Sabiendo que el esfuerzo máximo en el cable no debe exceder $190\text{ MPa}$ y que su elongación no debe superar $6\text{ mm}$, determine la carga máxima $P$ que puede aplicarse como se muestra en la figura.
+
+<Solution>
+**1. Datos iniciales y parámetros del sistema**
+* Diámetro del cable $BC$: $d = 4 \text{ mm} = 0.004 \text{ m}$
+* Módulo de elasticidad del acero: $E = 200 \text{ GPa} = 200 \times 10^9 \text{ Pa}$
+* Esfuerzo máximo admisible: $\sigma_{\text{allow}} = 190 \text{ MPa} = 190 \times 10^6 \text{ Pa}$
+* Elongación máxima permitida: $\delta_{\text{allow}} = 6 \text{ mm} = 0.006 \text{ m}$
+
+
+
+**2. Geometría de la estructura**
+* Longitud del cable $BC$ ($L_{BC}$):
+  $$
+  L_{BC} = \sqrt{(4.0 \text{ m})^2 + (2.5 \text{ m})^2} = \sqrt{16 + 6.25} = \sqrt{22.25} \approx 4.71698 \text{ m}
+  $$
+
+* Área transversal del cable $BC$ ($A$):
+  $$
+  A = \frac{\pi d^2}{4} = \frac{\pi (0.004 \text{ m})^2}{4} = 4\pi \times 10^{-6} \text{ m}^2 \approx 1.2566 \times 10^{-5} \text{ m}^2
+  $$
+
+
+
+**3. Análisis de equilibrio estático**
+Considerando la barra rígida vertical con un apoyo de pasador en $A$ y el cable en $B$:
+* Aplicamos sumatoria de momentos respecto al punto $A$ ($\sum M_A = 0$):
+  $$
+  -P \cdot (3.5 \text{ m}) + (F_{BC} \cdot \sin\theta) \cdot (6.0 \text{ m}) = 0
+  $$
+
+  Donde el ángulo $\theta$ del cable con respecto a la horizontal cumple:
+  $$
+  \sin\theta = \frac{2.5}{L_{BC}} = \frac{2.5}{4.71698} \approx 0.53001
+  $$
+
+* Sustituyendo en la ecuación de momentos:
+  $$
+  3.5 P = 6.0 \cdot F_{BC} \cdot (0.53001)
+  $$
+  $$
+  3.5 P = 3.18006 F_{BC} \implies P = 0.90859 F_{BC}
+  $$
+
+
+**4. Análisis por condición de esfuerzo admisible**
+Limitando el esfuerzo en el cable al valor máximo permitido ($\sigma_{\text{allow}} = 190 \text{ MPa}$):
+$$
+F_{BC,\sigma} = \sigma_{\text{allow}} \cdot A = (190 \times 10^6 \text{ Pa})(1.2566 \times 10^{-5} \text{ m}^2) = 2.3875 \text{ kN}
+$$
+
+A partir de esta fuerza en el cable, calculamos la carga $P_1$:
+$$
+P_1 = 0.90859 \cdot F_{BC,\sigma} = 0.90859 \cdot (2387.5 \text{ N}) \approx 2169.3 \text{ N} = 2.169 \text{ kN}
+$$
+
+**5. Análisis por condición de deformación (elongación máxima)**
+Limitando la elongación del cable a $\delta_{\text{allow}} = 6 \text{ mm}$:
+$$
+\delta = \frac{F_{BC} \cdot L_{BC}}{E \cdot A} \le \delta_{\text{allow}}
+$$
+Despejando la fuerza $F_{BC,\delta}$:
+$$
+F_{BC,\delta} = \frac{\delta_{\text{allow}} \cdot E \cdot A}{L_{BC}}
+$$
+$$
+F_{BC,\delta} = \frac{(0.006 \text{ m})(200 \times 10^9 \text{ Pa})(1.2566 \times 10^{-5} \text{ m}^2)}{4.71698 \text{ m}} \approx 3198.8 \text{ N} = 3.199 \text{ kN}
+$$
+
+Calculamos la carga correspondiente $P_2$:
+$$
+P_2 = 0.90859 \cdot F_{BC,\delta} = 0.90859 \cdot (3198.8 \text{ N}) \approx 2906.4 \text{ N} = 2.906 \text{ kN}
+$$
+**6. Conclusión y Carga Máxima**
+Comparamos ambos valores de carga obtenidos para determinar el límite crítico del sistema:
+* Por esfuerzo: $P_1 = 2.169 \text{ kN}$
+* Por elongación: $P_2 = 2.906 \text{ kN}$
+
+La carga máxima $P$ que puede aplicarse sin superar los límites establecidos es la menor de ambas:
+$$
+P_{\text{máx}} = 2.169 \text{ kN}
+$$
+</Solution>
+
+</Problem>
+<Problem image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794044698/ngsbrnyl5ajbcr3hdnvc.jpg" imageAlt="Diagrama del problema" imageWidth="45%" imagePosition="right">
+
+Una carga axial única de $P = 15\text{ kips}$ se aplica en el extremo $C$ de la barra de acero $ABC$. Sabiendo que $E = 30 \times 10^6\text{ psi}$, determine el diámetro $d$ de la porción $BC$ para que la deflexión en el punto $C$ sea de $0.05\text{ in}$.
+
+<Solution>
+**1. Datos iniciales y parámetros del sistema**
+* Carga axial aplicada en $C$: $P = 15 \text{ kips} = 15,000 \text{ lb}$
+* Módulo de elasticidad del acero: $E = 30 \times 10^6 \text{ psi}$
+* Deflexión total deseada en el punto $C$: $\delta_C = 0.05 \text{ in}$
+* Longitud de la porción $AB$: $L_{AB} = 4 \text{ ft} = 4 \times 12 \text{ in} = 48 \text{ in}$
+* Diámetro de la porción $AB$: $d_{AB} = 1.25 \text{ in}$
+* Longitud de la porción $BC$: $L_{BC} = 3 \text{ ft} = 3 \times 12 \text{ in} = 36 \text{ in}$
+
+**2. Análisis de las fuerzas internas**
+Ambas porciones de la barra soportan la misma carga axial de tensión debida a $P$:
+* $N_{AB} = P = 15,000 \text{ lb}$
+* $N_{BC} = P = 15,000 \text{ lb}$
+
+**3. Área y elongación de la porción $AB$**
+* Área transversal de la porción $AB$ ($A_{AB}$):
+  $$
+  A_{AB} = \frac{\pi d_{AB}^2}{4} = \frac{\pi (1.25 \text{ in})^2}{4} \approx 1.2272 \text{ in}^2
+  $$
+
+* Deformación (elongación) en la porción $AB$ ($\delta_{AB}$):
+  $$
+  \delta_{AB} = \frac{N_{AB} L_{AB}}{E A_{AB}} = \frac{(15,000 \text{ lb})(48 \text{ in})}{(30 \times 10^6 \text{ psi})(1.2272 \text{ in}^2)} \approx 0.01956 \text{ in}
+  $$
+
+**4. Requerimiento para la porción $BC$**
+La deflexión total en el extremo $C$ es la suma de las elongaciones de ambos tramos:
+$$
+\delta_C = \delta_{AB} + \delta_{BC}
+$$
+
+Despejamos la elongación permitida en la porción $BC$ ($\delta_{BC}$):
+$$
+\delta_{BC} = \delta_C - \delta_{AB} = 0.05 \text{ in} - 0.01956 \text{ in} = 0.03044 \text{ in}
+$$
+
+**5. Cálculo del área y diámetro de la porción $BC$**
+A partir de la fórmula de deformación axial, despejamos el área requerida $A_{BC}$:
+$$
+\delta_{BC} = \frac{N_{BC} L_{BC}}{E A_{BC}} \implies A_{BC} = \frac{N_{BC} L_{BC}}{E \delta_{BC}}
+$$
+
+Sustituyendo los valores:
+$$
+A_{BC} = \frac{(15,000 \text{ lb})(36 \text{ in})}{(30 \times 10^6 \text{ psi})(0.03044 \text{ in})} = \frac{540,000}{913,200} \approx 0.5913 \text{ in}^2
+$$
+
+A partir del área, calculamos el diámetro $d$ de la porción $BC$:
+$$
+A_{BC} = \frac{\pi d^2}{4} \implies d = \sqrt{\frac{4 A_{BC}}{\pi}} = \sqrt{\frac{4 (0.5913 \text{ in}^2)}{\pi}} \approx 0.868 \text{ in}
+$$
+**6. Conclusión**
+El diámetro requerido de la porción $BC$ para que la deflexión en el punto $C$ sea exactamente $0.05 \text{ in}$ es:
+$$
+d \approx 0.868 \text{ in}
+$$
+</Solution>
+
+</Problem>
+
+<Problem image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794045123/km6gnfcb07eldzffqt31.jpg" imageAlt="Diagrama del problema" imageWidth="150%" imagePosition="right">
+
+La barra $ABCD$ está hecha de aluminio con $E = 70\text{ GPa}$. Para la carga mostrada, determine la deflexión en
+- (a) el punto $B$
+- (b) el punto $D$.
+
+<Solution>
+**1. Datos iniciales y parámetros del sistema**
+* Módulo de elasticidad del aluminio: $E = 70 \text{ GPa} = 70 \times 10^9 \text{ Pa}$
+* Segmento $AB$: Longitud $L_{AB} = 1.75 \text{ m}$, Área $A_1 = 800 \text{ mm}^2 = 800 \times 10^{-6} \text{ m}^2$
+* Segmento $BC$: Longitud $L_{BC} = 1.25 \text{ m}$, Área $A_2 = 800 \text{ mm}^2 = 800 \times 10^{-6} \text{ m}^2$
+* Segmento $CD$: Longitud $L_{CD} = 1.5 \text{ m}$, Área $A_3 = 500 \text{ mm}^2 = 500 \times 10^{-6} \text{ m}^2$
+
+**2. Análisis de fuerzas internas por secciones**
+Realizando cortes a lo largo de la barra desde el extremo libre hacia el empotramiento en $A$:
+* **Tramo $CD$:** Soporta la carga aplicada en el extremo $D$ ($50 \text{ kN}$).
+  $$
+  N_{CD} = 50 \text{ kN} = 50,000 \text{ N} \quad (\text{Tensión})
+  $$
+
+* **Tramo $BC$:** Soporta las cargas acumuladas por debajo de él ($50 \text{ kN} + 75 \text{ kN}$).
+  $$
+  N_{BC} = 50 \text{ kN} + 75 \text{ kN} = 125 \text{ kN} = 125,000 \text{ N} \quad (\text{Tensión})
+  $$
+
+* **Tramo $AB$:** Soporta la fuerza neta considerando la carga en $B$ ($100 \text{ kN}$ hacia arriba y las demás hacia abajo, o según el balance estático total del tramo superior). Evaluando el equilibrio del nudo o sección:
+  $$
+  N_{AB} = 125 \text{ kN} - 100 \text{ kN} = 25 \text{ kN} = 25,000 \text{ N} \quad (\text{Tensión})
+  $$
+
+**3. Cálculo de la deflexión en el punto B ($\delta_B$)**
+La deflexión en el punto $B$ corresponde únicamente a la elongación del tramo $AB$:
+$$
+\delta_B = \delta_{AB} = \frac{N_{AB} \cdot L_{AB}}{E \cdot A_1}
+$$
+
+Sustituyendo los valores:
+$$
+\delta_B = \frac{(25,000 \text{ N})(1.75 \text{ m})}{(70 \times 10^9 \text{ Pa})(800 \times 10^{-6} \text{ m}^2)} = \frac{43,750}{56,000,000} = 0.781 \text{ mm}
+$$
+
+**4. Cálculo de las deformaciones en los tramos $BC$ y $CD$**
+* Deformación en el tramo $BC$ ($\delta_{BC}$):
+  $$
+  \delta_{BC} = \frac{N_{BC} \cdot L_{BC}}{E \cdot A_2} = \frac{(125,000 \text{ N})(1.25 \text{ m})}{(70 \times 10^9 \text{ Pa})(800 \times 10^{-6} \text{ m}^2)} = 2.790 \text{ mm}
+  $$
+
+* Deformación en el tramo $CD$ ($\delta_{CD}$):
+  $$
+  \delta_{CD} = \frac{N_{CD} \cdot L_{CD}}{E \cdot A_3} = \frac{(50,000 \text{ N})(1.5 \text{ m})}{(70 \times 10^9 \text{ Pa})(500 \times 10^{-6} \text{ m}^2)} = 2.143 \text{ mm}
+  $$
+
+**5. Cálculo de la deflexión en el punto D ($\delta_D$)**
+La deflexión total en el extremo $D$ es la suma algebraica de las elongaciones de los tres tramos:
+$$
+\delta_D = \delta_{AB} + \delta_{BC} + \delta_{CD}
+$$
+$$
+\delta_D = 0.781 \text{ mm} + 2.790 \text{ mm} + 2.143 \text{ mm} = 5.714 \text{ mm} = 0.005714 \text{ m}
+$$
+
+**6. Conclusión y Resultados Finales**
+* **(a) La deflexión en el punto $B$ es:** 
+  $$
+  \delta_B = 0.781 \text{ mm} \downarrow
+  $$
+* **(b) La deflexión en el punto $D$ es:** 
+  $$
+  \delta_D = 5.714 \text{ mm} \downarrow
+  $$
+</Solution>
+</Problem>
+
+<Problem image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794045697/ehgi9ahjochmmygswkcm.jpg" imageAlt="Diagrama del problema" imageWidth="55%" imagePosition="right">
+
+La probeta mostrada ha sido cortada de una lámina de vinilo de $5\text{ mm}$ de espesor ($E = 3.10\text{ GPa}$) y está sometida a una carga de tracción de $1.5\text{ kN}$. Determine:
+(a) la deformación total de la probeta
+(b) la deformación de su porción central $BC$.
+
+<Solution>
+**1. Datos iniciales y parámetros del sistema**
+* Carga de tracción axial: $P = 1.5 \text{ kN} = 1,500 \text{ N}$
+* Espesor de la lámina: $t = 5 \text{ mm} = 0.005 \text{ m}$
+* Módulo de elasticidad del vinilo: $E = 3.10 \text{ GPa} = 3.10 \times 10^9 \text{ Pa}$
+* Geometría de las porciones:
+  * Tramo $AB$ (ancho $w_{AB} = 25 \text{ mm}$, longitud $L_{AB} = 40 \text{ mm}$)
+  * Tramo $BC$ (ancho $w_{BC} = 10 \text{ mm}$, longitud $L_{BC} = 50 \text{ mm}$)
+  * Tramo $CD$ (ancho $w_{CD} = 25 \text{ mm}$, longitud $L_{CD} = 40 \text{ mm}$)
+
+**2. Cálculo de las áreas transversales**
+El área transversal de cada sección se calcula multiplicando el ancho por el espesor ($A = w \cdot t$):
+* **Áreas de los extremos ($AB$ y $CD$):**
+  $$
+  A_{AB} = A_{CD} = (25 \text{ mm})(5 \text{ mm}) = 125 \text{ mm}^2 = 125 \times 10^{-6} \text{ m}^2
+  $$
+
+* **Área de la porción central ($BC$):**
+  $$
+  A_{BC} = (10 \text{ mm})(5 \text{ mm}) = 50 \text{ mm}^2 = 50 \times 10^{-6} \text{ m}^2
+  $$
+
+**3. Análisis de fuerzas internas**
+Debido a la simetría y al equilibrio estático, cada porción de la probeta se encuentra sometida a la misma fuerza de tracción:
+$$
+N_{AB} = N_{BC} = N_{CD} = P = 1,500 \text{ N}
+$$
+**4. Cálculo de la deformación en la porción central BC ($\delta_{BC}$)**
+Aplicando la fórmula de elongación axial $\delta = \frac{N \cdot L}{E \cdot A}$ para el tramo central:
+$$
+\delta_{BC} = \frac{(1,500 \text{ N})(0.050 \text{ m})}{(3.10 \times 10^9 \text{ Pa})(50 \times 10^{-6} \text{ m}^2)} = \frac{75}{155,000}  \approx 0.484 \text{ mm}
+$$
+**5. Cálculo de las deformaciones en los tramos extremos ($AB$ y $CD$)**
+Dado que los tramos $AB$ y $CD$ tienen la misma longitud, material y sección transversal, su deformación es idéntica ($\delta_{AB} = \delta_{CD}$):
+$$
+\delta_{AB} = \frac{(1,500 \text{ N})(0.040 \text{ m})}{(3.10 \times 10^9 \text{ Pa})(125 \times 10^{-6} \text{ m}^2)} = \frac{60}{387,500} \approx 0.155 \text{ mm}
+$$
+**6. Cálculo de la deformación total de la probeta ($\delta_{\text{total}}$)**
+La deformación total es la suma de las elongaciones de los tres tramos independientes:
+$$
+\delta_{\text{total}} = \delta_{AB} + \delta_{BC} + \delta_{CD}
+$$
+$$
+\delta_{\text{total}} = 0.155 \text{ mm} + 0.484 \text{ mm} + 0.155 \text{ mm} = 0.794 \text{ mm} = 0.000794 \text{ m}
+$$
+
+**7. Conclusión y Resultados Finales**
+* **(a) La deformación total de la probeta es:** 
+  $$
+  \delta_{\text{total}} = 0.794 \text{ mm}
+  $$
+* **(b) La deformación de su porción central $BC$ es:** 
+  $$
+  \delta_{BC} = 0.484 \text{ mm}
+  $$
+</Solution>
+</Problem>
+
+
+
