@@ -1,0 +1,179 @@
+# Deformación Longitudinal en Carga Axial (Sistemas Isostáticos)
+
+En los **sistemas isostáticos**, las fuerzas internas en cualquier sección de la estructura se pueden determinar únicamente mediante las ecuaciones de la estática ($\sum F = 0$, $\sum M = 0$). Una vez obtenidas estas cargas internas, se procede a calcular las deformaciones longitudinales producidas por cargas axiales.
+
+---
+
+## 3.1 Fórmula Fundamental
+
+**Deducción de la Deformación en Barras Prismáticas**
+
+Considérese una barra prismática de longitud $L$, área de sección transversal constante $A$, y módulo de elasticidad $E$, sometida a una carga axial $P$.
+
+1. **Esfuerzo Normal ($\sigma$):**
+   $$
+   \sigma = \frac{P}{A}
+   $$
+
+2. **Deformación Unitaria Axial ($\varepsilon$):**
+   $$
+   \varepsilon = \frac{\delta}{L}
+   $$
+   *(donde $\delta$ representa el alargamiento o acortamiento total).*
+
+3. **Ley de Hooke Unidimensional:**
+   $$
+   \sigma = E \cdot \varepsilon
+   $$
+
+4. **Sustitución y Despeje:**
+   Sustituyendo $\sigma$ y $\varepsilon$ en la Ley de Hooke:
+   $$
+   \frac{P}{A} = E \cdot \left(\frac{\delta}{L}\right)
+   $$
+
+   Despejando la deformación total $\delta$:
+   $$
+   \delta = \frac{P \cdot L}{A \cdot E}
+   $$
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793930254/ijdh5u8sfzmadmbgc9e2.svg" alt="Descripción de la imagen" caption="Figura 1. Deformacion en barra prismatica carga P" />
+
+
+**Rigidez y Flexibilidad Axial**
+
+* **Rigidez Axial ($k$):** Fuerza requerida para producir una deformación unitaria.
+  $$
+  k = \frac{A \cdot E}{L} \quad [\text{N/m}]
+  $$
+* **Flexibilidad Axial ($f$):** Deformación producida por una fuerza unitaria.
+  $$
+  f = \frac{1}{k} = \frac{L}{A \cdot E} \quad [\text{m/N}]
+  $$
+
+---
+
+## 3.2 Criterio de Signos
+
+Para mantener la coherencia en el análisis estructural isostático, se establece la siguiente convención:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793929475/bemejkjkyel2qkrbpmjq.svg" alt="Descripción de la imagen" caption="Figura 2. Criterio de signos, Traccion y Compresion"/>
+
+| Tipo de Solicitación | Fuerza Interna ($P$) | Esfuerzo ($\sigma$) | Deformación ($\delta$) | Cambio Físico |
+| :--- | :---: | :---: | :---: | :--- |
+| **Tracción** | $P > 0$ | $\sigma > 0$ | $\delta > 0$ | Incremento de longitud ($\Delta L > 0$) |
+| **Compresión** | $P < 0$ | $\sigma < 0$ | $\delta < 0$ | Disminución de longitud ($\Delta L < 0$) |
+
+---
+
+## 3.3 Barras con Secciones Escalonadas o Compuestas (Sistemas en Serie)
+
+Cuando la barra presenta variaciones discontinuas en su geometría (área $A_i$), material ($E_i$), o en la fuerza axial interna ($P_i$), la deformación total del sistema se calcula mediante la **suma algebraica de las deformaciones por tramo**:
+
+$$
+\delta_{\text{total}} = \sum_{i=1}^{n} \delta_i = \sum_{i=1}^{n} \frac{P_i \cdot L_i}{A_i \cdot E_i}
+$$
+
+**Metodología de Análisis Isostático Paso a Paso**
+
+1. **Determinación de Reacciones:** Aplicar $\sum F_x = 0$ para encontrar las reacciones en los apoyos.
+2. **Método de las Secciones:** Realizar cortes transversales en cada tramo $i$ para obtener la fuerza interna $P_i$ mediante el equilibrio del segmento.
+3. **Cálculo de Deformaciones Parciales:** Aplicar $\delta_i = \frac{P_i L_i}{A_i E_i}$ considerando el signo adecuado para $P_i$.
+4. **Superposición:** Sumar algebraicamente todas las deformaciones parciales para obtener la deformación global.
+
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793930817/eq1vwryd6bdej51ot9a1.svg" alt="Descripción de la imagen" caption="Figura 3. Deformacion en tramos escalonados (Serie)" />
+
+
+
+---
+
+## 3.4 Secciones Transversales Variables Continuas
+
+En barras donde el área transversal $A(x)$, el módulo de elasticidad $E(x)$, o la carga interna $P(x)$ varían continuamente a lo largo del eje longitudinal $x$, se toma un elemento diferencial $dx$ y se integra a lo largo de la barra:
+
+$$
+d\delta = \frac{P(x) \cdot dx}{A(x) \cdot E(x)} \implies \delta = \int_{0}^{L} \frac{P(x)}{A(x) \cdot E(x)} \, dx
+$$
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793931068/euvl3am8smwj3vs4mvaj.svg" alt="Descripción de la imagen" caption="Figura 4. Deformacion en seccion variable continua" />
+
+## Caso Particular: Perfil Troncocónico Circular
+
+Consideremos una barra cónica de longitud $L$ con diámetro inicial $d_1$ en $x=0$ y diámetro final $d_2$ en $x=L$, sometida a una carga axial $P$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793931437/lttybi5esvzj7qdignng.svg" alt="Descripción de la imagen" caption="Figura 5. Deformacion en tronco de cono circular" />
+
+
+1. **Diámetro variable en función de $x$:**
+   $$
+   d(x) = d_1 + \left(\frac{d_2 - d_1}{L}\right)x
+   $$
+
+2. **Área transversal $A(x)$:**
+   $$
+   A(x) = \frac{\pi}{4}[d(x)]^2 = \frac{\pi}{4}\left[d_1 + \left(\frac{d_2 - d_1}{L}\right)x\right]^2
+   $$
+
+3. **Planteamiento e Integración:**
+   $$
+   \delta = \int_{0}^{L} \frac{P}{\frac{\pi}{4}\left[d_1 + \left(\frac{d_2 - d_1}{L}\right)x\right]^2 E} \, dx
+   $$
+
+   Resolviendo la integral por cambio de variable:
+   $$
+   \delta = \frac{4 \cdot P \cdot L}{\pi \cdot E \cdot d_1 \cdot d_2}
+   $$
+
+---
+
+## 3.5 Deformación por Peso Propio
+
+En barras verticales suspendidas de gran longitud, el peso propio actúa como una carga distribuidas axialmente que produce una fuerza interna variable $P(x)$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793931613/mwpyrflctjfjcurtoyy2.svg" alt="Descripción de la imagen" caption="Figura 6. Deformacion de Peso propio (Barra Prismatica)" />
+
+
+**Análisis de la Barra Suspendedida**
+
+Sea:
+* $\gamma = \rho \cdot g$ (peso específico del material)
+* $A$ (área constante)
+* $L$ (longitud)
+* $W = \gamma \cdot A \cdot L$ (peso total de la barra)
+
+1. **Fuerza interna a una distancia $x$ medida desde el extremo libre inferior ($x=0$):**
+   $$
+   P(x) = \gamma \cdot A \cdot x
+   $$
+
+2. **Integración de la Deformación:**
+   $$
+   \delta = \int_{0}^{L} \frac{P(x)}{A \cdot E} \, dx = \int_{0}^{L} \frac{\gamma \cdot A \cdot x}{A \cdot E} \, dx = \frac{\gamma}{E} \int_{0}^{L} x \, dx
+   $$
+
+   $$
+   \delta = \frac{\gamma}{E} \left[ \frac{x^2}{2} \right]_0^L = \frac{\gamma \cdot L^2}{2 E}
+   $$
+
+3. **En términos del peso total $W$:**
+   Como $\gamma = \frac{W}{A \cdot L}$:
+   $$
+   \delta = \frac{\left(\frac{W}{A \cdot L}\right) L^2}{2 E} = \frac{W \cdot L}{2 A \cdot E}
+   $$
+
+---
+
+## Resumen de Expresiones Matematicas
+
+| Caso de Carga y Geometría | Expresión de Deformación ($\delta$) |
+| :--- | :---: |
+| **Barra Prismática Carga P** | $\delta = \dfrac{P \cdot L}{A \cdot E}$ |
+| **Tramos Escalonados (Serie)** | $\delta = \sum_{i=1}^n \dfrac{P_i \cdot L_i}{A_i \cdot E_i}$ |
+| **Sección Variable Continua** | $\delta = \int_0^L \dfrac{P(x)}{A(x) E(x)} \, dx$ |
+| **Tronco de Cono Circular** | $\delta = \dfrac{4 P L}{\pi E d_1 d_2}$ |
+| **Peso Propio (Barra Prismática)** | $\delta = \dfrac{\gamma L^2}{2 E} = \dfrac{W L}{2 A E}$ |
