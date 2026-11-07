@@ -1,0 +1,150 @@
+# Efecto Poisson y Estado Multiaxial
+
+Cuando un cuerpo elástico se somete a una carga de tensión o compresión axial, no solo se deforma en la dirección paralela al esfuerzo aplicado, sino que también experimenta deformaciones laterales en las direcciones ortogonales a la carga. El estudio de este fenómeno y su extensión a estados tridimensionales de esfuerzo es indispensable para comprender el comportamiento mecánico real de los materiales.
+
+## 4.1 Coeficiente de Poisson ($\nu$)
+
+**Definición y Relación Matemática**
+
+El **Efecto Poisson** es el fenómeno por el cual un material sometido a una fuerza axial de tracción experimenta una contracción en su sección transversal (o una expansión lateral si se somete a compresión axial).
+
+El **Coeficiente de Poisson** ($\nu$, letra griega *nu*) se define cuantitativamente como el valor negativo de la razón entre la deformación unitaria lateral (transversal) y la deformación unitaria axial (longitudinal):
+
+$$
+\nu = -\frac{\varepsilon_{\text{trans}}}{\varepsilon_{\text{long}}}
+$$
+
+Donde:
+
+* $\varepsilon_{\text{long}}$: Deformación unitaria en la dirección de la carga aplicada.
+
+* $\varepsilon_{\text{trans}}$: Deformación unitaria en cualquier dirección perpendicular a la carga.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794043301/ptauyexaq1lpewqmjxow.svg" alt="Descripción de la imagen" caption="Figura 1. Coeficiente de Poisson" />
+
+
+### Justificación del Signo Negativo
+
+El signo menos en la fórmula es una convención para garantizar que $\nu$ sea una cantidad **positiva** en la inmensa mayoría de los materiales de ingeniería:
+
+* En **tracción**: $\varepsilon_{\text{long}} > 0$ (alargamiento) y $\varepsilon_{\text{trans}} < 0$ (reducción de sección) $\implies \nu > 0$.
+
+* En **compresión**: $\varepsilon_{\text{long}} < 0$ (acortamiento) y $\varepsilon_{\text{trans}} > 0$ (ensanchamiento) $\implies \nu > 0$.
+
+### Valores Típicos y Límites Teóricos
+
+Para un material continuo, isótropo y elástico, los límites teóricos del coeficiente de Poisson se encuentran definidos por la termodinámica en el rango:
+
+$$
+-1 \le \nu \le 0.5
+$$
+
+| Material | Coeficiente de Poisson ($\nu$) | Comportamiento Típico | 
+| ----- | ----- | ----- | 
+| **Goma / Caucho** | $\approx 0.49 - 0.50$ | Casi incompresible ($\Delta V \approx 0$). | 
+| **Aluminio** | $0.33$ | Deformación lateral moderada-alta. | 
+| **Acero Estructural** | $0.27 - 0.30$ | Valor típico de diseño en ingeniería civil/mecánica. | 
+| **Concreto (Hormigón)** | $0.15 - 0.20$ | Baja deformabilidad transversal. | 
+| **Corcho** | $\approx 0.00$ | Prácticamente nula deformación transversal al comprimirse. | 
+| **Materiales Auxéticos** | $< 0$ (negativo) | Estructuras especiales que se ensanchan al tensionarse. | 
+
+## Relación con los Esfuerzos Cortantes
+
+Para materiales isótropos, los esfuerzos cortantes ($\tau_{xy}, \tau_{yz}, \tau_{zx}$) causan únicamente deformaciones por distorsión angular ($\gamma_{xy}, \gamma_{yz}, \gamma_{zx}$), acopladas mediante el **Módulo de Rigidez al Corte** ($G$):
+
+$$
+\gamma_{xy} = \frac{\tau_{xy}}{G}, \quad \gamma_{yz} = \frac{\tau_{yz}}{G}, \quad \gamma_{zx} = \frac{\tau_{zx}}{G}
+$$
+
+Donde las constantes elásticas del material ($E, G, \nu$) se encuentran interrelacionadas según la expresión:
+
+$$
+G = \frac{E}{2(1 + \nu)}
+$$
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794043332/r8jsqy8zs6fomawahsko.svg" alt="Descripción de la imagen" caption="Figura 2. Relacion con los esfuerzos cortantes" />
+
+
+## 4.3 Cambio Volumétrico (Dilatación Cúbica)
+
+Cuando un cuerpo sólido experimenta deformaciones multiaxiales, las dimensiones de su volumen cambian.
+
+**Deducción de la Dilatación Cúbica**
+
+Consideremos un elemento cúbico de dimensiones iniciales $dx, dy, dz$, cuyo volumen original es:
+
+$$
+V_0 = dx \cdot dy \cdot dz
+$$
+
+Tras la deformación, las nuevas dimensiones pasan a ser $dx(1+\varepsilon_x)$, $dy(1+\varepsilon_y)$, y $dz(1+\varepsilon_z)$. El nuevo volumen $V$ se expresa como:
+
+$$
+V = dx(1+\varepsilon_x) \cdot dy(1+\varepsilon_y) \cdot dz(1+\varepsilon_z)
+$$
+
+Desarrollando el producto y despreciando los términos de orden superior por ser infinitamente pequeños ($\varepsilon_i \cdot \varepsilon_j \approx 0$):
+
+$$
+V \approx dx \cdot dy \cdot dz (1 + \varepsilon_x + \varepsilon_y + \varepsilon_z) = V_0 (1 + \varepsilon_x + \varepsilon_y + \varepsilon_z)
+$$
+
+El cambio de volumen absoluto $\Delta V$ es:
+
+$$
+\Delta V = V - V_0 = V_0 (\varepsilon_x + \varepsilon_y + \varepsilon_z)
+$$
+
+Se define la **Dilatación Cúbica** o deformación volumétrica unitaria como el cambio de volumen por unidad de volumen original:
+
+$$
+e = \frac{\Delta V}{V_0} = \varepsilon_x + \varepsilon_y + \varepsilon_z
+$$
+
+### Dilatación Cúbica en Función de los Esfuerzos Normales
+
+Sustituyendo la Ley de Hooke Generalizada en la expresión de $e$:
+
+$$
+e = \frac{1}{E} \left[ (\sigma_x + \sigma_y + \sigma_z) - 2\nu(\sigma_x + \sigma_y + \sigma_z) \right]
+$$
+
+$$
+e = \frac{1 - 2\nu}{E} (\sigma_x + \sigma_y + \sigma_z)
+$$
+
+### Módulo de Compresibilidad Volumétrica ($K$)
+
+En el caso particular de una **presión hidrostática uniforme** ($p$), donde $\sigma_x = \sigma_y = \sigma_z = -p$:
+
+$$
+e = \frac{1 - 2\nu}{E} (-3p) = -\frac{3(1 - 2\nu)}{E} p
+$$
+
+Se define el **Módulo de Elasticidad Volumétrico** ($K$ o *Bulk Modulus*) como la razón entre la presión aplicada y la reducción volumétrica:
+
+$$
+K = \frac{E}{3(1 - 2\nu)}
+$$
+
+> **Observación Física Relevante:**
+>
+> * Si $\nu = 0.5$, se cumple que $K \to \infty$ y $e = 0$. Esto implica que el material es **completamente incompresible** (su volumen no cambia independientemente del estado de esfuerzos aplicado, como sucede idealmente en el caucho).
+>
+> * Para que $K > 0$ (estabilidad mecánica), se deduce la condición $\nu < 0.5$.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794043361/q0rc71kl2fdq0wuh8003.svg" alt="Descripción de la imagen" caption="Figura 3. Cambio volumetrico (Dilatacion cubica)" />
+
+
+## Resumen de Formulario
+
+| Magnitud | Expresión Matemática | 
+| ----- | ----- | 
+| **Coeficiente de Poisson** | $\nu = -\dfrac{\varepsilon_{\text{trans}}}{\varepsilon_{\text{long}}}$ | 
+| **Deformación Multiaxial (**$x$**)** | $\varepsilon_x = \dfrac{1}{E} [\sigma_x - \nu(\sigma_y + \sigma_z)]$ | 
+| **Relación** $E, G, \nu$ | $G = \dfrac{E}{2(1 + \nu)}$ | 
+| **Dilatación Cúbica Unit.** | $e = \dfrac{\Delta V}{V_0} = \varepsilon_x + \varepsilon_y + \varepsilon_z = \dfrac{1 - 2\nu}{E}(\sigma_x + \sigma_y + \sigma_z)$ | 
+| **Módulo Volumétrico (**$K$**)** | $K = \dfrac{E}{3(1 - 2\nu)}$ | 
