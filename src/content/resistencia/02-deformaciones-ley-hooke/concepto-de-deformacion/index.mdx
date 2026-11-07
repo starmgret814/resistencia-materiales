@@ -1,0 +1,108 @@
+# Ley de Hooke Unidimensional
+
+La **Ley de Hooke Unidimensional** constituye el pilar fundamental de la mecánica de materiales y la teoría de la elasticidad lineal. Establece la base cuantitativa para analizar el comportamiento elástico de sólidos sometidos a esfuerzos axiales (cargas de tensión o compresión).
+
+---
+
+## 2.1 Enunciado de la Ley de Hooke
+
+**Concepto y Formulación Matemática**
+
+La Ley de Hooke establece que, dentro del límite de proporcionalidad de un material, el **esfuerzo normal** ($\sigma$) es directamente proporcional a la **deformación unitaria axial** ($\varepsilon$).
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793923109/pjpqwzue93f9igznufco.svg" alt="Descripción de la imagen" caption="Figura 1. Diagrana Esfuerzo-Deformacion (Ley de Hooke)" />
+
+Donde:
+- **$\sigma$ (Esfuerzo normal / Normal Stress):** Representa la intensidad de las fuerzas internas distribuidas por unidad de área. Se mide en pascales ($\text{Pa} = \text{N/m}^2$) o megapascales ($\text{MPa}$).
+  $$\sigma = \frac{P}{A_0}$$
+  *(siendo $P$ la carga axial aplicada y $A_0$ el área transversal inicial).*
+
+- **$\varepsilon$ (Deformación unitaria / Axial Strain):** Magnitud adimensional que cuantifica el cambio de longitud por unidad de longitud original.
+  $$\varepsilon = \frac{\Delta L}{L_0} = \frac{L - L_0}{L_0}$$
+  *(siendo $L_0$ la longitud inicial y $\Delta L$ la elongación o acortamiento).*
+
+- **$E$ (Módulo de Elasticidad o Módulo de Young):** Constante de proporcionalidad característica del material, expresada en $\text{Pa}$, $\text{GPa}$ o $\text{psi}$.
+
+---
+
+**Relación con la Forma Resorte ($F = k \cdot \Delta L$)**
+
+En la física elemental, la Ley de Hooke suele expresarse en términos de la fuerza $F$ aplicada a un resorte con constante de rigidez $k$:
+
+$$
+F = k \cdot \Delta L
+$$
+
+Podemos derivar la forma de la mecánica de continuos a partir de esta relación elemental:
+
+1. Sustituyendo el esfuerzo $\sigma = \frac{F}{A_0}$ y la deformación $\varepsilon = \frac{\Delta L}{L_0}$ en $\sigma = E \cdot \varepsilon$:
+
+$$
+\frac{F}{A_0} = E \cdot \left(\frac{\Delta L}{L_0}\right)
+$$
+
+2. Despejando la fuerza $F$:
+
+$$
+F = \left( \frac{E \cdot A_0}{L_0} \right) \Delta L
+$$
+
+3. Al comparar con $F = k \cdot \Delta L$, se obtiene la **rigidez axial equivalente ($k$)** de un elemento prismático:
+
+$$
+k = \frac{E \cdot A_0}{L_0}
+$$
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793923597/wf9kyfdoa9sbqbdqy1rt.svg" alt="Descripción de la imagen" caption="Figura 2. Relación con la Forma Resorte (F=K.ΔL)" />
+
+**Condición de Validez y Límites de Aplicación**
+
+La relación lineal $\sigma = E \cdot \varepsilon$ no aplica indefinidamente. Es válida únicamente bajo las siguientes premisas:
+
+1. **Límite de Proporcionalidad ($\sigma_{lp}$):** Valor de esfuerzo máximo hasta el cual la relación entre esfuerzo y deformación sigue rigurosamente una línea recta.
+2. **Material Homogéneo e Isótropo:** Propiedades mecánicas continuas e independientes de la dirección de la carga.
+3. **Peligro de Fluencia o Plasticidad:** Si el esfuerzo excede el *límite elástico* ($\sigma_y$), la deformación deja de ser completamente reversible y el material experimenta deformación plástica (permanente).
+
+
+
+## 2.2 Módulo de Elasticidad ($E$ o Módulo de Young)
+
+**Significado Físico: Rigidez del Material**
+
+El **Módulo de Young ($E$)** representa la medida cuantitativa de la **rigidez** de un material frente a esfuerzos axiales. 
+
+- **Interpretación Geométrica:** En una gráfica esfuerzo-deformación ($\sigma$ vs $\varepsilon$), el módulo $E$ corresponde geométricamente a la **pendiente de la recta** dentro del régimen lineal elástico:
+  $$
+  E = \frac{d\sigma}{d\varepsilon} = \tan(\theta)
+  $$
+
+- **Interpretación Mecánica:** 
+  - Un valor elevado de $E$ indica que el material requiere niveles de esfuerzo muy altos para experimentar una deformación elástica pequeña (ej. acero).
+  - Un valor bajo de $E$ indica que el material se deforma significativamente ante cargas relativamente pequeñas (ej. goma, polímeros).
+  - **No confundir Rigidez con Resistencia:** La *rigidez* ($E$) es la oposición a deformarse elásticamente; la *resistencia* ($\sigma_y$ o $\sigma_u$) es la capacidad de soportar cargas antes de fluir o romperse.
+
+---
+
+**Tabla de Valores Típicos de Módulo de Young ($E$)**
+
+A continuación se presentan los rangos característicos para diversos materiales de uso común en la ingeniería:
+
+| Material | Módulo de Young ($E$) en GPa | Módulo de Young ($E$) en $10^6\text{ psi}$ | Comportamiento y Observaciones |
+| :--- | :---: | :---: | :--- |
+| **Acero Estructural (A36, A992)** | $200 - 210$ | $29.0 - 30.5$ | Muy rígido; comportamiento elástico lineal pronunciado y predecible. |
+| **Aleaciones de Aluminio (6061-T6)** | $69 - 72$ | $10.0 - 10.4$ | Aprox. $\frac{1}{3}$ de la rigidez del acero; peso ligero. |
+| **Concreto (Hormigón)** | $20 - 40$ | $2.9 - 5.8$ | Varía según la resistencia a compresión ($f'_c$). $E_c \approx 4700\sqrt{f'_c\text{ (MPa)}}$. |
+| **Madera Structural (Paralela a la fibra)** | $9 - 16$ | $1.3 - 2.3$ | Ortótropo; la rigidez perpendicular a la fibra es sustancialmente menor ($E_\perp \ll E_\parallel$). |
+| **Titanio (Grado 5 - Ti-6Al-4V)** | $110 - 120$ | $16.0 - 17.4$ | Excelente relación rigidez/peso. |
+| **Goma / Elastómeros** | $0.01 - 0.1$ | $0.0015 - 0.015$ | Extremadamente flexible; comportamiento no lineal a deformaciones grandes. |
+
+---
+
+
+## Resumen de Fórmulas Clave
+
+| Fórmula | Descripción |
+| :--- | :--- |
+| $\sigma = E \cdot \varepsilon$ | Ley de Hooke Unidimensional |
+| $\Delta L = \frac{P \cdot L_0}{E \cdot A_0}$ | Deformación Longitudinal Total |
+| $k = \frac{E \cdot A_0}{L_0}$ | Rigidez Axial |
