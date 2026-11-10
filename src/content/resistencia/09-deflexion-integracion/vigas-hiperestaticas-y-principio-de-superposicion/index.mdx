@@ -1,0 +1,214 @@
+# Vigas hiperestáticas y principio de superposición
+
+En las vigas isostáticas las reacciones se obtienen solo con las ecuaciones de equilibrio. Cuando la viga tiene más apoyos de los necesarios, esas ecuaciones no alcanzan y hay que recurrir a las deformaciones. El principio de superposición permite resolver ambos casos: descompone un problema complejo en casos simples cuyas deflexiones ya se conocen.
+
+## Principio de superposición
+
+<Definition title="Principio de superposición">
+Si el material es elástico lineal y las deflexiones son pequeñas, el efecto de varias cargas actuando juntas (deflexión, giro, momento, cortante o reacción) es la suma de los efectos que produce cada carga actuando sola.
+</Definition>
+
+### Condiciones de validez
+
+- El material cumple la ley de Hooke, $\sigma = E \cdot \varepsilon$ (régimen elástico lineal).
+- Las deflexiones y pendientes son pequeñas, de modo que la ecuación $EI\,y'' = M$ es válida.
+- La deformación no modifica de forma apreciable la geometría de las cargas ni de los apoyos.
+
+Bajo estas condiciones, la ecuación de la curva elástica es **lineal** respecto de las cargas. Por eso, la solución para varias cargas es la suma de las soluciones individuales.
+
+<Formula label="Superposición de deflexiones">
+$$
+\small v(x) = v_1(x) + v_2(x) + \cdots + v_n(x) = \sum_{i=1}^{n} v_i(x)
+$$
+</Formula>
+
+Donde $v(x)$ es la deflexión de la viga (equivalente a $y(x)$ de las secciones anteriores) y $v_i(x)$ es la deflexión producida solo por la carga $i$.
+
+### Ejemplo gráfico
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794029947/oycpbx3rstt2euqkc14l.png" alt="Descripción de la imagen" caption="Figura" />
+
+La viga (a) soporta al mismo tiempo la carga distribuida $w_0$ y la carga puntual $P$. Equivale a sumar la viga (b), con solo $w_0$, y la viga (c), con solo $P$. Por lo tanto:
+
+<Formula label="Superposición para la viga de la figura">
+$$
+\small v_a(x) = v_b(x) + v_c(x)
+$$
+</Formula>
+
+## Vigas estáticamente indeterminadas
+
+<Definition title="Viga isostática">
+Viga cuyas reacciones se determinan únicamente con las ecuaciones de equilibrio.
+</Definition>
+
+<Definition title="Viga hiperestática">
+Viga que tiene más reacciones que ecuaciones de equilibrio. Las reacciones sobrantes se llaman **redundantes** y se obtienen a partir de las deformaciones de la viga.
+</Definition>
+
+### Grado de indeterminación estática
+
+<Formula label="Grado de indeterminación estática (viga plana)">
+$$
+\small \text{G.I.E.} = r - 3 - c
+$$
+</Formula>
+
+Donde:
+- $r$ es el número de reacciones de los apoyos.
+- $3$ es el número de ecuaciones de equilibrio en el plano ($\sum F_x = 0$, $\sum F_y = 0$, $\sum M = 0$).
+- $c$ es el número de rótulas intermedias. Cada una aporta una ecuación adicional, $M = 0$.
+
+Si $\text{G.I.E.} = 0$ la viga es isostática, si $\text{G.I.E.} > 0$ es hiperestática, y si $\text{G.I.E.} < 0$ no está suficientemente restringida.
+
+<Table title="Grado de indeterminación de casos usuales" align="center" width="100%" columnWidths="40%, 15%, 15%, 15%, 15%">
+
+| Viga | $r$ | $c$ | G.I.E. | Clasificación |
+|:---|:---:|:---:|:---:|:---:|
+| Simplemente apoyada | 3 | 0 | 0 | Isostática |
+| Voladizo | 3 | 0 | 0 | Isostática |
+| Empotrada y apoyada | 4 | 0 | 1 | Hiperestática |
+| Continua con tres apoyos | 4 | 0 | 1 | Hiperestática |
+| Empotrada, rótula y apoyo simple | 4 | 1 | 0 | Isostática |
+
+</Table>
+
+## Método de superposición (método de las fuerzas)
+
+Como las ecuaciones de equilibrio no bastan, se añaden **ecuaciones de compatibilidad**: expresan que las deformaciones de la viga respetan las restricciones de los apoyos. Se necesita una ecuación por cada redundante, es decir, $\text{G.I.E.}$ ecuaciones.
+
+### Procedimiento
+
+1. **Calcular el G.I.E.** para conocer cuántas redundantes hay.
+2. **Elegir las redundantes**: una reacción de apoyo o un momento de empotramiento. Al retirarlas queda una viga estable e isostática, llamada *estructura liberada*.
+3. **Descomponer el problema**: la carga aplicada actúa sobre la estructura liberada, y cada redundante actúa sola como una carga desconocida.
+4. **Calcular las deflexiones** en el punto de cada redundante, usando casos básicos o integración.
+5. **Plantear la compatibilidad**: la suma de las deflexiones debe cumplir la restricción del apoyo real.
+6. **Resolver** la redundante y calcular las demás reacciones con las ecuaciones de equilibrio.
+
+### Descomposición de una viga hiperestática
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794029739/hyasxlhyoti5ljvttalg.png" alt="Descripción de la imagen" caption="Figura" />
+
+En (a), la viga está empotrada en A (reacciones $R_A$ y $M_A$) y apoyada en B (reacción $R_B$, redundante). En (b) se retira el apoyo B: la carga produce una deflexión $(\delta_B)_b$ hacia abajo. En (c), $R_B$ actuando sola produce una deflexión $(\delta_B)_c$ hacia arriba. Como el apoyo real impide el desplazamiento de B:
+
+<Formula label="Ecuación de compatibilidad en el apoyo redundante">
+$$
+\small v_a(L) = v_b(L) + v_c(L) = 0 \quad \Longrightarrow \quad (\delta_B)_b = (\delta_B)_c
+$$
+</Formula>
+
+### Apoyos elásticos y holguras
+
+Si el apoyo en B no es rígido, la viga se desplaza en B una cantidad $\delta_{apoyo}$ y la compatibilidad se generaliza:
+
+<Formula label="Compatibilidad con apoyo deformable">
+$$
+\small (\delta_B)_b - (\delta_B)_c = \delta_{apoyo}
+$$
+</Formula>
+
+<Table title="Desplazamiento del apoyo según su tipo" align="center" width="100%" columnWidths="60%, 40%">
+
+| Tipo de apoyo en B | $\delta_{apoyo}$ |
+|:---|:---:|
+| Apoyo rígido | $0$ |
+| Asentamiento conocido $\Delta$ | $\Delta$ |
+| Resorte de rigidez $k$ | $\dfrac{R_B}{k}$ |
+| Poste o varilla (área $A$, longitud $L_p$, módulo $E_p$) | $\dfrac{R_B\,L_p}{A\,E_p}$ |
+| Poste o varilla con holgura inicial $\delta_0$ | $\delta_0 + \dfrac{R_B\,L_p}{A\,E_p}$ |
+
+</Table>
+
+Si hay holgura inicial, primero se verifica que la viga libre llegue a tocar el apoyo. Si $(\delta_B)_b \le \delta_0$ no hay contacto y $R_B = 0$.
+
+### Otros métodos de solución
+
+- **Integración directa**: se integra $EI\,y'' = M(x)$ o $EI\,y^{IV} = -q(x)$. La reacción redundante es una incógnita más, y se determina con la condición de contorno adicional que impone el apoyo, por ejemplo $v = 0$ en B.
+- **Funciones de singularidad (método de Macaulay)**: permiten escribir $M(x)$ en una sola expresión, incluyendo la redundante como una carga más.
+
+## Ejemplo Resuelto
+
+<Example number={1} title="Viga empotrada y apoyada con carga uniforme">
+Una viga de longitud $L$ y rigidez $EI$ constante está empotrada en A y apoyada en B mediante un apoyo simple rígido. Soporta una carga uniformemente distribuida $w$ en toda su longitud. Determine las reacciones en A y B.
+
+<Solution>
+1. **Grado de indeterminación:**
+   Hay $r = 4$ reacciones y 3 ecuaciones de equilibrio, entonces $\text{G.I.E.} = 4 - 3 = 1$. Se elige $R_B$ como redundante.
+
+2. **Estructura liberada:**
+   Al retirar el apoyo B queda un voladizo empotrado en A.
+
+3. **Deflexión en B por la carga uniforme:**
+   $$
+   \small (\delta_B)_b = \frac{wL^4}{8EI}
+   $$
+
+4. **Deflexión en B por la redundante:**
+   $$
+   \small (\delta_B)_c = \frac{R_B L^3}{3EI}
+   $$
+
+5. **Compatibilidad:**
+   $$
+   \small \frac{wL^4}{8EI} = \frac{R_B L^3}{3EI} \quad \Longrightarrow \quad R_B = \frac{3wL}{8}
+   $$
+
+6. **Equilibrio:**
+   $$
+   \small \sum F_y = 0: \quad R_A = wL - R_B = \frac{5wL}{8}
+   $$
+   $$
+   \small \sum M_A = 0: \quad M_A = \frac{wL^2}{2} - R_B L = \frac{wL^2}{8} \quad \text{(antihorario)}
+   $$
+</Solution>
+</Example>
+
+## Problema Propuesto
+
+<Problem title="Reacción en el apoyo de rodillo">
+Una viga de longitud $L$ y rigidez $EI$ constante está apoyada en A mediante un rodillo y empotrada en B. Una carga puntual $P$ actúa en el punto medio C de la viga. Determine la reacción en el apoyo de rodillo y las reacciones en el empotramiento.
+
+<Solution>
+1. **Redundante:**
+   $\text{G.I.E.} = 1$. Se elige la reacción $R_A$ del rodillo.
+
+2. **Deflexión en A por la carga $P$** (voladizo empotrado en B, con $P$ a una distancia $a = L/2$ del empotramiento):
+   $$
+   \small (\delta_A)_b = \frac{P a^2}{6EI}(3L - a) = \frac{5PL^3}{48EI}
+   $$
+
+3. **Deflexión en A por la redundante:**
+   $$
+   \small (\delta_A)_c = \frac{R_A L^3}{3EI}
+   $$
+
+4. **Compatibilidad:**
+   $$
+   \small \frac{5PL^3}{48EI} = \frac{R_A L^3}{3EI} \quad \Longrightarrow \quad R_A = \frac{5P}{16}
+   $$
+
+5. **Equilibrio:**
+   $$
+   \small R_B = P - \frac{5P}{16} = \frac{11P}{16}, \qquad M_B = \frac{PL}{2} - \frac{5PL}{16} = \frac{3PL}{16}
+   $$
+</Solution>
+</Problem>
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Cuál es el grado de indeterminación de una viga empotrada en un extremo y simplemente apoyada en el otro?">
+Es 1: tiene 4 reacciones y solo 3 ecuaciones de equilibrio ($4 - 3 = 1$), por lo que existe una reacción redundante.
+</Quiz>
+
+<Quiz question="¿Por qué puede aplicarse el principio de superposición a las deflexiones de una viga?">
+Porque, con material elástico lineal y deflexiones pequeñas, la ecuación $EI\,y'' = M$ es lineal respecto de las cargas. Así, la deflexión total es la suma de las deflexiones producidas por cada carga.
+</Quiz>
+
+<Summary title="Resumen">
+- El principio de superposición exige material elástico lineal y deflexiones pequeñas: $v = \sum v_i$.
+- El grado de indeterminación de una viga plana es $\text{G.I.E.} = r - 3 - c$.
+- Una viga hiperestática se resuelve liberando las redundantes y planteando una ecuación de compatibilidad por cada una.
+- Con apoyo rígido, la compatibilidad es $(\delta_B)_b = (\delta_B)_c$. Con resortes, postes o holguras, $(\delta_B)_b - (\delta_B)_c = \delta_{apoyo}$.
+- Obtenida la redundante, las demás reacciones salen de las ecuaciones de equilibrio.
+</Summary>
