@@ -1,25 +1,150 @@
 # Introducción y comportamiento físico
 
-## 1. Importancia del estudio de las flexiones:
+Cuando se carga una viga, su eje deja de ser recto: cada sección se desplaza (deflexión) y gira (giro). La curva que adopta el eje se llama deformada o curva elástica. En este tema se explica por qué es necesario calcularla y se definen sus elementos. Con ellos se plantea, en los siguientes temas, la ecuación diferencial de la curva elástica.
 
-En el análisis y diseño de elementos estructurales, el dimensionamiento de una viga no solo exige evitar el colapso por ruptura o fluencia (Criterio de resistencia), sino también de limitar sus deformaciones por acción de las cargas (Criterio de rigidez). Por ello, una viga estructuralmente segura ante cargas puede ser rechazada si experimenta una deflexión o flecha excesiva que comprometa su funcionalidad.
+## Importancia del estudio de las flexiones
 
-En la practica de la ingeniería civil y mecánica, las deformaciones no controladas generan severos problemas funcionales, aquí unas imágenes que evidencian lo mencionado.
+En el análisis y diseño de elementos estructurales, el dimensionamiento de una viga no solo exige evitar el colapso por ruptura o fluencia (criterio de resistencia), sino también limitar sus deformaciones por acción de las cargas (criterio de rigidez). Por ello, una viga estructuralmente segura ante las cargas puede ser rechazada si experimenta una deflexión o flecha excesiva que comprometa su funcionalidad.
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792730978/suwlzuo3s7rt9bgggdmi.png" alt="Descripción de la imagen" caption="Figura" />
+### Criterios de resistencia y de rigidez
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792731000/pawbdlmwqkra9rwzmd3i.png" alt="Descripción de la imagen" caption="Figura" />
+El diseño de una viga debe cumplir ambos criterios a la vez:
 
+<Table title="Criterios de diseño de una viga" width="100%" columnWidths="16%, 24%, 34%, 26%">
 
-## 2. Parámetros geométricos de la curva elástica:
+| Criterio | Qué evita | Qué se verifica | Herramienta de cálculo |
+|:---|:---|:---:|:---|
+| Resistencia | Rotura o fluencia del material | $\sigma_{max} \leq \sigma_{adm}$ y $\tau_{max} \leq \tau_{adm}$ | Esfuerzos normal y cortante |
+| Rigidez | Deformaciones excesivas | $y_{max} \leq y_{adm}$ | Curva elástica y rigidez $EI$ |
 
+</Table>
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792731032/p4yvjomkkgdtrjp4bffm.png" alt="Descripción de la imagen" caption="Figura" />
+### Consecuencias de una deflexión excesiva
 
+En la práctica de la ingeniería civil y mecánica, las deformaciones no controladas generan problemas funcionales aunque no haya riesgo de colapso:
 
-* **Deflexión o flecha ($y$):** Es el desplazamiento vertical del eje neutro de la viga en una posición $x$, medido desde el eje original no deformado. La convención de signos usual considera positivos los desplazamientos hacia arriba y negativos hacia abajo.
-* **Deflexión máxima ($y_{max}$):** Es el desplazamiento vertical absoluto de mayor magnitud a lo largo del claro de la viga.
-* **Ángulo de giro o pendiente ($\theta$):** Corresponde a la inclinación de la recta tangente a la curva elástica en un punto determinado respecto al eje horizontal $X$. Para pequeñas deformaciones ($\theta \ll 1$), la pendiente se aproxima a la primera derivada de la deflexión:
+- **Daño a elementos no estructurales:** fisuras en tabiques, acabados y cielos rasos que acompañan la deformación de la viga.
+- **Mal funcionamiento:** puertas y ventanas que se traban, o pisos con pendientes visibles.
+- **Acumulación de agua:** en techos con poca pendiente, la deflexión forma zonas donde se empoza el agua y aumenta la carga.
+- **Desalineación de máquinas:** en ejes con poleas y rodamientos, la deflexión desalinea los apoyos y los engranajes, y acelera su desgaste.
+
+Las siguientes fotografías muestran vigas reales con deflexiones excesivas.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794095538/xon4r5ptjyzaku3jbchy.png" alt="Descripción de la imagen" caption="Figura 1. Deflexiones excesivas en vigas secundarias." />
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794096606/ynqolsauzfujwz2lgoal.png" alt="Descripción de la imagen" caption="Figura 2. Deflexiones excesivas en vigas primarias y secundarias." />
+
+En una edificación, las vigas secundarias reciben la carga de la losa y la transmiten a las vigas principales (o primarias), y estas la llevan a las columnas. Las vigas chatas tienen un peralte igual al espesor de la losa, por lo que son más flexibles.
+
+### Deflexión admisible
+
+Las normas limitan la deflexión máxima de una viga como una fracción de su claro $L$:
+
+<Formula label="Deflexión máxima admisible">
 $$
-\theta(x) \approx \tan(\theta) = \frac{dy}{dx} = y'(x)
+\scriptsize
+y_{max} \leq y_{adm} = \frac{L}{n}
 $$
+</Formula>
+
+El factor $n$ lo fija la norma según el uso del elemento. Por ejemplo, un cielo raso de yeso exige $y_{max} \leq \frac{L}{360}$, porque una deflexión mayor lo fisuraría. Otros usos tienen límites más estrictos o más holgados.
+
+<Example number={1} title="Deflexión admisible con cielo raso de yeso">
+Una viga simplemente apoyada soporta una carga uniforme de $30\text{ kN/m}$ y dos cargas puntuales de $40\text{ kN}$, ubicadas a $1.2\text{ m}$ de cada apoyo. Por un cielo raso de yeso, el código exige que la deflexión máxima no supere $\frac{1}{360}$ de la longitud del claro. Determine la deflexión admisible. Las distancias entre cargas son $1.2\text{ m}$, $2.4\text{ m}$ y $1.2\text{ m}$.
+
+<Solution>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794093978/h74qwn1l6gnwshw6upvr.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+
+1. **Claro de la viga:**
+   $$
+   \scriptsize
+   L = 1.2 + 2.4 + 1.2 = 4.8\text{ m} = 4800\text{ mm}
+   $$
+
+2. **Deflexión admisible:**
+   $$
+   \scriptsize
+   y_{adm} = \frac{L}{360} = \frac{4800}{360} = 13.3\text{ mm}
+   $$
+
+3. **Conclusión:** la deflexión máxima de la viga bajo las cargas no debe superar $13.3\text{ mm}$. Como $y_{max}$ disminuye al aumentar $I$, al igualar $y_{max} = y_{adm}$ se obtiene el momento de inercia mínimo que cumple el criterio de rigidez. Ese cálculo se hace con las ecuaciones de la curva elástica de los siguientes temas.
+</Solution>
+</Example>
+
+### Dónde se usa la deflexión en este curso
+
+El cálculo de deflexiones aparece en los problemas del capítulo de varias formas:
+
+- **Ecuación de la elástica, deflexión y giro:** en vigas en voladizo y simplemente apoyadas, con cargas puntuales, distribuidas y momentos.
+- **Vigas de rigidez variable:** tramos con $EI$, $2EI$ o $3EI$.
+- **Diseño por rigidez:** obtener el momento de inercia requerido para cumplir un límite de deflexión, como en el ejemplo anterior.
+- **Ejes con poleas y rodamientos:** deflexión máxima del eje entre apoyos.
+- **Vigas hiperestáticas:** vigas con apoyos adicionales, resortes, cables o varillas, y con espacios iniciales entre la viga y el apoyo. Las reacciones sobrantes se obtienen con condiciones de deformación.
+- **Deflexión como objetivo:** en un interruptor de relé, la armadura debe deflectarse lo suficiente para hacer contacto.
+
+## Elementos de la deformada de una viga
+
+<Definition title="Deformada o curva elástica">
+Es la forma curva que adopta el eje neutro de una viga al flexionarse por efecto de las cargas. Se describe con la función $y(x)$ y sus derivadas.
+</Definition>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794191963/pqkxsznwntr8sxsyqobl.webp" alt="Descripción de la imagen" caption="Figura" />
+
+La deformada se describe con los siguientes elementos:
+
+- **Deflexión o flecha ($y$):** es el desplazamiento vertical del eje neutro de la viga en una posición $x$, medido desde el eje original no deformado. La convención de signos usual considera positivos los desplazamientos hacia arriba y negativos hacia abajo.
+- **Deflexión máxima ($y_{max}$):** es el desplazamiento vertical absoluto de mayor magnitud a lo largo del claro de la viga.
+- **Giro o pendiente ($\theta$):** corresponde a la inclinación de la recta tangente a la curva elástica en un punto determinado, respecto al eje horizontal $X$. En los apoyos $A$ y $B$ se denota $\theta_A$ y $\theta_B$. Se mide en radianes.
+- **Curvatura ($\frac{1}{\rho}$):** indica cuánto cambia la dirección de la curva por unidad de longitud de arco. Se relaciona con el momento flector, como se deduce en el siguiente tema.
+
+<Table title="Elementos de la deformada" width="100%" columnWidths="14%, 24%, 18%, 44%">
+
+| Símbolo | Nombre | Unidad | Significado |
+|:---:|:---|:---:|:---|
+| $y$ | Deflexión | $\text{mm}$ | Desplazamiento vertical del eje neutro en $x$ |
+| $y_{max}$ | Deflexión máxima | $\text{mm}$ | Mayor valor absoluto de $y$ en la viga |
+| $\theta$ | Giro o pendiente | $\text{rad}$ | Inclinación de la tangente en $x$ |
+| $\frac{1}{\rho}$ | Curvatura | $\text{m}^{-1}$ | Cambio de dirección por unidad de arco |
+
+</Table>
+
+### Pendiente en pequeñas deformaciones
+
+Para pequeñas deformaciones ($\theta \ll 1$), la tangente del ángulo es casi igual al propio ángulo en radianes, y la pendiente se aproxima a la primera derivada de la deflexión:
+
+<Formula label="Pendiente de la curva elástica">
+$$
+\scriptsize
+\theta(x) \approx \tan\theta = \frac{dy}{dx} = y'(x)
+$$
+</Formula>
+
+Con $\theta = y'$, un giro antihorario es positivo. Por eso, en una viga simplemente apoyada que se deflecta hacia abajo, se tiene $\theta_A < 0$ y $\theta_B > 0$.
+
+Por ejemplo, para $\theta = 0.05\text{ rad}$ (cerca de $2.9^\circ$) se tiene $\tan\theta = 0.0500$, y la diferencia es menor que $0.1\%$.
+
+Esta aproximación es válida en las vigas reales. En una viga simplemente apoyada con carga uniforme y deflexión máxima $L/360$, el giro en los apoyos es cercano a $0.009\text{ rad}$ ($0.5^\circ$). Las pendientes son tan pequeñas que $y'^{\,2}$ se puede despreciar frente a 1 en las deducciones siguientes.
+
+## Contenido del capítulo
+
+A partir de estos elementos, el capítulo desarrolla los siguientes temas:
+
+1. **Introducción y comportamiento físico:** cómo se deforma una viga sometida a flexión, con los conceptos de deflexión, pendiente y curvatura del eje neutro.
+2. **Fundamentos Matemáticos y Deducción de la Curva Elástica:** relación curvatura-momento flector, deducción de $\frac{1}{\rho} = \frac{M}{EI}$ y de la ecuación diferencial de la curva elástica.
+3. **Métodos de integración directa (2° y 4° orden):** relaciones con la cortante y la carga distribuida mediante ecuaciones de 2° y 4° orden, y determinación de las constantes de integración con las condiciones de contorno según el tipo de apoyo.
+4. **Funciones de discontinuidad y singularidad (Método de Macaulay):** una sola expresión para vigas con varios tramos o cargas puntuales.
+5. **Vigas hiperestáticas y principio de superposición:** reacciones sobrantes a partir de las deformaciones.
+
+<Quiz question="Una viga cumple con los esfuerzos admisibles de resistencia. ¿Basta eso para considerarla adecuada?">
+No. También debe cumplir el criterio de rigidez: su deflexión máxima no debe superar el límite admisible de la norma, porque una deflexión excesiva puede dañar elementos no estructurales (como un cielo raso) o impedir el uso normal de la estructura.
+</Quiz>
+
+<Summary title="Resumen">
+- El diseño de una viga exige cumplir el criterio de resistencia (esfuerzos admisibles) y el de rigidez (deflexión admisible).
+- Una deflexión excesiva puede causar fisuras, empozamiento y desalineación de máquinas, aunque la viga no falle.
+- La deflexión máxima se limita como una fracción del claro, $y_{adm} = \frac{L}{n}$. Con cielo raso de yeso, $n = 360$.
+- Los elementos de la deformada son la deflexión $y$, la deflexión máxima $y_{max}$, el giro $\theta$ (con $\theta_A$ y $\theta_B$ en los apoyos) y la curvatura $\frac{1}{\rho}$.
+- Para pequeñas deformaciones, $\theta \approx \tan\theta = y'(x)$.
+</Summary>
