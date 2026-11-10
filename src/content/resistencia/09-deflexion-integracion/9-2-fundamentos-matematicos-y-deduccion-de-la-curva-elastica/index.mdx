@@ -1,90 +1,218 @@
 # Fundamentos Matemáticos y Deducción de la Curva Elástica
 
-## Relación curvatura-momento flector:
+Cuando una viga se carga, su eje longitudinal deja de ser recto y adopta una forma curva. En este tema se deduce la ecuación que relaciona esa curvatura con el momento flector y se llega a la ecuación diferencial de la curva elástica.
+
+<Definition title="Curva elástica">
+Es la forma curva que adopta el eje longitudinal de una viga al flexionarse por efecto de las cargas. Su ecuación $y(x)$ da la deflexión de cada sección de la viga.
+</Definition>
+
+La deducción se basa en las siguientes hipótesis:
+
+- **Material:** homogéneo y elástico lineal, es decir, cumple la ley de Hooke.
+- **Secciones planas:** las secciones transversales que son planas antes de la flexión siguen siendo planas y perpendiculares al eje deformado.
+- **Plano de flexión:** el eje neutro pasa por el centroide de la sección y la flexión ocurre en un plano de simetría.
+- **Pequeñas deformaciones:** se usa en la segunda parte para simplificar la ecuación.
+
+## Relación curvatura-momento flector
 
 Se analiza un elemento diferencial de viga de longitud $dx$, que al flexionarse forma un arco de radio de curvatura $\rho$ y ángulo $d\theta$.
 
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792738058/p887wauclgm91nmsci8k.png" alt="Descripción de la imagen" caption="Figura" />
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794193972/gwudheuehejmtsjwla2n.webp" alt="Descripción de la imagen" caption="Figura" />
 
 
-**Arco y curvatura:** como $ds = \rho\,d\theta$, la curvatura es:
+### Arco y curvatura
 
+Como la longitud del arco es $ds = \rho\,d\theta$, la curvatura $\frac{1}{\rho}$ indica cuánto gira la tangente por unidad de longitud de arco:
+
+<Formula label="Curvatura">
 $$
+\scriptsize
 \frac{1}{\rho} = \frac{d\theta}{ds}
 $$
+</Formula>
 
-**Deformación unitaria:** Un grosor infinitesimal a distancia $y$ del eje neutro pasa de longitud $\rho\,d\theta$ a $(\rho - y)\,d\theta$, entonces:
+### Deformación unitaria
 
+Se toma una fibra a una distancia $y$ del eje neutro, medida hacia el centro de curvatura. Su longitud inicial es $\rho\,d\theta$ (igual a la del eje neutro, que no cambia) y pasa a ser $(\rho - y)\,d\theta$. Entonces:
+
+<Formula label="Deformación unitaria de la fibra">
 $$
-\varepsilon_y = \frac{(\rho - y)\,d\theta - \rho\,d\theta}{\rho\,d\theta} = -\frac{y}{\rho}
+\scriptsize
+\varepsilon_y = \frac{(\rho - y)\,d\theta - \rho\,d\theta}{\rho\,d\theta} = \frac{-y\,d\theta}{\rho\,d\theta} = -\frac{y}{\rho}
 $$
+</Formula>
 
-**Por ley de Hooke:**
+El signo negativo indica que las fibras con $y > 0$ (lado cóncavo) se acortan y las de $y < 0$ se alargan. La deformación varía linealmente con $y$.
 
+### Esfuerzo normal (ley de Hooke)
+
+<Formula label="Esfuerzo normal en la fibra">
 $$
+\scriptsize
 \sigma_y = E \cdot \varepsilon_y = -E \cdot \frac{y}{\rho}
 $$
+</Formula>
 
-**Fuerza diferencial respecto al esfuerzo:**
+El esfuerzo también varía linealmente con $y$: es nulo en el eje neutro y máximo en las fibras más alejadas de él.
 
+### Fuerza y momento diferenciales
+
+Sobre un área diferencial $dA$ a distancia $y$ del eje neutro actúa la fuerza:
+
+<Formula label="Fuerza diferencial">
 $$
+\scriptsize
 dF = \sigma_y \cdot dA
 $$
+</Formula>
 
-**Momento diferencial:**
+Cada fuerza diferencial produce un momento respecto al eje neutro. Con $y$ medido hacia el centro de curvatura, el momento flector positivo $M$ comprime las fibras del lado cóncavo ($y > 0$ y $\sigma_y < 0$). Por eso el momento flector interno se toma con signo contrario a $y \cdot dF$:
 
+<Formula label="Momento diferencial">
 $$
-dM = y \cdot dF = y \cdot \left( \sigma_y \cdot dA \right) = y \cdot \left( E \cdot \frac{y}{\rho} \cdot dA \right) = E \cdot \frac{y^2}{\rho} \cdot dA
+\scriptsize
+dM = -y \cdot dF = -y \cdot \sigma_y \cdot dA
 $$
+</Formula>
 
+Al sustituir $\sigma_y = -E\,\frac{y}{\rho}$ se obtiene:
+
+<Formula label="Momento diferencial en función de la curvatura">
 $$
-M = \int E \cdot \frac{y^2}{\rho} \cdot dA = \frac{E}{\rho} \int y^2 \, dA = \frac{E \cdot I}{\rho}
+\scriptsize
+dM = -y \cdot \left( -E \cdot \frac{y}{\rho} \right) dA = E \cdot \frac{y^2}{\rho} \cdot dA
 $$
+</Formula>
+
+### Momento flector total
+
+Se integra sobre toda el área $A$ de la sección. Como $E$ y $\rho$ no dependen de $y$, salen de la integral:
+
+<Formula label="Momento flector en la sección">
+$$
+\scriptsize
+M = \int_{A} E \cdot \frac{y^2}{\rho}\,dA = \frac{E}{\rho} \int_{A} y^2\,dA = \frac{E \cdot I}{\rho}
+$$
+</Formula>
+
+La integral que queda es el momento de inercia $I$ de la sección respecto al eje neutro:
+
+<Formula label="Momento de inercia de la sección">
+$$
+\scriptsize
+I = \int_{A} y^2\,dA
+$$
+</Formula>
+
+Despejando la curvatura se obtiene la relación buscada:
 
 <Formula label="Relación curvatura-momento flector">
 $$
+\scriptsize
 \frac{1}{\rho} = \frac{M}{E \cdot I}
 $$
 </Formula>
 
-* Momento flector ($M$).
-* Módulo de Young ($E$).
-* Momento de inercia de la sección transversal ($I$).
-* Radio de curvatura ($\rho$).
+Donde:
 
-## Ecuación diferencial exacta vs aproximación de pequeñas pendientes:
+- $M$ es el momento flector ($\text{N}\cdot\text{m}$).
+- $E$ es el módulo de Young del material ($\text{Pa}$).
+- $I$ es el momento de inercia de la sección transversal respecto al eje neutro ($\text{m}^4$).
+- $\rho$ es el radio de curvatura ($\text{m}$).
+
+El producto $E \cdot I$ se llama **rigidez a la flexión**: a mayor $E \cdot I$, menor es la curvatura que produce un mismo momento.
+
+## Ecuación diferencial exacta vs aproximación de pequeñas pendientes
+
+La relación anterior da la curvatura en función de $M$. Para obtener la curva elástica $y(x)$ hay que escribir esa curvatura en función de la deflexión y sus derivadas.
 
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792738120/q2e8umootodgupaeujtd.png" alt="Descripción de la imagen" caption="Figura" />
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794098068/w2hqlan9xxqwcyozttrd.jpg" alt="Descripción de la imagen" caption="Figura" />
 
 
-**Pendiente:** $\tan\theta = y'(x)$, es decir, $\theta(x) = \arctan(y'(x))$.
+### Pendiente de la curva
 
-**Elementos diferenciales:** Al derivar el ángulo y la longitud de arco respecto a $x$:
+La pendiente en un punto es la tangente del ángulo $\theta$ que forma la recta tangente con el eje $x$. De ahí se despeja el ángulo:
 
+<Formula label="Pendiente y ángulo de la tangente">
 $$
-d\theta = \frac{y''(x)}{1 + \left[ y'(x) \right]^2}\,dx \qquad ds = \sqrt{1 + \left[ y'(x) \right]^2}\,dx
+\scriptsize
+\tan\theta = y'(x) \qquad \Longrightarrow \qquad \theta(x) = \arctan\left( y'(x) \right)
 $$
+</Formula>
 
-**Curvatura exacta:**
+### Elementos diferenciales
 
+Al derivar el ángulo respecto a $x$ y expresar la longitud de arco con $ds^2 = dx^2 + dy^2$ se obtiene:
+
+<Formula label="Ángulo y arco diferenciales">
 $$
+\scriptsize
+d\theta = \frac{y''(x)}{1 + \left[ y'(x) \right]^2}\,dx \qquad\qquad ds = \sqrt{1 + \left[ y'(x) \right]^2}\,dx
+$$
+</Formula>
+
+### Curvatura exacta
+
+Al dividir $d\theta$ entre $ds$:
+
+<Formula label="Curvatura exacta">
+$$
+\scriptsize
 \frac{1}{\rho} = \frac{d\theta}{ds} = \frac{y''(x)}{\left( 1 + \left[ y'(x) \right]^2 \right)^{3/2}}
 $$
+</Formula>
 
-**Ecuación diferencial exacta:** Igualando con $\frac{M}{E \cdot I}$
+### Ecuación diferencial exacta
 
+Al igualar con $\frac{M}{E \cdot I}$:
+
+<Formula label="Ecuación diferencial exacta de la curva elástica">
 $$
+\scriptsize
 \frac{y''(x)}{\left( 1 + \left[ y'(x) \right]^2 \right)^{3/2}} = \frac{M}{E \cdot I}
 $$
+</Formula>
 
-La ecuación es no lineal, por lo que es difícil de integrar directamente.
+Esta ecuación es no lineal, por lo que es difícil de integrar directamente.
 
-**Hipótesis de pequeñas deformaciones:** En ingeniería la pendiente suele ser muy pequeña, así que $y'(x) \ll 1$, entonces $\left[ y'(x) \right]^2 \approx 0$ y el denominador vale aproximadamente 1.
+### Hipótesis de pequeñas deformaciones
 
-**Ecuación simplificada de segundo orden:**
+En ingeniería la pendiente suele ser muy pequeña, así que $y'(x) \ll 1$. Entonces $\left[ y'(x) \right]^2 \approx 0$ y el denominador vale aproximadamente 1:
 
+<Formula label="Aproximación del denominador">
 $$
+\scriptsize
+\left( 1 + \left[ y'(x) \right]^2 \right)^{3/2} \approx 1
+$$
+</Formula>
+
+Por ejemplo, para una pendiente $y' = 0.05$ (cerca de $2.9^\circ$) se tiene $\left[ y' \right]^2 = 0.0025$ y el denominador vale $1.0038$. La aproximación cambia la curvatura en menos de $0.4\%$.
+
+<Formula label="Ecuación simplificada de segundo orden">
+$$
+\scriptsize
 y''(x) = \frac{M}{E \cdot I}
 $$
+</Formula>
+
+Esta es la ecuación de partida del método de integración directa.
+
+<Table title="Ecuación exacta frente a ecuación simplificada" width="100%" columnWidths="22%, 42%, 36%">
+
+| Característica | Ecuación exacta | Ecuación simplificada |
+|:---|:---:|:---:|
+| Expresión | $\displaystyle \frac{y''}{\left( 1 + [y']^2 \right)^{3/2}} = \frac{M}{E \cdot I}$ | $\displaystyle y'' = \frac{M}{E \cdot I}$ |
+| Tipo de ecuación | No lineal | Lineal |
+| Validez | Cualquier pendiente | $y' \ll 1$ |
+| Integración | Difícil de integrar directamente | Se integra directamente |
+
+</Table>
+
+<Summary title="Resumen">
+- La curvatura de la viga es proporcional al momento flector: $\frac{1}{\rho} = \frac{M}{E \cdot I}$. Se deduce de la deformación unitaria $\varepsilon_y = -\frac{y}{\rho}$, la ley de Hooke y el equilibrio de momentos de la sección.
+- El producto $E \cdot I$ es la rigidez a la flexión.
+- Escrita con la deflexión, la curvatura exacta es $\frac{y''}{\left( 1 + [y']^2 \right)^{3/2}}$, y la ecuación diferencial resultante es no lineal.
+- Para pendientes pequeñas ($y' \ll 1$) el denominador vale aproximadamente 1 y queda la ecuación lineal $y''(x) = \frac{M}{E \cdot I}$, base del método de integración directa.
+</Summary>
