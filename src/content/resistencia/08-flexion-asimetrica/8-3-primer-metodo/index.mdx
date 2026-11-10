@@ -1,12 +1,12 @@
-# 8.3 Primer método
+# Vigas no simétricas: ejes principales
 
-Cuando la sección no tiene simetría, hay dos formas de resolver la flexión asimétrica. El **primer método** consiste en trabajar con los **ejes principales**: como allí $I_{yz} = 0$, se vuelven a usar las mismas fórmulas del subtema 8.1.
+Cuando la sección no tiene simetría, hay dos formas de analizar la viga. La primera es trabajar con los **ejes principales** de la sección: como allí $I_{yz} = 0$, se vuelven a usar las mismas fórmulas del subtema 8.1. La segunda, con ejes centroidales cualesquiera, se ve en el subtema 8.5.
 
-<Definition title="Primer método (ejes principales)">
-Se hallan los ejes principales de la sección (subtema 8.2), se descompone el momento en esos dos ejes y se superponen los dos efectos, igual que en una sección con doble simetría.
+<Definition title="Análisis con ejes principales">
+Se hallan los ejes principales de la sección (subtemas 8.2 y 8.3), se descompone el momento en esos dos ejes y se superponen los dos efectos, igual que en una sección con doble simetría.
 </Definition>
 
-## Fundamento
+## Momentos flectores en los ejes principales
 
 Si $z$ e $y$ son ejes principales, $I_{yz} = 0$ y la superposición del subtema 8.1 es válida aunque la sección no sea simétrica. Lo único que cambia es que primero hay que encontrar esos ejes.
 
@@ -17,8 +17,7 @@ M_y = M\sin\theta \qquad M_z = M\cos\theta
 $$
 
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792686279/okuo0ibdcptjcn2ip8sj.svg"  alt="Sección irregular con ejes principales z, y, el vector M con ángulo theta, sus componentes y el eje neutro con ángulo beta" 
- caption="Figura 8.6: Primer método. z e y son ejes principales; M forma un ángulo θ con z y el eje neutro forma β."
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794192376/dyvyw6wpgdfdtwjdnoov.svg" alt="Descripción de la imagen" caption="Figura 8.14: z e y son ejes principales de la sección; M forma un ángulo θ con z y el eje neutro forma un ángulo β."
 />
 
 Sustituyendo en $\sigma_x = M_y z/I_y - M_z y/I_z$:
@@ -36,6 +35,8 @@ Donde:
 - $I_y$, $I_z$ son las inercias principales de la sección ($\text{m}^4$).
 - $y$, $z$ son las coordenadas del punto respecto a los ejes principales ($\text{m}$).
 
+## Eje neutro
+
 Haciendo $\sigma_x = 0$ se obtiene el eje neutro:
 
 <Formula label="Eje neutro (ejes principales)">
@@ -44,18 +45,18 @@ $$
 $$
 </Formula>
 
-Donde $\beta$ es el ángulo entre el eje neutro y el eje principal $z$.
+Donde $\beta$ es el ángulo formado por el eje neutro y el eje principal $z$.
 
 ## Procedimiento
 
 1. **Centroide:** se ubica el centroide $C$ de la sección.
-2. **Ejes principales:** se obtienen con $\tan 2\theta_p$ (subtema 8.2) o, en perfiles normalizados, de las tablas. En perfiles I y canales los ejes $1\text{-}1$ y $2\text{-}2$ ya son principales. En ángulos, los ejes principales son $3\text{-}3$ y $4\text{-}4$ (a $45°$ si las alas son iguales); $I_{3\text{-}3} = A\, r_{min}^2$ e $I_{4\text{-}4} = I_{1\text{-}1} + I_{2\text{-}2} - I_{3\text{-}3}$.
+2. **Ejes principales:** se obtienen con $\tan 2\theta_p$ (subtema 8.2), con el círculo de Mohr (subtema 8.3) o, en perfiles normalizados, de las tablas (subtema 8.7). En perfiles I y canales los ejes $1\text{-}1$ y $2\text{-}2$ ya son principales. En ángulos, los ejes principales son $3\text{-}3$ y $4\text{-}4$ (a $45°$ si las alas son iguales); $I_{3\text{-}3} = A\, r_{min}^2$ e $I_{4\text{-}4} = I_{1\text{-}1} + I_{2\text{-}2} - I_{3\text{-}3}$.
 3. **Componentes del momento:** se mide $\theta$ desde el eje principal $z$ y se calculan $M_y$ y $M_z$.
 4. **Eje neutro:** se calcula $\beta$ con $\tan\beta = (I_z/I_y)\tan\theta$ y se dibuja.
 5. **Esfuerzos máximos:** el esfuerzo es lineal, así que los máximos están en los puntos más alejados del eje neutro. En una sección sin simetría no es evidente cuáles son, por eso se evalúa $\sigma_x$ en todos los vértices o puntos candidatos y se comparan. El mayor valor positivo es $\sigma_t$ y el mayor valor negativo (en magnitud) es $\sigma_c$.
 
 <Example number={1} title="Esfuerzo en un punto con ejes principales">
-Una sección tiene ejes principales $z$, $y$ con $I_z = 1500\text{ cm}^4$ e $I_y = 300\text{ cm}^4$. Soporta un momento $M = 2\text{ kN}\cdot\text{m}$ que forma $\theta = 30°$ con $z$. Determine la inclinación del eje neutro y el esfuerzo en el punto $A$, con $z = 5\text{ cm}$ e $y = -8\text{ cm}$.
+Una sección tiene ejes principales $z$, $y$ con $I_z = 1500\text{ cm}^4$ e $I_y = 300\text{ cm}^4$. Soporta un momento $M = 2\text{ kN}\cdot\text{m}$ que forma $\theta = 30°$ con $z$. Determine la inclinación del eje neutro y el esfuerzo en el punto $A$, con $z = 5\text{ cm}$ e $y = 8\text{ cm}$ (cuadrante positivo).
 
 <Solution>
 1. **Componentes del momento:**
@@ -68,16 +69,16 @@ Una sección tiene ejes principales $z$, $y$ con $I_z = 1500\text{ cm}^4$ e $I_y
    $$
 3. **Esfuerzo en A:**
    $$
-   \sigma_A = \frac{1000(0.05)}{300\times 10^{-8}} - \frac{1732(-0.08)}{1500\times 10^{-8}} = 16.7\text{ MPa} + 9.2\text{ MPa} = 25.9\text{ MPa}
+   \sigma_A = \frac{1000(0.05)}{300\times 10^{-8}} - \frac{1732(0.08)}{1500\times 10^{-8}} = 16.7\text{ MPa} - 9.2\text{ MPa} = 7.4\text{ MPa}
    $$
 4. **Conclusión:**
-   El punto $A$ está en tracción ($25.9\text{ MPa}$). El eje neutro queda mucho más cerca de $y$ ($70.9°$ desde $z$) que el momento ($30°$), igual que en el subtema 8.1.
+   El punto $A$ está en tracción ($7.4\text{ MPa}$): $M_y$ lo tracciona porque $z>0$ y $M_z$ lo comprime porque $y>0$. El eje neutro queda mucho más cerca de $y$ ($70.9°$ desde $z$) que el momento ($30°$), igual que en el subtema 8.1.
 </Solution>
 </Example>
 
 ## Ejercicio de autoevaluación
 
-<Quiz question="En un perfil UPN (canal) con el momento aplicado en el centroide, ¿hay que buscar los ejes principales antes de usar este método?">
+<Quiz question="En un perfil UPN (canal) con el momento aplicado en el centroide, ¿hay que buscar los ejes principales antes de usar estas fórmulas?">
 No. En perfiles normalizados como el canal y el perfil I, los ejes $1\text{-}1$ y $2\text{-}2$ de las tablas ya son ejes principales centroidales, así que se usan directamente.
 </Quiz>
 
