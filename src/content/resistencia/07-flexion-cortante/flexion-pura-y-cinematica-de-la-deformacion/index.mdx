@@ -1,0 +1,119 @@
+# Flexión Pura y Cinemática de la Deformación
+
+## ¿Qué es la flexión pura?
+
+La flexión pura es un estado de solicitación en el que una viga prismática se encuentra sometida exclusivamente a la acción de pares de momentos flectores constantes y opuestos en sus extremos.
+
+**Características:**
+
+- La fuerza cortante interna es nula ($V = 0$) en todo el tramo.
+- El momento flector interno ($M$) permanece constante a lo largo del segmento.
+
+**Ejemplo:** 
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794083236/bz9pxbtgto1gimpgvrya.svg" alt="Descripción de la imagen" caption="Eje posterior de vehículo en flexión pura" />
+
+## Análisis de deformaciones
+
+Cuando el momento flector actúa sobre la viga, se generan deformaciones en sus fibras longitudinales. Para analizarlas, partimos de la hipótesis fundamental de la resistencia de materiales:
+
+<Note title="">
+"Las secciones planas y perpendiculares al eje longitudinal de la viga antes de la deformación, permanecen planas y perpendiculares al eje después de haberse flectado".
+</Note>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794098549/elyvct5t30brhgzu4ve3.svg" alt="Descripción de la imagen" caption="" />
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794092866/lnjktfyknnfxcfvsgf16.svg" alt="Descripción de la imagen" caption="" />
+
+### Deformación longitudinal unitaria ($\varepsilon$)
+
+Al curvarse la viga, las fibras superiores experimentan compresión y las inferiores experimentan tracción (o viceversa), formando un arco de radio de curvatura $\rho$ subtendido por un ángulo $\theta$. 
+
+**Longitud inicial de la fibra JK**
+
+$$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad L_{JK} = \rho\theta$$
+
+**Longitud después de la deformación**
+
+$$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad l_{JK} = (\rho - y)\theta$$
+
+**Cambio de longitud de la fibra**
+
+$$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \Delta l_{JK} = -y\theta$$
+
+**Deformación unitaria de la fibra**
+
+$$\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \varepsilon = \frac{-y\theta}{\rho\theta} = -\frac{y}{\rho}$$
+
+La deformación unitaria en cualquier fibra ubicada a una distancia $y$ del eje neutro se define como:
+
+<Formula label="Deformación unitaria de la fibra">
+$$
+\varepsilon = -\frac{y}{\rho} 
+$$
+</Formula>
+
+## Eje neutro y su ubicación
+
+Es la línea longitudinal a lo largo de la viga donde las fibras no sufren ningún cambio de longitud (su deformación unitaria y su esfuerzo son estrictamente cero: $\varepsilon = 0$, $\sigma = 0$).
+
+**Propiedad fundamental:**
+
+Para cumplir con el equilibrio estático ante fuerzas axiales nulas ($\int \sigma \, dA = 0$), se demuestra que el eje neutro coincide exactamente con el centroide geométrico de la sección transversal de la viga:
+
+<Formula label="">
+$$
+\int y \, dA = \bar{y}A = 0
+$$
+</Formula>
+
+**DEMOSTRACIÓN:**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794094785/eebdl5dbqdmqhobcmc8u.png" alt="Descripción de la imagen" caption="" />
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,F_R = \sum F_x$$ 
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0 = \int_A dF = \int_A \sigma \, dA = \int_A -\left(\frac{y}{c}\right) \sigma_{\text{máx}} \, dA = \frac{-\sigma_{\text{máx}}}{c} \int_A y \, dA$$
+<Formula label="LQQD">
+$$
+\therefore  \int_A y \, dA = 0
+$$
+</Formula>
+
+## Curvatura y Radio de Curvatura ($\rho$)
+
+Es la distancia desde el centro de curvatura $C$ hasta la fibra neutra de la viga.
+
+**Curvatura ($\kappa$):** Se define matemáticamente como la inversa del radio de curvatura:
+
+<Formula label="Curvatura (K)">
+$$
+\kappa = \frac{1}{\rho}
+$$
+</Formula>
+
+A mayor momento aplicado, menor es el radio de curvatura $\rho$ y mayor es la curvatura $\kappa$ de la estructura.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794097069/bo6a1jdzoivciyif30mu.svg" alt="Descripción de la imagen" caption="" />
+
+
+<Note title="SE CUMPLE QUE:">
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,R = \infty > R_1 > R_2$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\kappa = 0 < \kappa_1 < \kappa_2$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,M = 0 < M_1 < M_2$$
+</Note>
+
+<Quiz question="¿Qué condición fundamental debe cumplir una viga en flexión pura respecto a su fuerza cortante y su momento flector interno?">
+La fuerza cortante interna debe ser estrictamente nula ($V = 0$) en todo el tramo, y el momento flector interno ($M$) debe mantenerse completamente constante.
+</Quiz>
+
+<Summary title="Resumen">
+- **Flexión Pura:** Ocurre cuando un elemento prismático está sometido únicamente a pares de momentos constantes en sus extremos, generando cortante nulo.
+- **Cinemática de Deformación:** Las secciones planas permanecen planas tras la deformación, estableciendo que la deformación unitaria lineal varía linealmente con la distancia al eje neutro según $\varepsilon = -\frac{y}{\rho}$.
+- **Eje Neutro y Curvatura:** El eje neutro coincide con el centroide de la sección transversal ($\int y \, dA = 0$) y la curvatura $\kappa = \frac{1}{\rho}$ es directamente proporcional al grado de flexión.
+</Summary>
