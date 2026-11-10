@@ -1,35 +1,42 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { db } from '@/lib/firebase'
+import { auth, db } from '@/lib/firebase'
 import { workspaceFetch } from '@/lib/workspace-api'
 import { doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore'
 import { withSubtopicTitle } from '@/lib/course-titles'
 import type { CourseDocument } from '@/lib/content-schema'
 import { useRef } from 'react'
-import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check, RotateCcw } from 'lucide-react'
-import { chapters as initialChapters, type Chapter, type Section } from '@/lib/course-data'
+import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
+import { chapters as initialChapters, isChapterList, type Chapter, type Section } from '@/lib/course-data'
 
 const RESET_VERSION = '2026_10_05_clean_v4';
 
 export default function Dashboard({ session }: { session: any }) {
   const expansionStorageKey = `mc361_expanded_chapters:${session?.email || 'guest'}`
-  const [expandedChapters, setExpandedChapters] = useState<string[]>(() => {
+  const [expandedChapters, setExpandedChapters] = useState<string[]>([])
+  const [storageReady, setStorageReady] = useState(false)
+  useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(expansionStorageKey) || '[]')
-      return Array.isArray(saved) ? saved.filter((value): value is string => typeof value === 'string') : []
-    } catch {
-      return []
-    }
-  })
+      setExpandedChapters(Array.isArray(saved) ? saved.filter((value): value is string => typeof value === 'string') : [])
+      const cached = localStorage.getItem('mc361_local_chapters')
+      if (localStorage.getItem('mc361_clean_version') === RESET_VERSION && cached) {
+        const parsed = JSON.parse(cached)
+        if (isChapterList(parsed) && parsed.length) setLocalChapters(parsed)
+      }
+    } catch { /* Browser storage is optional. */ }
+    setStorageReady(true)
+  }, [expansionStorageKey])
 
   useEffect(() => {
+    if (!storageReady) return
     try {
       localStorage.setItem(expansionStorageKey, JSON.stringify(expandedChapters))
     } catch {
       // Chapters still expand when browser storage is unavailable.
     }
-  }, [expansionStorageKey, expandedChapters])
+  }, [expansionStorageKey, expandedChapters, storageReady])
 
   const toggleChapter = (number: string) => {
     setExpandedChapters((current) => current.includes(number)
@@ -45,30 +52,18 @@ export default function Dashboard({ session }: { session: any }) {
   }
   const [documentsStatus, setDocumentsStatus] = useState<Record<string, any>>({})
   const [isLoading, setIsLoading] = useState(true)
-  const [localChapters, setLocalChapters] = useState<Chapter[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        if (localStorage.getItem('mc361_clean_version') !== RESET_VERSION) {
-          localStorage.removeItem('mc361_local_chapters');
-          return initialChapters;
-        }
-        const cached = localStorage.getItem('mc361_local_chapters');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
-          }
-        }
-      } catch {}
-    }
-    return initialChapters;
-  });
+  const [dataReady, setDataReady] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [retry, setRetry] = useState(0)
+  const [localChapters, setLocalChapters] = useState<Chapter[]>(initialChapters)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localChapters) {
+    if (!storageReady || !dataReady) return
+    try {
       localStorage.setItem('mc361_local_chapters', JSON.stringify(localChapters));
-    }
-  }, [localChapters]);
+      localStorage.setItem('mc361_clean_version', RESET_VERSION);
+    } catch { /* Keep working without browser storage. */ }
+  }, [localChapters, storageReady, dataReady]);
 
   // Para crear nuevo subtema in-line
   const [creatingInChapter, setCreatingInChapter] = useState<string | null>(null)
@@ -90,19 +85,31 @@ export default function Dashboard({ session }: { session: any }) {
   const [deleteConfirm, setDeleteConfirm] = useState<{chapter: string, index: number, title: string, isPublished: boolean} | null>(null)
 
   useEffect(() => {
+    let active = true;
+    setIsLoading(true);
+    setDataReady(false);
+    setLoadError(null);
+    const timeout = window.setTimeout(() => {
+      active = false;
+      setIsLoading(false);
+      setLoadError('La conexión está tardando demasiado. Mostramos el temario disponible; reintenta para cargar los datos actuales y habilitar los cambios.');
+    }, 15000);
     async function loadData() {
-      if (!session?.email) { setIsLoading(false); return }
+      if (!session?.email) { window.clearTimeout(timeout); setIsLoading(false); return }
       
       try {
+        await auth.authStateReady();
+        if (!active) return;
+        if (!auth.currentUser || auth.currentUser.email !== session.email) throw new Error('La sesión del navegador no coincide con la plataforma. Recarga la página o vuelve a iniciar sesión.');
         const structureSnap = await getDoc(doc(db, 'course', 'chapters'));
+        if (!active) return;
         const statusMap: Record<string, any> = {};
-        const currentList: Chapter[] = (structureSnap.exists() && Array.isArray(structureSnap.data().list))
+        if (structureSnap.exists() && !isChapterList(structureSnap.data().list)) throw new Error('El temario guardado tiene un formato inválido. No se habilitarán cambios hasta que pueda cargarse correctamente.');
+        const currentList: Chapter[] = (structureSnap.exists() && isChapterList(structureSnap.data().list))
           ? structureSnap.data().list
           : initialChapters;
 
-        if (structureSnap.exists() && Array.isArray(structureSnap.data().list)) {
-          setLocalChapters(structureSnap.data().list);
-        }
+        setLocalChapters(currentList);
 
         if (session.role === 'admin') {
           const draftsSnap = await getDocs(query(collection(db, 'drafts')));
@@ -142,17 +149,23 @@ export default function Dashboard({ session }: { session: any }) {
             await Promise.all(draftFetches);
           }
         }
+        if (!active) return;
         setDocumentsStatus(statusMap);
+        setDataReady(true);
       } catch (e) {
         console.error(e);
+        if (active) setLoadError(e instanceof Error ? e.message : 'No se pudieron cargar los datos actuales del curso. Inténtalo nuevamente.');
       } finally {
-        setIsLoading(false);
+        window.clearTimeout(timeout);
+        if (active) setIsLoading(false);
       }
     }
     loadData();
-  }, [session]);
+    return () => { active = false; window.clearTimeout(timeout); };
+  }, [session, retry]);
 
   const handleCreate = async (chapterNumber: string) => {
+    if (!dataReady) return showToast('Espera a que se confirmen los datos del curso.', 'error');
     if (!newTitle.trim()) return showToast('Escribe el título', 'error')
     setIsProcessing(true)
     const chData = localChapters.find(c => c.number === chapterNumber)
@@ -221,6 +234,7 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const handleReorder = async (chapterNumber: string, sectionIndex: number, direction: 'up' | 'down') => {
+    if (!dataReady) return;
     if (isProcessing) return;
     const chData = localChapters.find(c => c.number === chapterNumber);
     if (!chData) return;
@@ -265,6 +279,7 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const executeDelete = async (chapterNumber: string, sectionIndex: number) => {
+    if (!dataReady) return;
     if (!canEditChapter(chapterNumber)) {
       showToast('No tienes permisos para modificar este capítulo.', 'error');
       setDeleteConfirm(null);
@@ -327,6 +342,7 @@ export default function Dashboard({ session }: { session: any }) {
   }
 
   const handleSaveEdit = async (chapterNumber: string, sectionIndex: number) => {
+    if (!dataReady) return;
     if (!editTitle.trim()) {
       setEditingSection(null);
       return;
@@ -381,39 +397,7 @@ export default function Dashboard({ session }: { session: any }) {
 
   // Filtrar capítulos que el usuario puede ver
   const visibleChapters = localChapters.filter(c => session.role === 'admin' || assignedChapters.includes(c.number))
-  const handleResetDb = async () => {
-    if (!confirm('¿Estás seguro de que deseas restablecer todos los subtemas y borradores a 0? Esta acción borrará borradores y subtemas extras.')) return;
-    try {
-      setIsProcessing(true);
-      await setDoc(doc(db, 'course', 'chapters'), {
-        list: initialChapters,
-        updatedAt: new Date().toISOString(),
-        version: RESET_VERSION
-      });
-      const allDrafts = await getDocs(collection(db, 'drafts'));
-      const batch = writeBatch(db);
-      allDrafts.docs.forEach(d => batch.delete(d.ref));
-      await batch.commit();
-
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('mc361_local_chapters');
-        localStorage.setItem('mc361_clean_version', RESET_VERSION);
-      }
-      setLocalChapters(initialChapters);
-      setDocumentsStatus({});
-      showToast('Base de datos y subtemas restablecidos a 0.', 'success');
-      setTimeout(() => window.location.reload(), 600);
-    } catch (e: any) {
-      console.error(e);
-      showToast('Error al restablecer: ' + (e.message || ''), 'error');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const allChaptersExpanded = visibleChapters.length > 0 && visibleChapters.every((chapter) => expandedChapters.includes(chapter.number))
-
-  if (isLoading) return <div className="p-10 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#8B0000] border-t-transparent rounded-full" /></div>
 
   return (
     <div className="max-w-6xl mx-auto p-6 text-[#3b2022] relative">
@@ -429,18 +413,6 @@ export default function Dashboard({ session }: { session: any }) {
           <p className="text-sm text-[#8b6d6d] mt-1">Abre un capítulo para gestionar sus subtemas. Recordaremos los que dejes abiertos.</p>
         </div>
         <div className="flex items-center gap-2">
-          {session?.role === 'admin' && (
-            <button
-              type="button"
-              onClick={handleResetDb}
-              disabled={isProcessing}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-3 py-2 text-xs font-semibold text-[#8B0000] hover:bg-[#f8eaea] disabled:opacity-40 transition-colors"
-              title="Restablecer todos los subtemas y borradores a 0"
-            >
-              <RotateCcw className="size-4" aria-hidden="true" />
-              Restablecer a 0
-            </button>
-          )}
           <button
             type="button"
             onClick={() => setExpandedChapters(allChaptersExpanded ? [] : visibleChapters.map((chapter) => chapter.number))}
@@ -453,6 +425,9 @@ export default function Dashboard({ session }: { session: any }) {
         </div>
       </div>
 
+      {isLoading && <p role="status" className="mb-5 flex items-center gap-2 text-sm text-[#8b6d6d]"><Clock className="size-4 animate-pulse" aria-hidden="true" />Actualizando capítulos y estados de publicación…</p>}
+      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => setRetry(value => value + 1)} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
+      {!visibleChapters.length && <p className="rounded-lg border border-dashed border-[#d5baba] p-6 text-sm">{session.role === 'admin' ? 'El curso todavía no tiene capítulos.' : 'Tu cuenta no tiene capítulos asignados. Un administrador debe asignarte los capítulos que puedes editar.'}</p>}
       <div className="space-y-3">
         {visibleChapters.map(chapter => (
           <div key={chapter.number} className="bg-white rounded-xl border border-[#eadada] overflow-hidden shadow-sm">
@@ -472,6 +447,7 @@ export default function Dashboard({ session }: { session: any }) {
                 </button>
               </h2>
               <button 
+                disabled={!dataReady || isProcessing}
                 onClick={() => {
                   setExpandedChapters((current) => current.includes(chapter.number) ? current : [...current, chapter.number]);
                   setCreatingInChapter(chapter.number);
@@ -523,7 +499,7 @@ export default function Dashboard({ session }: { session: any }) {
                               }}
                               className="flex-1 rounded border border-[#dcc3c3] px-2 py-1 text-[15px] font-semibold outline-none focus:border-[#9c4d4d]"
                             />
-                            <button onClick={() => handleSaveEdit(chapter.number, idx)} disabled={isProcessing} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
+                            <button onClick={() => handleSaveEdit(chapter.number, idx)} disabled={isProcessing || !dataReady} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
                               <Check className="w-4 h-4" />
                             </button>
                             <button onClick={() => setEditingSection(null)} className="p-1 text-[#8b6d6d] hover:bg-[#f1dddd] rounded">
@@ -540,7 +516,7 @@ export default function Dashboard({ session }: { session: any }) {
                       <div className="flex items-center gap-3">
                         {statusBadge}
                         <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
+                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing || !dataReady} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
                              <Pencil className="w-4 h-4" />
                            </button>
                            {canEditChapter(chapter.number) && (
@@ -549,7 +525,7 @@ export default function Dashboard({ session }: { session: any }) {
                                  const isPublished = Boolean(docStatus?.publishedContent || docStatus?.status === 'approved');
                                  setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title, isPublished });
                                }} 
-                               disabled={isProcessing} 
+                               disabled={isProcessing || !dataReady}
                                className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" 
                                title="Eliminar"
                              >
@@ -558,10 +534,10 @@ export default function Dashboard({ session }: { session: any }) {
                            )}
                         </div>
                         <div className="flex flex-col border border-[#eadada] rounded bg-white mr-2">
-                          <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                          <button onClick={() => handleReorder(chapter.number, idx, 'up')} disabled={idx === 0 || isProcessing || !dataReady} className="p-0.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
                             <ChevronUp className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
+                          <button onClick={() => handleReorder(chapter.number, idx, 'down')} disabled={idx === chapter.sections.length - 1 || isProcessing || !dataReady} className="p-0.5 border-t border-[#eadada] text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] disabled:opacity-30">
                             <ChevronDown className="w-4 h-4" />
                           </button>
                         </div>
@@ -587,7 +563,7 @@ export default function Dashboard({ session }: { session: any }) {
                       className="flex-1 rounded border border-[#dcc3c3] px-3 py-2 text-sm outline-none focus:border-[#9c4d4d]"
                     />
                     <button onClick={() => setCreatingInChapter(null)} className="text-sm font-semibold text-[#8b6d6d] hover:underline px-2 py-1">Cancelar</button>
-                    <button onClick={() => handleCreate(chapter.number)} disabled={isProcessing} className="bg-[#8B0000] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-[#6a0000] disabled:opacity-50">
+                    <button onClick={() => handleCreate(chapter.number)} disabled={isProcessing || !dataReady} className="bg-[#8B0000] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-[#6a0000] disabled:opacity-50">
                       {isProcessing ? 'Guardando...' : 'Guardar'}
                     </button>
                   </div>

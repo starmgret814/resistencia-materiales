@@ -173,9 +173,30 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"01-esfuerzos-falla/xd/index.mdx": {
+	id: "01-esfuerzos-falla/xd/index.mdx";
+  slug: "01-esfuerzos-falla/xd";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "02-deformaciones-ley-hooke/subtema-inicial/index.mdx": {
 	id: "02-deformaciones-ley-hooke/subtema-inicial/index.mdx";
   slug: "02-deformaciones-ley-hooke/subtema-inicial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"03-cambio-temperatura-hiperestaticos/3-11-problemas-resueltos/index.mdx": {
+	id: "03-cambio-temperatura-hiperestaticos/3-11-problemas-resueltos/index.mdx";
+  slug: "03-cambio-temperatura-hiperestaticos/3-11-problemas-resueltos";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"03-cambio-temperatura-hiperestaticos/cambios-de-temperatura/index.mdx": {
+	id: "03-cambio-temperatura-hiperestaticos/cambios-de-temperatura/index.mdx";
+  slug: "03-cambio-temperatura-hiperestaticos/cambios-de-temperatura";
   body: string;
   collection: "resistencia";
   data: any
@@ -215,9 +236,65 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/8-2-ejes-principales/index.mdx": {
+	id: "08-flexion-asimetrica/8-2-ejes-principales/index.mdx";
+  slug: "08-flexion-asimetrica/8-2-ejes-principales";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/8-3-primer-metodo/index.mdx": {
+	id: "08-flexion-asimetrica/8-3-primer-metodo/index.mdx";
+  slug: "08-flexion-asimetrica/8-3-primer-metodo";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/8-4-segundo-metodo/index.mdx": {
+	id: "08-flexion-asimetrica/8-4-segundo-metodo/index.mdx";
+  slug: "08-flexion-asimetrica/8-4-segundo-metodo";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/problemas-para-practicar/index.mdx": {
+	id: "08-flexion-asimetrica/problemas-para-practicar/index.mdx";
+  slug: "08-flexion-asimetrica/problemas-para-practicar";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "08-flexion-asimetrica/subtema-inicial/index.mdx": {
 	id: "08-flexion-asimetrica/subtema-inicial/index.mdx";
   slug: "08-flexion-asimetrica/subtema-inicial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/tablas/index.mdx": {
+	id: "08-flexion-asimetrica/tablas/index.mdx";
+  slug: "08-flexion-asimetrica/tablas";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"09-deflexion-integracion/9-2-fundamentos-matematicos-y-deduccion-de-la-curva-elastica/index.mdx": {
+	id: "09-deflexion-integracion/9-2-fundamentos-matematicos-y-deduccion-de-la-curva-elastica/index.mdx";
+  slug: "09-deflexion-integracion/9-2-fundamentos-matematicos-y-deduccion-de-la-curva-elastica";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-/index.mdx": {
+	id: "09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-/index.mdx";
+  slug: "09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"09-deflexion-integracion/metodos-de-integracion-directa--2--y-4--orden--/index.mdx": {
+	id: "09-deflexion-integracion/metodos-de-integracion-directa--2--y-4--orden--/index.mdx";
+  slug: "09-deflexion-integracion/metodos-de-integracion-directa--2--y-4--orden--";
   body: string;
   collection: "resistencia";
   data: any

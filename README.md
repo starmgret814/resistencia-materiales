@@ -179,10 +179,15 @@ Guarda la imagen (por ejemplo `foto.png`) en la **misma carpeta** donde estás e
 
 ## 🛠️ Herramientas Interactivas (Calculadoras)
 
-El sistema soporta calculadoras dinámicas y simuladores en vivo (como una calculadora de esfuerzos). Sin embargo, estas herramientas requieren programación avanzada.
+Inserta una herramienta directamente en el Markdown del tema:
 
-> 📞 **¿Tienes una propuesta o quieres crear una herramienta interactiva nueva para tu tema?**  
-> Comunícate conmigo directamente a mi número y lo desarrollamos: **[AQUÍ VA TU NÚMERO]**
+```mdx
+<Tool id="mohr-esfuerzos" />
+
+<Tool id="mohr-deformaciones" />
+```
+
+También están disponibles `esfuerzo-normal` y `deformacion-axial`. Las herramientas funcionan en la vista previa del editor y en el curso público. En **Insertar componente** encontrarás las plantillas. Consulta los detalles en [la guía de colaboradores](GUIA_COLABORADORES.md#herramientas-interactivas).
 
 ---
 

@@ -292,6 +292,16 @@ $A \ge V / \tau_{adm} \implies d \ge 20.6\text{ mm}$.
 &lt;/Summary&gt;</code></pre>
             </div>
 
+            <!-- Interactive tools -->
+            <div class="rounded-lg border border-[#ebd0cf] bg-[#fcf8f7] p-4 dark:border-[#3a1f22] dark:bg-[#1e1012]">
+              <p class="font-mono text-xs font-bold text-[#7f0303] dark:text-[#fca5a5]">&lt;Tool id="..." /&gt;</p>
+              <p class="mt-2 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">Inserta simuladores dentro del tema, respetando su ancho. El cuadrado rota y sus flechas cambian con las componentes giradas. Los campos aceptan valores libres; los deslizadores amplían su rango al llegar a un extremo y también tienen controles ×2 y ÷2. Se conservan las variables, el radio, el promedio, los valores principales y sus dos direcciones. Cada herramienta es independiente y funciona en la vista previa.</p>
+              <pre is:raw class="mt-3 overflow-x-auto rounded border border-[#ead0ce] bg-white p-3 font-mono text-xs text-[#8B0000] dark:border-[#3b1e21] dark:bg-[#281315] dark:text-[#fca5a5]"><code>&lt;Tool id="mohr-esfuerzos" /&gt;
+
+&lt;Tool id="mohr-deformaciones" /&gt;</code></pre>
+              <p class="mt-3 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">En deformaciones se introduce γxy ingenieril en µε y se grafica γ/2. θ representa el giro físico antihorario y el círculo usa 2θ. Usa <strong>Insertar componente → Mohr: esfuerzos / Mohr: deformaciones</strong>. También están disponibles <code>esfuerzo-normal</code> y <code>deformacion-axial</code>. Puedes añadir <code>title="Tu título"</code>.</p>
+            </div>
+
             <!-- Quiz -->
             <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Quiz question="..."&gt;</p>

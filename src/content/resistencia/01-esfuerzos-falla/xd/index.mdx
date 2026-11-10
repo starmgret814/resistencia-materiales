@@ -1,0 +1,27 @@
+# xd
+
+Las cargas transmitidas por los elementos y sus conexiones producen esfuerzos sobre las secciones y superficies de contacto. Para analizarlos, se relacionan las fuerzas internas resultantes con las áreas que las transmiten. Las expresiones de esta sección permiten calcular esfuerzos promedio; la distribución real puede variar dentro de cada área.
+## 1.2.1. Esfuerzo normal
+
+Cuando un elemento está sometido a una carga axial, la fuerza interna actúa perpendicularmente a su sección transversal y produce esfuerzo normal. Si la fuerza axial resultante es $P$ y el área de la sección es $A$, el esfuerzo normal promedio es:
+
+$$
+\sigma_{\mathrm{prom}}=\frac{P}{A}.
+$$
+
+En una barra de armadura, por ejemplo, primero se determina la fuerza axial que soporta el miembro. Luego, al dividirla entre el área de su sección transversal, se obtiene el esfuerzo normal promedio. Si la carga tiende a alargar el elemento, el esfuerzo es de tensión; si tiende a acortarlo, es de compresión.
+
+<Image
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793411265/rqpwnilohnehayh63rra.png"
+  alt="Miembro de una armadura sometido a una fuerza axial; se muestra su sección transversal de área A y la distribución de fuerzas normales sobre ella."
+  caption="Figura 5. Fuerza axial y esfuerzo normal promedio en la sección de un miembro."
+/>
+
+## 1.2.2. Principio de Saint-Venant
+
+La forma en que una carga se aplica puede afectar la distribución de esfuerzos en la zona cercana. Por ejemplo, si una fuerza axial $P$ actúa a una distancia $d$ del centro de una sección, su efecto puede representarse en el centro mediante la misma fuerza y un momento:
+
+<Tool id="mohr-esfuerzos" />
+
+<Tool id="mohr-deformaciones" />
+

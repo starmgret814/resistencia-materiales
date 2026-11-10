@@ -18,12 +18,18 @@ function compile(file, name, replacements = []) {
 try {
   compile('lib/remark-number-headings.ts', 'numbering.mjs')
   compile('lib/course-markdown.ts', 'markdown.mjs')
+  compile('lib/interactive-tools.ts', 'tool-models.mjs')
+  compile('lib/mohr-circle.ts', 'mohr-model.mjs')
+  compile('components/mohr-plot.tsx', 'mohr-plot.mjs', [["'@/lib/mohr-circle'", "'./mohr-model.mjs'"]])
+  compile('components/mohr-circle.tsx', 'mohr.mjs', [["'@/lib/mohr-circle'", "'./mohr-model.mjs'"], ["'@/components/mohr-plot'", "'./mohr-plot.mjs'"]])
+  compile('components/interactive-tools.tsx', 'tools.mjs', [["'@/lib/interactive-tools'", "'./tool-models.mjs'"], ["'@/lib/mohr-circle'", "'./mohr-model.mjs'"], ["'@/components/mohr-circle'", "'./mohr.mjs'"]])
   compile('lib/course-headings.ts', 'headings.mjs', [["'./remark-number-headings'", "'./numbering.mjs'"], ["'./course-markdown'", "'./markdown.mjs'"]])
   compile('components/mdx-components.tsx', 'components.mjs', [
     [/import \{ cn \} from '[^']+'/, "const cn = (...values) => values.filter(Boolean).join(' ')"],
     [/import \{ useContentSlug \} from '[^']+'/, "const useContentSlug = () => '05-course/section'"],
   ])
   compile('components/content-renderer.tsx', 'renderer.mjs', [
+    ["'@/components/interactive-tools'", "'./tools.mjs'"],
     ["'@/lib/remark-number-headings'", "'./numbering.mjs'"], ["'@/lib/course-markdown'", "'./markdown.mjs'"], ["'@/components/mdx-components'", "'./components.mjs'"],
   ])
   // Fake Firestore responses: these tests never connect to production.

@@ -15,7 +15,7 @@ if (!session) {
   <div class="min-h-screen bg-[#f8f5f4]">
     <WorkspaceHeader session={session} />
     <main>
-      <DashboardComponent session={session} client:only="react" />
+      <DashboardComponent session={session} client:load />
     </main>
   </div>
 

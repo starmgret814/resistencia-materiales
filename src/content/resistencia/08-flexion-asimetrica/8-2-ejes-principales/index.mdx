@@ -1,6 +1,6 @@
 # 8.2 Ejes principales
 
-En 8.1 la sección tenía simetría y los ejes $y$, $z$ eran los correctos para aplicar $\sigma_x = M_y z/I_y - M_z y/I_z$. En una sección sin simetría (un ángulo, una Z, un canal) esa fórmula solo vale si $y$ y $z$ son **ejes principales**. Este subtema enseña a encontrarlos.
+En 8.1 la sección tenía al menos un eje de simetría y los ejes $y$, $z$ eran los correctos para aplicar $\sigma_x = M_y z/I_y - M_z y/I_z$. En una sección sin simetría (un ángulo, una Z) esa fórmula solo vale si $y$ y $z$ son **ejes principales**. Este subtema enseña a encontrarlos con fórmulas; el subtema 8.3 lo hace con el círculo de Mohr.
 
 ## Producto de inercia
 
@@ -20,14 +20,14 @@ Son los dos ejes perpendiculares por el centroide para los cuales $I_{yz} = 0$. 
 
 La pregunta es: si se conocen $I_z$, $I_y$ e $I_{yz}$ en unos ejes, ¿cuánto valen en otros ejes $z'$, $y'$ girados un ángulo $\theta$? Se resuelve en cuatro pasos.
 
-**Paso 1: coordenadas del mismo punto en los ejes nuevos.** Los ejes $z'$, $y'$ se obtienen girando $z$, $y$ un ángulo $\theta$ en sentido antihorario (Figura 8.4). El elemento $dA$ no se mueve, solo cambian sus coordenadas:
+**Paso 1: coordenadas del mismo punto en los ejes nuevos.** Los ejes $z'$, $y'$ se obtienen girando $z$, $y$ un ángulo $\theta$, de $z$ hacia $y$ (Figura 8.10). El elemento $dA$ no se mueve, solo cambian sus coordenadas:
 
 $$
 z' = z\cos\theta + y\sin\theta \qquad y' = y\cos\theta - z\sin\theta
 $$
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792686052/xwv4nisddy4kdt3udn65.svg" alt="Sección irregular con ejes z, y y ejes girados z', y' un ángulo theta, y un elemento dA con sus coordenadas" 
- caption="Figura 8.4: El mismo elemento dA visto desde los ejes z, y y desde los ejes girados z′, y′."
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794190542/vrxyoyzlz18dyrnyljvv.svg" alt="Descripción de la imagen" caption="Figura 8.10: El mismo elemento dA visto desde los ejes z, y (z a la izquierda, y arriba) y desde los ejes girados z′, y′."
 />
 
 **Paso 2: definición de las inercias nuevas.** $I_{z'} = \int y'^2\, dA$, $I_{y'} = \int z'^2\, dA$, $I_{y'z'} = \int y'z'\, dA$.
@@ -58,7 +58,7 @@ I_{y'z'} = \frac{I_z - I_y}{2}\sin 2\theta + I_{yz}\cos 2\theta
 $$
 </Formula>
 
-Donde $\theta$ es el ángulo de giro, antihorario de $z$ a $z'$ ($\text{grados}$), y todas las inercias están en $\text{m}^4$.
+Donde $\theta$ es el ángulo de giro, de $z$ hacia $y$ ($\text{grados}$), y todas las inercias están en $\text{m}^4$.
 
 Al sumar las dos primeras ecuaciones se ve que $I_{z'} + I_{y'} = I_z + I_y$: el **momento polar** $J_O = I_z + I_y$ no cambia al girar los ejes.
 
@@ -84,25 +84,6 @@ I_{max,\,min} = \frac{I_z + I_y}{2} \pm \sqrt{\left(\frac{I_z - I_y}{2}\right)^2
 $$
 </Formula>
 
-## Círculo de Mohr para momentos de inercia
-
-Las ecuaciones de giro describen un círculo. Se dibuja así:
-
-1. Se trazan dos ejes: $I$ horizontal e $I_{yz}$ vertical (positivo hacia arriba).
-2. El centro $C$ está en $I = (I_z + I_y)/2$, sobre el eje horizontal.
-3. Se ubican los puntos $A = (I_z,\ I_{yz})$ y $B = (I_y,\ -I_{yz})$. Son los extremos de un diámetro.
-4. El círculo pasa por $A$ y $B$, con radio $R = \sqrt{\left(\tfrac{I_z - I_y}{2}\right)^2 + I_{yz}^2}$.
-5. Donde el círculo corta el eje horizontal están $I_{max} = C + R$ e $I_{min} = C - R$.
-6. El ángulo desde $CA$ hasta el eje horizontal es $2\theta_p$.
-
-Si los ejes giran un ángulo $\theta$, el punto que representa a los nuevos ejes gira **el doble** ($2\theta$) sobre el círculo, en el mismo sentido.
-
-
-
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792698585/nvxtxcihvyydpkj06nwy.svg" alt="Círculo de Mohr con centro 50, radio 42.4, puntos A y B, Imax e Imin, y un punto rojo que recorre el círculo" 
- caption="Figura 8.5: Círculo de Mohr del Ejemplo 1. El punto rojo recorre el círculo mientras los ejes giran."
-/>
-
 <Example number={1} title="Ejes principales de una sección">
 Una sección tiene respecto a sus ejes centroidales $I_z = 80\text{ cm}^4$, $I_y = 20\text{ cm}^4$ e $I_{yz} = -30\text{ cm}^4$. Determine los ejes principales y las inercias principales.
 
@@ -122,7 +103,7 @@ Una sección tiene respecto a sus ejes centroidales $I_z = 80\text{ cm}^4$, $I_y
    $$
    I_{max} = 50 + 42.4 = 92.4\text{ cm}^4, \qquad I_{min} = 50 - 42.4 = 7.6\text{ cm}^4
    $$
-4. **Comprobación:** con $\theta = 22.5°$ en la fórmula de $I_{z'}$: $50 + 30\cos 45° + 30\sin 45° = 92.4\text{ cm}^4$. El eje $z'$, girado $22.5°$ en sentido antihorario desde $z$, es el de inercia máxima.
+4. **Comprobación:** con $\theta = 22.5°$ en la fórmula de $I_{z'}$: $50 + 30\cos 45° + 30\sin 45° = 92.4\text{ cm}^4$. El eje $z'$, girado $22.5°$ desde $z$ hacia $y$, es el de inercia máxima. En el subtema 8.3 se resuelve el mismo caso con el círculo de Mohr.
 </Solution>
 </Example>
 
@@ -132,7 +113,7 @@ Una sección tiene respecto a sus ejes centroidales $I_z = 80\text{ cm}^4$, $I_y
 Cero. Por cada elemento $dA$ a un lado del eje de simetría hay otro simétrico con coordenada opuesta, así que los productos $y\,z\,dA$ se cancelan. Por eso los ejes de simetría son ejes principales.
 </Quiz>
 
-<Quiz question="Al girar los ejes, ¿cambia la suma I_z + I_y?">
+<Quiz question="Al girar los ejes, ¿cambia la suma $I_z + I_y$?">
 No. Es el momento polar $J_O$, que permanece constante al girar los ejes.
 </Quiz>
 
@@ -140,6 +121,5 @@ No. Es el momento polar $J_O$, que permanece constante al girar los ejes.
 - El producto de inercia es $I_{yz} = \int yz\, dA$; vale cero respecto a ejes de simetría.
 - Los ejes principales son aquellos con $I_{yz} = 0$; en ellos la inercia es máxima o mínima.
 - Su dirección sale de $\tan 2\theta_p = -I_{yz}/[(I_z - I_y)/2]$ y los valores, de $I_{max,\,min} = \tfrac{I_z + I_y}{2} \pm R$.
-- El círculo de Mohr resume todo: centro $(I_z + I_y)/2$, radio $R$, y un giro de ejes $\theta$ equivale a un giro $2\theta$ del punto.
 - La suma $I_z + I_y$ no cambia al girar los ejes.
 </Summary>

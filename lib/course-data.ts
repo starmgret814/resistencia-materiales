@@ -32,6 +32,11 @@ export interface Chapter {
   sections: Section[]
 }
 
+/** Reject malformed browser caches or remote data before rendering chapter cards. */
+export function isChapterList(value: unknown): value is Chapter[] {
+  return Array.isArray(value) && value.every(chapter => chapter && typeof chapter.number === 'string' && typeof chapter.title === 'string' && Array.isArray(chapter.sections) && chapter.sections.every((section: Section) => section && typeof section.id === 'string' && typeof section.title === 'string' && (section.slug === null || typeof section.slug === 'string')))
+}
+
 import chaptersData from './chapters.json';
 
 export const chapters: Chapter[] = chaptersData as Chapter[];

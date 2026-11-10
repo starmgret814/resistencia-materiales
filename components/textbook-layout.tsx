@@ -19,9 +19,11 @@ import CourseSearch from '@/components/course-search'
 // ─── Logo ──────────────────────────────────────────────────────────────
 function LogoMark() {
   return (
-    <a href="/" className="flex size-9 items-center justify-center rounded-lg bg-[#7f0303] text-[#fff8f4] shadow-sm" aria-label="Universidad Nacional de Ingeniería">
-      <span className="font-serif text-lg font-semibold tracking-tight">UNI</span>
-    </a>
+  <img
+    src="/logo-uni.png"
+    alt="Universidad Nacional de Ingeniería"
+    className="h-10 w-auto object-contain"
+  />
   )
 }
 
@@ -274,7 +276,7 @@ export default function TextbookLayout({
         <main className="min-w-0 flex-1">
           <div className="flex justify-center">
             {/* ─── Content area ─── */}
-            <article className={cn('mx-auto w-full min-w-0 px-5 pb-20 pt-8 sm:px-8 sm:pt-12 lg:px-10', variant === 'archive' ? 'max-w-[1100px]' : 'max-w-[840px]')}>
+            <article className={cn('textbook-reading-column mx-auto w-full min-w-0 px-5 pb-20 pt-8 sm:px-8 sm:pt-12 lg:px-10', variant === 'archive' ? 'max-w-[1100px]' : 'max-w-[840px]')}>
               {/* Breadcrumb */}
               {chapterNumber && chapterTitle && (
                 <div className="mb-8 flex items-center gap-2 text-[11px] font-medium text-[#866b6b] dark:text-[#ab8e8e]">

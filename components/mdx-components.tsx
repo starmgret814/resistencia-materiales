@@ -10,7 +10,7 @@ export function Definition({ children, title = 'Definición' }: { children: Reac
 }
 
 export function Formula({ children, label }: { children: ReactNode; label?: string }) {
-  return <div className="my-7 px-5 py-6 text-center"><div className="font-serif text-3xl italic tracking-wide text-[#4b1719] dark:text-[#fca5a5] sm:text-4xl">{children}</div>{label && <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-[#9a7777] dark:text-[#bca4a3]">{label}</p>}</div>
+  return <div className="formula-block my-2 px-4 py-0 text-center"><div>{children}</div>{label && <p className="formula-label mt-3">{label}</p>}</div>
 }
 
 export function Example({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {

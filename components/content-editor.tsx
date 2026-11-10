@@ -422,6 +422,10 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     else if (kind === 'problem') insertMarkdown('\n<Problem title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
     else if (kind === 'problemimage') insertMarkdown('\n<Problem title="Título del problema" image="figura.png" imageAlt="Diagrama del problema" imageWidth="38%" imagePosition="right">\n\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el enunciado. La imagen aparecerá a su costado.')
     else if (kind === 'quiz') insertMarkdown('\n<Quiz question="Escribe la pregunta">\n', '\n</Quiz>\n', 'Escribe la respuesta.')
+    else if (kind === 'tool-stress') insertMarkdown('\n\n<Tool id="esfuerzo-normal" />\n\n')
+    else if (kind === 'tool-axial') insertMarkdown('\n\n<Tool id="deformacion-axial" />\n\n')
+    else if (kind === 'tool-mohr-stress') insertMarkdown('\n\n<Tool id="mohr-esfuerzos" />\n\n')
+    else if (kind === 'tool-mohr-strain') insertMarkdown('\n\n<Tool id="mohr-deformaciones" />\n\n')
     else if (kind === 'summary') insertMarkdown('\n<Summary title="Resumen">\n', '\n</Summary>\n', 'Resume los puntos principales.')
     else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla" align="center" width="100%" columnWidths="40%, 30%, 30%">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| --- | --- | --- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
     else if (kind === 'tablegrid') insertMarkdown('\n<TableGrid columns="2">\n\n<Table title="Tabla 1" align="center">\n\n| A | B |\n| --- | --- |\n| 1 | 2 |\n\n</Table>\n\n<Table title="Tabla 2" align="center">\n\n| C | D |\n| --- | --- |\n| 3 | 4 |\n\n</Table>\n\n</TableGrid>\n')
@@ -769,7 +773,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             </div>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]">
-            <div className="mx-auto max-w-[760px]">
+            <div className="editor-preview-content mx-auto max-w-[760px]">
               <Suspense fallback={<p role="status" className="text-sm text-[#8b6d6d]">Cargando vista previa...</p>}>
                 {problemOffset !== null ? <ContentRenderer document={deferredDocument} headingPrefix={findSubtopicNumber(courseChapters, deferredDocument.chapterId, deferredDocument.slug)} problemOffset={problemOffset} /> : problemNumberError ? <p role="alert" className="text-sm text-[#8b2020]">No se pudo comprobar la numeración del capítulo. <button type="button" onClick={() => setNumberingRetry(value => value + 1)} className="underline">Reintentar</button></p> : <p role="status" className="text-sm">Calculando numeración de problemas…</p>}
               </Suspense>
@@ -863,6 +867,10 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
     { value: 'problem', label: 'Problema' },
     { value: 'problemimage', label: 'Problema con imagen al costado' },
     { value: 'quiz', label: 'Quiz' },
+    { value: 'tool-stress', label: 'Calculadora de esfuerzo' },
+    { value: 'tool-mohr-stress', label: 'Mohr: esfuerzos' },
+    { value: 'tool-mohr-strain', label: 'Mohr: deformaciones' },
+    { value: 'tool-axial', label: 'Calculadora de deformación' },
     { value: 'summary', label: 'Resumen' },
     { value: 'tablegrid', label: 'Tablas en una fila' },
     { value: 'table', label: 'Tabla con título' },
@@ -881,7 +889,7 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 z-50 mt-1 w-48 overflow-hidden rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10">
+        <div className="absolute top-full right-0 z-50 mt-1 max-h-80 w-64 overflow-y-auto rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10">
           {options.map((option) => (
             <button
               key={option.value}

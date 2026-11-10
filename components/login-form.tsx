@@ -1,60 +1,70 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, type User } from 'firebase/auth';
+import { establishLoginSession, LoginSessionError, loginErrorMessage } from '@/lib/client-login';
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [stage, setStage] = useState('Conectando con Google…');
+  const active = useRef(false);
+  const mounted = useRef(false);
+  const completedUser = useRef<string | null>(null);
+
+  const completeLogin = async (user: User) => {
+    if (mounted.current) setStage('Verificando acceso…');
+    await establishLoginSession(await user.getIdToken());
+    completedUser.current = user.uid;
+    if (mounted.current) window.location.assign('/workspace-mc361/content/chapters');
+  };
+
+  const reportError = async (cause: unknown) => {
+    if (cause instanceof LoginSessionError && (cause.status === 401 || cause.status === 403)) {
+      await auth.signOut().catch(() => {});
+    }
+    if (mounted.current) setError(loginErrorMessage(cause, window.location.hostname));
+  };
 
   useEffect(() => {
+    mounted.current = true;
+    setReady(true);
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      if (user && !active.current && completedUser.current !== user.uid) {
+        active.current = true;
+        setLoading(true);
+        setError(null);
         try {
-          const idToken = await user.getIdToken();
-          const response = await fetch('/api/auth/signin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken })
-          });
-          if (response.ok) {
-            window.location.href = '/workspace-mc361/content/chapters';
-          }
-        } catch {}
+          await completeLogin(user);
+        } catch (cause) {
+          await reportError(cause);
+        } finally {
+          active.current = false;
+          if (mounted.current) setLoading(false);
+        }
       }
+    }, (cause) => {
+      if (mounted.current) setError(loginErrorMessage(cause, window.location.hostname));
     });
-    return () => unsubscribe();
+    return () => { mounted.current = false; unsubscribe(); };
   }, []);
 
   const handleGoogleLogin = async () => {
+    if (active.current || !ready) return;
+    active.current = true;
     try {
       setLoading(true);
       setError(null);
+      setStage('Conectando con Google…');
       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-      
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.role === 'admin') {
-          window.location.href = '/workspace-mc361/content/chapters';
-        } else {
-          window.location.href = '/workspace-mc361/content/chapters';
-        }
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Acceso denegado. Tu correo no está en la lista de editores.');
-        await auth.signOut();
-      }
-    } catch (err: any) {
-      setError(err.message || 'Ocurrió un error al iniciar sesión con Google.');
+      await completeLogin(result.user);
+    } catch (cause) {
+      await reportError(cause);
     } finally {
-      setLoading(false);
+      active.current = false;
+      if (mounted.current) setLoading(false);
     }
   };
 
@@ -71,18 +81,21 @@ export default function LoginForm() {
         </div>
         
         {error && (
-          <div className="rounded-lg bg-[#f8eaea] p-4 text-sm text-[#8B0000] border border-[#d5baba]">
+          <div role="alert" className="rounded-lg bg-[#f8eaea] p-4 text-sm text-[#8B0000] border border-[#d5baba]">
             {error}
           </div>
         )}
 
         <div className="mt-8">
           <button
+            type="button"
+            data-login-ready={ready}
+            aria-busy={loading || !ready}
             onClick={handleGoogleLogin}
-            disabled={loading}
+            disabled={loading || !ready}
             className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d5baba] bg-white px-4 py-3.5 text-sm font-semibold text-[#3E3030] transition hover:bg-[#FCF9F7] hover:border-[#8B0000] focus:outline-none focus:ring-2 focus:ring-[#8B0000]/20 disabled:opacity-50"
           >
-            {loading ? (
+            {loading || !ready ? (
               <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#8B0000] border-t-transparent" />
             ) : (
               <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -104,7 +117,7 @@ export default function LoginForm() {
                 />
               </svg>
             )}
-            {loading ? 'Conectando...' : 'Continuar con Google'}
+            {!ready ? 'Preparando acceso…' : loading ? stage : 'Continuar con Google'}
           </button>
         </div>
       </div>

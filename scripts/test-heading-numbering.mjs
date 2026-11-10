@@ -20,11 +20,17 @@ try {
   compile('lib/remark-number-headings.ts', 'numbering.mjs')
   compile('lib/course-markdown.ts', 'markdown.mjs')
   compile('lib/course-titles.ts', 'titles.mjs')
+  compile('lib/interactive-tools.ts', 'tool-models.mjs')
+  compile('lib/mohr-circle.ts', 'mohr-model.mjs')
+  compile('components/mohr-plot.tsx', 'mohr-plot.mjs', [["'@/lib/mohr-circle'", "'./mohr-model.mjs'"]])
+  compile('components/mohr-circle.tsx', 'mohr.mjs', [["'@/lib/mohr-circle'", "'./mohr-model.mjs'"], ["'@/components/mohr-plot'", "'./mohr-plot.mjs'"]])
+  compile('components/interactive-tools.tsx', 'tools.mjs', [["'@/lib/interactive-tools'", "'./tool-models.mjs'"], ["'@/lib/mohr-circle'", "'./mohr-model.mjs'"], ["'@/components/mohr-circle'", "'./mohr.mjs'"]])
   compile('lib/course-headings.ts', 'headings.mjs', [
     ["'./remark-number-headings'", "'./numbering.mjs'"],
     ["'./course-markdown'", "'./markdown.mjs'"],
   ])
   compile('components/content-renderer.tsx', 'renderer.mjs', [
+    ["'@/components/interactive-tools'", "'./tools.mjs'"],
     ["'@/lib/remark-number-headings'", "'./numbering.mjs'"],
     ["'@/lib/course-markdown'", "'./markdown.mjs'"],
     [/import \{ Image,.*from '@\/components\/mdx-components'/, 'const Table = ({children}) => <div>{children}</div>; const Image = Table, ImageGrid = Table, Definition = Table, Formula = Table, Example = Table, Problem = Table, Solution = Table, Summary = Table;'],

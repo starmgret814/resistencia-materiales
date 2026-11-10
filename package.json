@@ -13,8 +13,11 @@
     "astro": "astro",
     "gestor": "node scripts/manager.mjs",
     "test:auth": "node scripts/test-auth.mjs",
+    "test:login": "node scripts/test-client-login.mjs",
+    "test:dashboard": "node scripts/test-dashboard-loading.mjs",
     "test:headings": "node scripts/test-heading-numbering.mjs",
     "test:problems": "node scripts/test-problem-numbering.mjs",
+    "test:tools": "node scripts/test-interactive-tools.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-mc361-permissions \"node scripts/test-firestore.mjs\""
   },
   "dependencies": {

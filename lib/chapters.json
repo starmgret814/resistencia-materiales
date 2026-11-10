@@ -5,8 +5,28 @@
     "sections": [
       {
         "id": "1.1",
-        "title": "Subtema inicial",
+        "title": "Concepto de esfuerzo",
         "slug": "01-esfuerzos-falla/subtema-inicial"
+      },
+      {
+        "id": "1.2",
+        "title": "Esfuerzos en elementos y conexiones",
+        "slug": "01-esfuerzos-falla/fundamentos-del-esfuerzo"
+      },
+      {
+        "id": "1.3",
+        "title": "Resistencia y seguridad",
+        "slug": "01-esfuerzos-falla/resistencia-y-seguridad"
+      },
+      {
+        "id": "1.4",
+        "title": "Problemas",
+        "slug": "01-esfuerzos-falla/problemas"
+      },
+      {
+        "id": "1.5",
+        "title": "xd",
+        "slug": "01-esfuerzos-falla/xd"
       }
     ]
   },
@@ -16,8 +36,28 @@
     "sections": [
       {
         "id": "2.1",
-        "title": "Subtema inicial",
-        "slug": "02-deformaciones-ley-hooke/subtema-inicial"
+        "slug": "02-deformaciones-ley-hooke/subtema-inicial",
+        "title": "Deformaciones unitarias"
+      },
+      {
+        "title": "Relaciones entre desplazamientos y deformaciones",
+        "id": "2.2",
+        "slug": "02-deformaciones-ley-hooke/concepto-de-deformacion"
+      },
+      {
+        "title": "Análisis general de deformaciones",
+        "slug": "02-deformaciones-ley-hooke/deformacion-de-elementos-sometidos-a-carga-axial",
+        "id": "2.3"
+      },
+      {
+        "id": "2.4",
+        "title": "Ley de Hooke",
+        "slug": "02-deformaciones-ley-hooke/ley-de-hooke"
+      },
+      {
+        "id": "2.5",
+        "title": "Problemas",
+        "slug": "02-deformaciones-ley-hooke/problemas"
       }
     ]
   },
@@ -82,8 +122,38 @@
     "sections": [
       {
         "id": "8.1",
-        "title": "Subtema inicial",
+        "title": "8.1 Doble simetría",
         "slug": "08-flexion-asimetrica/subtema-inicial"
+      },
+      {
+        "id": "8.2",
+        "title": "8.2 Ejes principales",
+        "slug": "08-flexion-asimetrica/8-2-ejes-principales"
+      },
+      {
+        "id": "8.3",
+        "title": "8.3 Círculo de Mohr",
+        "slug": "08-flexion-asimetrica/8-3-circulo-de-mohr"
+      },
+      {
+        "id": "8.4",
+        "title": "8.4 Vigas no simétricas: ejes principales",
+        "slug": "08-flexion-asimetrica/8-3-primer-metodo"
+      },
+      {
+        "id": "8.5",
+        "title": "8.5 Vigas no simétricas: ejes centroidales",
+        "slug": "08-flexion-asimetrica/8-4-segundo-metodo"
+      },
+      {
+        "id": "8.6",
+        "title": "Problemas para practicar",
+        "slug": "08-flexion-asimetrica/problemas-para-practicar"
+      },
+      {
+        "id": "8.7",
+        "title": "Tablas",
+        "slug": "08-flexion-asimetrica/tablas"
       }
     ]
   },

@@ -10,6 +10,7 @@ import rehypeKatex from 'rehype-katex'
 import { visit } from 'unist-util-visit'
 import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary, Table } from '@/components/mdx-components'
 import type { CourseDocument } from '@/lib/content-schema'
+import { Tool } from '@/components/interactive-tools'
 
 type TableOptions = { align?: 'left' | 'center' | 'right'; width?: string; columnWidths?: string[] }
 const TableContext = createContext<TableOptions>({})
@@ -35,7 +36,17 @@ function MarkdownCell({ header, children, style }: ComponentPropsWithoutRef<'td'
   return <Tag style={{ ...style, textAlign: style?.textAlign || align || 'left', overflowWrap: 'anywhere' }}>{children}</Tag>
 }
 
-const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table', 'tablegrid'])
+const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table', 'tablegrid', 'tool'])
+
+function InlineMarkdown({ children }: { children: string }) {
+  return <ReactMarkdown
+    remarkPlugins={[remarkMath]}
+    rehypePlugins={[rehypeKatex]}
+    components={{ p: ({ children: content }) => <>{content}</> }}
+  >
+    {children}
+  </ReactMarkdown>
+}
 
 
 function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterNumber?: string; problemOffset?: number } = {}) {
@@ -62,6 +73,7 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
       node.data.hProperties = {
         'data-course-kind': node.name,
         'data-course-title': title,
+        'data-course-tool': node.attributes?.id || '',
         'data-course-number': number,
         'data-course-image': node.attributes?.image || '',
         'data-course-image-alt': node.attributes?.imageAlt || '',
@@ -86,6 +98,7 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
 
 function CourseDirective({
   kind,
+  toolId,
   title,
   number,
   image,
@@ -107,6 +120,7 @@ function CourseDirective({
   children
 }: {
   kind: string;
+  toolId?: string;
   title?: string;
   number?: string;
   image?: string;
@@ -127,6 +141,7 @@ function CourseDirective({
   align?: string;
   children: ReactNode
 }) {
+  if (kind === 'tool') return <Tool id={toolId || ''} title={title} />
   if (kind === 'image') {
     return (
       <Image
@@ -150,7 +165,7 @@ function CourseDirective({
     return <Solution>{children}</Solution>
   }
   if (kind === 'quiz') {
-    return <section className="my-8 rounded-lg border border-[#e5c6c4] bg-[#f7e9e8] p-5"><p className="font-semibold text-[#4b1719]">{question || title || 'Pregunta'}</p><details className="group mt-3"><summary className="cursor-pointer text-xs font-semibold text-[#7f0303] underline underline-offset-4">Ver respuesta</summary><div className="mt-3 border-t border-[#e5c6c4] pt-3">{children}</div></details></section>
+    return <section className="my-8 rounded-lg border border-[#e5c6c4] bg-[#f7e9e8] p-5"><p className="font-semibold text-[#4b1719]"><InlineMarkdown>{question || title || 'Pregunta'}</InlineMarkdown></p><details className="group mt-3"><summary className="cursor-pointer text-xs font-semibold text-[#7f0303] underline underline-offset-4">Ver respuesta</summary><div className="mt-3 border-t border-[#e5c6c4] pt-3">{children}</div></details></section>
   }
   if (kind === 'example') {
     return <Example title={title || undefined} number={number}>{children}</Example>
@@ -202,6 +217,7 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   return (
     <CourseDirective
       kind={kind}
+      toolId={String(rest['data-course-tool' as keyof typeof rest] || '')}
       title={title}
       number={number}
       image={String(rest['data-course-image' as keyof typeof rest] || '')}

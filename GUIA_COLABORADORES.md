@@ -135,6 +135,45 @@ Para escribir fórmulas y símbolos matemáticos se utiliza una notación están
 
 ## 5. Componentes del libro
 
+### Herramientas interactivas
+
+Puedes insertar un simulador en cualquier parte del tema, dejando una línea en blanco antes y después. No necesitas escribir código JavaScript ni adjuntar archivos HTML.
+
+```mdx
+<Tool id="mohr-esfuerzos" />
+
+<Tool id="mohr-deformaciones" />
+```
+
+También puedes usar la sintaxis de directiva `::tool{id="mohr-esfuerzos"}`.
+
+| Identificador | Herramienta |
+| --- | --- |
+| `mohr-esfuerzos` | Transformación de esfuerzos planos: σx, σy, τxy y ángulo θ. Incluye círculo, estado rotado, valores principales y cortante máximo en el plano. |
+| `mohr-deformaciones` | Transformación de deformaciones: εx, εy, γxy ingenieril y ángulo θ. Entradas en µε; el eje vertical del círculo representa γ/2. |
+| `esfuerzo-normal` | Calculadora de esfuerzo promedio σ = P/A, con P en kN y A en mm². |
+| `deformacion-axial` | Calculadora δ = PL/AE, con L en mm y E en GPa. |
+
+Para cambiar el título que verá el estudiante:
+
+```mdx
+<Tool id="mohr-esfuerzos" title="Explora el estado de esfuerzos de este problema" />
+```
+
+Los círculos respetan el ancho habitual del tema. El elemento girado y el círculo se muestran juntos cuando hay espacio; los controles y los resultados quedan debajo, agrupados en dos columnas. Se conservan todas las variables de esfuerzo o deformación, los valores principales y las componentes del plano girado. En móvil se apilan.
+
+Cada deslizador está junto a un campo de valor libre: admite negativos, decimales con punto o coma y notación científica. El rango no es un límite físico. Al escribir un valor exterior se amplía automáticamente; al soltar un deslizador cerca de un extremo también se amplía, conservando el valor elegido. Los botones **×2** y **÷2** cambian el rango sin modificar las variables; no se reduce por debajo de los valores actuales. Los ángulos también admiten valores escritos fuera de ±180°. Si falta un dato o no es válido se muestra un aviso y se conserva el último gráfico válido. El botón de restablecer recupera los valores y los rangos iniciales.
+
+El cuadrado rota con θ y sus flechas representan las componentes giradas que ya calcula la herramienta. Las flechas normales distinguen tracción y compresión; las cortantes cambian de sentido con su signo. Sus longitudes comparten la escala visual indicada junto al diagrama. Para deformaciones, las flechas ilustran deformaciones, no fuerzas.
+
+El panel incluye el radio R (igual a τmáx para esfuerzos), el promedio, los dos valores principales y sus direcciones θp₁ y θp₂. θp₁ corresponde al valor principal mayor, θp₂ al menor, y difieren 90° (con orientaciones equivalentes cada 180°). El gráfico identifica A y B con sus componentes, el promedio, los valores principales, el nivel de cortante máximo y el sector 2θp₁. Los resultados del plano girado siguen disponibles debajo de las propiedades principales.
+
+El gráfico amplía el círculo alrededor de su centro C y conserva la misma escala en ambos ejes. El cero horizontal puede quedar fuera de esa vista. El giro físico θ es antihorario; el círculo representa 2θ y usa el eje vertical positivo hacia abajo. En deformaciones, γmáx = 2R; en esfuerzos, τmáx en el plano = R. Cuando el radio es cero, todas las orientaciones son principales. La convención y la ecuación pueden consultarse dentro de cada herramienta.
+
+Puedes insertar varias herramientas en una página: cada una mantiene su propio estado. Los cambios del estudiante son locales a su navegador y no modifican el tema publicado. Las fórmulas de transformación se contrastaron con [Applied Mechanics · Jönköping University](https://mechanics.ju.se/SolidMechanics/MohrsCircle.html); el modelo axial usa las relaciones de [Introductory Solid Mechanics · University of Illinois](https://mechref.engr.illinois.edu/sol/axial.html).
+
+Para desarrollar otra herramienta, agrega su modelo y componente al catálogo de `lib/interactive-tools.ts` o `lib/mohr-circle.ts` y regístralo en `components/interactive-tools.tsx`. El Markdown solo selecciona herramientas registradas mediante su identificador.
+
 Para hacer el libro interactivo y visualmente atractivo, dispones de componentes especiales. Se escriben siempre con la **primera letra en mayúscula**.
 
 ### 1. `<Definition>`

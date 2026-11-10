@@ -9,6 +9,20 @@ if (Astro.locals.session) {
 
 <Layout title="Iniciar Sesión - Resistencia de Materiales">
   <main>
+    <div id="login-load-error" hidden role="alert" class="mx-auto mt-6 max-w-md rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm text-[#8B0000]">
+      El formulario de acceso no pudo cargarse. <a href="/workspace-mc361/login" data-astro-reload class="font-semibold underline">Recarga la página</a> e inténtalo nuevamente.
+    </div>
+    <noscript><p class="p-4 text-center">Activa JavaScript en el navegador para continuar con Google.</p></noscript>
     <LoginForm client:load />
   </main>
+  <script is:inline>
+    (() => {
+      const notice = document.getElementById('login-load-error');
+      const timeout = window.setTimeout(() => {
+        if (notice?.isConnected && !document.querySelector('[data-login-ready="true"]')) notice.hidden = false;
+      }, 12000);
+      const island = notice?.parentElement?.querySelector('astro-island');
+      island?.addEventListener('astro:hydrate', () => window.clearTimeout(timeout), { once: true });
+    })();
+  </script>
 </Layout>

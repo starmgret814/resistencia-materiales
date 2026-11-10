@@ -16,6 +16,13 @@ export function normalizeLegacyMdx(markdown: string): string {
     .replace(/&#x20;|&nbsp;/gi, ' ')
     .replace(/\\([#*<>_])/g, '$1')
 
+  normalized = normalized.replace(/<Tool\b([^>]*?)\s*\/>/gi, (_match, attrs) => {
+    const id = attribute(attrs, 'id')
+    const title = attribute(attrs, 'title')
+    const properties = `id="${id.replace(/"/g, '&quot;')}"${title ? ` title="${title.replace(/"/g, '&quot;')}"` : ''}`
+    return `\n\n::tool{${properties}}\n\n`
+  })
+
   normalized = normalized.replace(/<(Solution)\s*>\s*([\s\S]*?)\s*<\/\1>/gi, (_match, _tag, body) => `:::solution\n${body.trim()}\n:::`)
 
   normalized = normalized.replace(/<Image\b([\s\S]*?)\/>/gi, (_match, attrs) => {

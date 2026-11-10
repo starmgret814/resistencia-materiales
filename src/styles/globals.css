@@ -165,9 +165,45 @@
 }
 
 /* ─── MDX Content Typography & Formatting ─── */
+.mdx-content .course-tool p { margin: 0; }
+.mdx-content .course-tool p + p { margin-top: 0.25rem; }
+.mdx-content .course-tool p.mt-2 { margin-top: 0.5rem; }
+.mdx-content .course-tool p.mt-3 { margin-top: 0.75rem; }
+.course-tool header p:first-child { color: inherit; }
+.course-tool input { font: inherit; }
+.mohr-tool { container-type: inline-size; --mohr-point-outline: #fff; --mohr-original: #37668e; --mohr-rotated: #9e3d4e; --mohr-normal: #b82e42; --mohr-shear: #287c50; }
+.mohr-workspace { display: grid; gap: 0.75rem; align-items: start; }
+.mohr-diagrams, .mohr-controls-grid { display: grid; gap: 0.75rem; align-items: center; }
+.mohr-controls-grid { align-items: start; }
+.mohr-visual { border: 1px solid #eadada; border-radius: 0.5rem; padding: 0.5rem; }
+.mohr-element-square { fill: #eaf2f7; stroke: var(--mohr-original); }
+.mohr-element svg { max-height: 280px; }
+.mohr-element { order: 1; }
+.dark .mohr-visual { border-color: #422527; }
+.dark .mohr-element-square { fill: #182b39; }
+.mdx-content .course-tool .mohr-panel > p { margin-bottom: 0.5rem; }
+@container (min-width: 540px) {
+  .mohr-diagrams { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+  .mohr-element { order: 0; }
+}
+@container (min-width: 600px) {
+  .mohr-controls-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+}
+.mohr-plot svg { max-height: 450px; }
+.mohr-principal-sector { fill: #fef3c7; stroke: #bb8716; }
+.mohr-principal-text { fill: #9a6410; }
+.dark .mohr-principal-sector { fill: #3d3015; stroke: #e6b65f; }
+.dark .mohr-principal-text { fill: #e6b65f; }
+.mohr-grid { stroke: #eadada; }
+.mohr-circle-line { stroke: #927275; }
+.dark .mohr-tool { --mohr-point-outline: #1a0f10; --mohr-original: #8dbce4; --mohr-rotated: #f3a2af; --mohr-normal: #f4a0aa; --mohr-shear: #89d3a8; }
+.dark .mohr-grid { stroke: #382022; }
+.dark .mohr-circle-line { stroke: #d4a5a2; }
+
 .mdx-content {
+  --course-font-size: 0.96875rem;
   color: #4d3838;
-  font-size: 0.96875rem;
+  font-size: var(--course-font-size);
   line-height: 1.75;
 }
 
@@ -282,13 +318,38 @@
 
 
 
-/* ─── Normalizar tamaño de expresiones matemáticas ─── */
-math {
-  font-size: 1.15em; /* Igual que texto normal */
+/* One base size for inline math, display equations and Formula, in every container. */
+.katex,
+math,
+.math-large,
+.katex-large {
+  font-size: var(--course-font-size, 0.96875rem);
+  font-style: normal;
+  letter-spacing: normal;
 }
-/* Clase opcional para tamaños mayores en casos excepcionales */
-.math-large {
-  font-size: 1.5em;
+
+/* Slightly enlarge Formula equations and captions relative to course text. */
+.formula-block {
+  --course-font-size: 0.96875rem;
+  font-family: inherit;
+  font-size: var(--course-font-size, 0.96875rem);
+  font-style: normal;
+  letter-spacing: normal;
+  color: inherit;
+}
+
+.formula-block .formula-label {
+  font: inherit;
+  color: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
 }
 
 /* ─── Mostrar MathML nativo y ocultar versión HTML de KaTeX ─── */
@@ -306,12 +367,6 @@ math {
   overflow: visible !important;
   clip: auto !important;
   white-space: normal !important;
-}
-.katex {
-  font-size: 1em; /* Igual que texto normal */
-}
-.katex-large {
-  font-size: 1.5em; /* Opcional para casos excepcionales */
 }
 
 /* ─── Modo Oscuro para MDX ─── */
