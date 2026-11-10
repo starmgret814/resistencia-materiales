@@ -1,0 +1,160 @@
+# Fuerzas Internas en Vigas \ Diagramas de fuerza Cortante y Momento Flector
+
+<Definition title="Fuerza Cortante">
+**La fuerza cortante ($V$)** es la resultante de las fuerzas internas que actúan de manera paralela o transversal a la sección transversal de una viga. Esta fuerza representa la tendencia física a que una sección del material se deslice o corte respecto a la sección adyacente bajo la acción de las cargas aplicadas. 
+</Definition>
+
+<Definition title="Momento flector">
+**El momento flector ($M$)** es la resultante de los pares de fuerzas internos que actúan sobre la sección transversal. Representa la tendencia de la viga a flectarse o curvarse (provocando compresión en unas fibras y tracción en otras) alrededor de un eje perpendicular al plano longitudinal del elemento.
+</Definition>
+
+## 7.2.1 Convención estándar de signos
+
+La convención de signos le da el sentido físico a las fuerzas y momentos internos, siendo positivos o negativos según su dirección.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792873440/vrsqqlld4zykms5zn3nx.png" alt="Descripción de la imagen" caption="Figura 7.2.1: Convención de signos" />
+
+## 7.2.2 Relaciones diferenciales
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792906164/wp137edfwsovnlanhx44.png" alt="Descripción de la imagen" caption="Figura 7.2.2: Relaciones diferenciales" />
+
+## 7.2.3 Diagramas de fuerza cortante y momento flector
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792906745/xx9x5ioyg6zzxuo8psf2.png" alt="Descripción de la imagen" caption="Figura 7.2.3: Diagramas de cortante y momento" />
+
+<Definition title="Efecto de discontinuidades (Fuerzas y momentos puntuales)">
+**- Cargas puntuales ($P$):** Provocan un salto vertical abrupto en el diagrama de fuerza cortante exactamente de la misma magnitud que la carga $P$.
+
+**- Momentos concentrados ($M$):** Provocan un salto o cambio brusco en el diagrama de momento flector equivalente al valor del par aplicado.
+
+**NOTA:** En el caso de las cargas distribuidas se considera como punto de discontinuidad el punto de inicio y final de la carga distribuida.
+
+</Definition>
+
+## 7.2.4 Procedimiento de análisis de vigas isoestáticas
+
+1. Calcular las reacciones externas en los apoyos usando las ecuaciones de equilibrio estático $(\sum F=0 , \sum M=0 )$.
+
+2. Identificar los tramos de la viga delimitados por las aplicaciones de cargas (puntuales, distribuidas o momentos).
+
+3. Aplicar el método de secciones o las relaciones de área bajo la curva (relaciones diferenciales) para determinar las ecuaciones o los valores clave en puntos críticos.
+
+### Método de secciones:
+
+- Hacer un corte imaginario de la viga en un punto cualquiera dentro de un intervalo entre el inicio de la viga y un punto de discontinuidad (comenzar desde la izquierda de toda la viga).
+- Hacer el DCL de la sección considerando la convención de signos de la cortante ($V$) y el momento flector ($M$). Además, al ser un punto cualquiera dentro del intervalo, se considera como la variable $x$ a la distancia desde el origen de la viga hasta la sección de corte.
+- Usar las ecuaciones de equilibrio estático $(\sum F=0 , \sum M=0 )$ para hallar $V(x)$ y $M(x)$.
+- Repetir el mismo procedimiento para los demás intervalos.
+- Hallar los puntos notables de $V(x)$ y $M(x)$ (máximos, mínimos, cruce con abscisas, etc).
+- Hacer las gráficas haciendo uso de las ecuaciones $V(x)$ y $M(x)$.
+
+### Método de áreas:
+
+- Con ayuda de las relaciones diferenciales se hacen las respectivas integraciones para hallar $V(x)$ y $M(x)$ en los intervalos.
+- Las constantes de integración se hallan evaluando $V(x)$ y $M(x)$ en puntos conocidos.
+- Hallar los puntos notables de $V(x)$ y $M(x)$ (máximos, mínimos, cruce con abscisas, etc).
+- Hacer las gráficas haciendo uso de las ecuaciones $V(x)$ y $M(x)$.
+
+<Definition title="Relacion de grados entre W, v y M">
+
+ $$Gr(w(x)) \le Gr(V(x)) \le Gr(M(x))$$ 
+
+</Definition>
+
+## Ejemplo Resuelto
+
+<Example number={1} title="Viga sometida a todas las cargas">
+Hallar las graficas de fuerza cortante y momento flector. Además, hallar las reacciones en los soportes.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792910744/e2cmqzai22cp5errh4uv.png" alt="Descripción de la imagen" caption="" />
+
+<Solution>
+1. **Planteamiento:**
+   Primero hallamos los puntos de discontinuidad y las reacciones en los nodos. Luego, hacemos los cortes imaginarios para evaluar $V$ y $M$ en cada punto $x$. Al final, hacemos las graficas con ayuda de las funciones halladas y los puntos notables.
+
+2. **Cálculo:**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792911395/f0ckckwgwtsec10rfsgg.png" alt="Descripción de la imagen" caption="" />
+
+   $$
+   \sum Fx=0: \text{ } Ax = 0\text{ kN}
+   $$
+   $$
+   \sum Fy=0: \text{ } Ay+By-60-2*20 = 0\text{ kN}
+   $$
+   $$
+   \sum M=0: \text{ } -600+180+30By-30*40 = 0\text{ kN}
+   $$
+   $$
+   By = 54\text{ kN} \text{ ,} \text{ }Ay=46\text{ kN}
+   $$
+
+   Ahora hallamos $V(x)$ y $M(x)$ para cada intervalo:
+- Cuando $$x \in [0;10>$$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792913359/rj2alljzaklxiqmkk6a0.png" alt="Descripción de la imagen" caption="" />
+
+  $$
+   V(x) = 46\text{ kN}
+   $$
+   $$
+   M(x) = 46x\text{ kN}*\text{m}
+   $$
+
+- Cuando $$x \in [10;20>$$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792916211/ruwghkayw3vjsxw75r68.png" alt="Descripción de la imagen" caption="" />
+
+  $$
+   V(x) = -14\text{ kN}
+   $$
+   $$
+   M(x) = -14x+600\text{ kN}*\text{m}
+   $$
+
+- Cuando $$x \in [20;30>$$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792919296/gyuhuimq5kflsiklfxe0.png" alt="Descripción de la imagen" caption="" />
+
+  $$
+   V(x) = -2x+26\text{ kN}
+   $$
+   $$
+   M(x) = -x^2+26x+20\text{ kN}*\text{m}
+   $$
+
+   - Cuando $$x \in [30;40]$$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792923415/zx8tnlx22ku6d0vn4u26.png" alt="Descripción de la imagen" caption="Figura" />
+
+  $$
+   V(x) = -2x+80\text{ kN}
+   $$
+   $$
+   M(x) = -x^2+80x-1600\text{ kN}*\text{m}
+   $$
+
+3. **Gráficas:**
+   Interpretación física del resultado obtenido.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794097816/nrtvtwg7xrbepyhosbzl.svg" alt="Descripción de la imagen" caption="" />
+
+</Solution>
+</Example>
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Cuál es el mejor método?">
+Si el problema te da las cargas; entonces, puedes usar cualquiera de los 2 métodos. Pero, si el problema te da la gráfica de fuerza cortante o momento flector, el método que se debe usar sí o sí es el método de áreas.
+</Quiz>
+
+<Quiz question="¿Cómo afecta las cargas y momentos puntuales en las gráficas?">
+La fuerza puntual traslada aumenta o disminuye la cortante en ese punto, lo cual se refleja en la gráfica de fuerza cortante como una discontinuidad y en la gráfica de momento se evidencia la forma de un tríangulo con la punta en el punto de aplicación de la fuerza.
+El momento puntual al igual que la fuerza puntual aumenta o disminuye la grafica de momento flector en ese punto, lo que se refleja como una discontinuidad.
+</Quiz>
+
+<Summary title="Resumen">
+- La convención de signos le dan el sentido físico a la viga.
+- En el método de secciones se debe hacer un corte imaginario.
+- En el método de áreas se usan las relaciones diferenciales.
+</Summary>
