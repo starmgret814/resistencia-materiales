@@ -1,0 +1,149 @@
+# Problemas resueltos
+
+## Fuerza Cortante y momento Flector
+
+<Problem title="Problema propuesto">
+Determine la fuerza axial, el cortante y el momento flector en el punto B de la viga
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794184312/tvy7p8mqnrpsfg8n1hkb.svg" alt="Descripción de la imagen" caption="" />
+<Solution>
+**1) Hacemos el DCL**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794184528/lxzrvzc6rej8psrqnew8.svg" alt="Descripción de la imagen" caption="" />
+Con el DCL hecho hacemos $\sum F = 0$ y $\sum M_A = 0$ para hallar los valores de $A_x\,,\,A_y\,,\,C_y$.
+
+- $\sum M_A = 0$:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,-30(12) - 15(24) + C_y(36) = 0$$ 
+
+$$\,\,\,\,\,\,\,\,\,\,\,-360 - 360 + 36C_y = 0 \implies 36C_y = 720 \implies C_y = 20\text{ kN} \text{ (hacia arriba)}$$
+
+- $\sum F_y = 0$:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,A_y - 30 - 15 + C_y = 0$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,A_y - 45 + 20 = 0 \implies A_y = 25\text{ kN} \text{ (hacia arriba)}$$
+
+- $\sum F_x = 0$:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,A_x - 20 = 0 \implies A_x = 20\text{ kN} \text{ (hacia la derecha)}$$
+
+**2) Hacemos el corte imaginario en B**
+
+Respetamos la convencion de signos y elegimos un lado para trabajar
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794186092/gru5qgczlcmw30uhszkm.svg" alt="Descripción de la imagen" caption="" />
+
+Hacemos un corte en el punto B y analizamos el tramo izquierdo (desde $x = 0$ hasta $x = 18\text{ m}$): 
+- **Fuerza axial ($N_B$):**
+
+$$\,\sum F_x = 0 \implies A_x + N_B = 0$$
+$$20 + N_B = 0 \implies N_B = -20\text{ kN} \quad (\text{Compresión de } 20\text{ kN})$$
+
+- **Fuerza cortante ($V_B$):**
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\sum F_y = 0 \implies A_y - 30 - V_B = 0$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,25 - 30 - V_B = 0 \implies V_B = -5\text{ kN}$$
+
+- **Momento flector ($M_B$):**
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\sum M_B = 0 \implies -A_y(18) + 30(18 - 12) + M_B = 0$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,-25(18) + 30(6) + M_B = 0$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,-450 + 180 + M_B = 0 \implies M_B = 270\text{ kN}\cdot\text{m}$$
+
+**3) Respuesta final**
+
+- Fuerza axial: $-20\text{ kN}$ (compresión)
+- Cortante: $-5\text{ kN}$
+- Momento flector: $270\text{ kN}\cdot\text{m}$
+</Solution>
+</Problem>
+
+## Flexion en vigas
+
+
+<Problem title="Título del problema" image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794188776/mj3bvvgp4zamrh8syysk.svg" imageAlt="Diagrama del problema" imageWidth="60%" imagePosition="right">
+
+La viga mostrada está hecha de nylon, cuyo esfuerzo admisible es de 24 MPa en tracción y 30 MPa en compresión. Determina el mayor momento M que se puede aplicar a la viga.
+
+<Solution>
+
+**1. Propiedades Geométricas de la Sección Transversal**
+
+Dividimos la sección en dos partes rectangulares (tomando un sistema de referencia desde la base inferior):
+- Parte 1 (Alma inferior):
+
+Ancho $b_1 = 20\text{ mm}$
+
+Altura $h_1 = 30 - 15 = 15\text{ mm}$
+
+Área $A_1 = 20 \times 15 = 300\text{ mm}^2$
+
+Centroide desde la base: $y_1 = \frac{15}{2} = 7.5\text{ mm}$
+
+- Parte 2 (Patín superior):
+
+Ancho $b_2 = 40\text{ mm}$
+
+Altura $h_2 = 15\text{ mm}$
+
+Área $A_2 = 40 \times 15 = 600\text{ mm}^2$
+
+Centroide desde la base: $y_2 = 15 + \frac{15}{2} = 22.5\text{ mm}$
+
+- Área Total ($A$):
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,A = A_1 + A_2 = 300 + 600 = 900\text{ mm}^2$$
+
+**2. Ubicación del Centroide ($\bar{y}$)**
+
+Calculamos la distancia del eje neutro (centroide) medida desde la base inferior:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\bar{y} = \frac{\sum (y_i A_i)}{A} = \frac{(7.5)(300) + (22.5)(600)}{900} = \frac{2250 + 13500}{900} = 17.5\text{ mm}$$
+
+Distancias desde el eje neutro a las fibras extremas: 
+- Fibra inferior ($c_{\text{inf}}$): $17.5\text{ mm}$
+- Fibra superior ($c_{\text{sup}}$): $30 - 17.5 = 12.5\text{ mm}$
+
+**3. Momento de Inercia ($I$) respecto al Eje Neutro**
+
+Aplicamos el teorema de los ejes paralelos (Steiner) para cada rectángulo:
+
+$$I_1 = \frac{20(15)^3}{12} + 300(7.5 - 17.5)^2 = 5625 + 30000 = 35625\text{ mm}^4$$
+
+$$I_2 = \frac{40(15)^3}{12} + 600(22.5 - 17.5)^2 = 11250 + 15000 = 26250\text{ mm}^4$$
+
+$$I = I_1 + I_2 = 35625 + 26250 = 61875\text{ mm}^4$$
+
+**4. Cálculo del Momento Máximo Admisible ($M$)**
+
+Los esfuerzos admisibles son: 
+
+- $\sigma_{\text{trac}} = 24\text{ MPa} = 24\text{ N/mm}^2$
+
+- $\sigma_{\text{comp}} = 30\text{ MPa} = 30\text{ N/mm}^2$
+
+Utilizamos la fórmula de flexión $\sigma = \frac{M c}{I}$, despejando el momento $M = \frac{\sigma I}{c}$:
+
+a) Evaluando en la fibra superior ($c_{\text{sup}} = 12.5\text{ mm}$):
+
+- Límite por tracción: $M = \frac{24 \times 61875}{12.5} = 118,800\text{ N}\cdot\text{mm} = 118.8\text{ N}\cdot\text{m}$
+- Límite por compresión: $M = \frac{30 \times 61875}{12.5} = 148,500\text{ N}\cdot\text{mm} = 148.5\text{ N}\cdot\text{m}$
+
+b) Evaluando en la fibra inferior ($c_{\text{inf}} = 17.5\text{ mm}$):
+
+- Límite por tracción: $M = \frac{24 \times 61875}{17.5} \approx 84,857\text{ N}\cdot\text{mm} = 84.86\text{ N}\cdot\text{m}$
+- Límite por compresión: $M = \frac{30 \times 61875}{17.5} \approx 106,071\text{ N}\cdot\text{mm} = 106.07\text{ N}\cdot\text{m}$
+
+**5. Resultado Final**
+
+El mayor momento $M$ que se puede aplicar a la viga está gobernado por el valor más restrictivo (el menor de todos):
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,M_{\text{max}} = 84.86\text{ N}\cdot\text{m}$$
+
+
+
+</Solution>
+</Problem>
