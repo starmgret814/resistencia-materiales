@@ -1,0 +1,140 @@
+# Distribución de Esfuerzos, Ecuación de la Flexión y Momento de Inercia
+
+## Relación entre Esfuerzos y Deformaciones
+
+A partir de la **ley de Hooke** para materiales elásticos lineales **($\sigma = E\varepsilon$)** y combinándola con la cinemática de la deformación **($\varepsilon = -\frac{y}{\rho}$)**, obtenemos la distribución lineal de los esfuerzos normales internos en la sección transversal de la viga:
+
+<Formula label="">
+$$
+\sigma = E\left(-\frac{y}{\rho}\right) = -\frac{E}{\rho}y
+$$
+</Formula>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794127139/lggyaogtxi5okaw79rjf.png" alt="Descripción de la imagen" caption="" />
+
+## Ubicación del Eje Neutro (Equilibrio Estático)
+
+Para que el elemento se encuentre en equilibrio estático ante fuerzas axiales nulas ($F_R = \sum F_x = 0$), la integral de los esfuerzos en el área debe anularse:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,0 = \int_A dF = \int_A \sigma \, dA = \int_A -\left(\frac{y}{c}\right) \sigma_{\text{máx}} \, dA = \frac{-\sigma_{\text{máx}}}{c} \int_A y \, dA$$
+
+<Formula label="">
+$$
+\int_A y \, dA = 0
+$$
+</Formula>
+
+∴ Como el área no es nula, se concluye que el eje neutro coincide exactamente con el centroide de la sección transversal de la viga.
+
+## Deducción de la Ecuación General de Flexión
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794129042/qnlv2msixgs6awljidvj.png" alt="Descripción de la imagen" caption="" />
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,dF = \sigma dA = -E \frac{y}{\rho} dA$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,dM = \sigma y dA = -E \frac{y^2}{\rho} dA$$
+
+Aplicando el equilibrio de momentos internos respecto al eje neutro ($z$), el momento flector total $M$ se relaciona con la distribución de esfuerzos:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\int_A \sigma y \, dA = M \implies \int_A \frac{E}{\rho} y^2 \, dA = M$$
+
+Al definir el Momento de Inercia de la sección transversal respecto al eje neutro como:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,I = \int_A y^2 \, dA$$
+
+Sustituyendo y despejando la curvatura, obtenemos la relación fundamental de curvatura:
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\frac{1}{\rho} = \frac{M}{EI}$$
+
+Finalmente, combinando esta expresión con la fórmula del esfuerzo $\sigma$, llegamos a la ecuación de la flexión uniaxial:
+
+<Formula label="ecuación de la flexión uniaxial">
+$$
+\sigma = -\frac{My}{I}
+$$
+</Formula>
+
+## Cálculo del Momento de Inercia ($I$)
+
+El momento de inercia cuantifica la resistencia geométrica de la sección a la flexión:
+
+### Momento de inercia con doble integración
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794172060/qpmh0jsfx4r6npcqtlcd.svg" alt="Descripción de la imagen" caption="" />
+
+<Formula label="">
+$$
+I_x = \int y^2 \, dA = \iint y^2 \, dx \, dy
+$$
+</Formula>
+
+<Formula label="">
+$$
+I_y = \int x^2 \, dA = \iint x^2 \, dx \, dy
+$$
+</Formula>
+
+
+### Momento de inercia con integral simple
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794174576/brqzrkyipqjy6qq7pdhi.svg" alt="Descripción de la imagen" caption="" />
+
+<Formula label="">
+$$
+I_x = \int y^2 \, dA = \int y^2 \, b(y) \, dy
+$$
+</Formula>
+
+<Formula label="">
+$$
+I_y = \int x^2 \, dA = \int x^2 \, h(x) \, dx
+$$
+</Formula>
+
+### Tabla de momentos de inercia notables
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794180044/gnjxq4nx7lfhsxhhepmj.svg" alt="Descripción de la imagen" caption="" />
+
+### Teorema de los Ejes Paralelos (Steiner)
+
+Permite trasladar el momento de inercia desde un eje genérico hacia el eje centroidal ($I_{xG}$):
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794180998/wc6kgctswgoogxbv5mps.svg" alt="Descripción de la imagen" caption="" />
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,dI_x = (y + y_G)^2 \, dA \quad\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, dI_y = (x + x_G)^2 \, dA$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,dI_x = y^2 \, dA + y_G^2 \, dA + 2yy_G \, dA$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,I_x = \int y^2 \, dA + y_G^2 \int dA + 2y_G \int y \, dA$$
+
+$$\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\int y^2 \, dA = I_{xG} \quad\,\,\,\,\,\,\,\,\,\,\,\,\, \int y \, dA = 0$$
+
+<Formula label="Momento de Inercia respecto al eje X">
+$$
+I_x = I_{xG} + y_G^2 A
+$$
+</Formula>
+
+<Formula label="Momento de Inercia respecto al eje y">
+$$
+I_y = I_{yG} + x_G^2 A
+$$
+</Formula>
+
+<Quiz question="¿Cómo varía el esfuerzo normal a lo largo del peralte de la viga y en qué puntos de la sección transversal alcanza su valor máximo absoluto?">
+El esfuerzo normal varía de forma **lineal** respecto a la distancia al eje neutro ($y$). Alcanza su valor máximo absoluto en las fibras más alejadas del eje neutro (las superficies superior e inferior de la viga, donde $|y| = c$).
+</Quiz>
+
+<Quiz question="¿Por qué el eje neutro de una viga sometida a flexión pura coincide geométricamente con su centroide?">
+Porque al no existir fuerza axial externa ($\sum F_x = 0$), la resultante de los esfuerzos normales en toda la sección transversal debe ser nula:
+$$\int_A \sigma \, dA = 0$$
+Dado que el esfuerzo varía linealmente ($\sigma = -\frac{E}{\rho}y$), al integrar se obtiene que $\frac{E}{\rho} \int_A y \, dA = 0$. Como el término geométrico $\int_A y \, dA = \bar{y}A = 0$ y el área $A$ es diferente de cero, esto obliga matemáticamente a que la distancia al centroide sea $\bar{y} = 0$, demostrando que el eje neutro pasa exactamente por el centroide de la sección.
+</Quiz>
+
+<Summary title="Resumen">
+- **Distribución de Esfuerzos:** Los esfuerzos normales por flexión se distribuyen linealmente a lo largo de la sección transversal, rigiéndose por la ecuación fundamental $\sigma = -\frac{My}{I}$.
+- **Ubicación del Eje Neutro:** Al no existir carga axial externa, la condición de equilibrio estático ($\int y \, dA = 0$) demuestra que el eje neutro pasa siempre por el centroide geométrico ($\bar{y}$) de la sección.
+- **Momento de Inercia ($I$):** Es la propiedad geométrica que mide la resistencia a la flexión; perfiles estructurales que alejan el área del centroide (como perfiles en "I" o secciones tubulares) poseen mayor inercia y reducen significativamente los esfuerzos máximos.
+</Summary>
+
