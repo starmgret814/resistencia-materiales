@@ -6,7 +6,7 @@ En el diseño de estructuras livianas (como chasis tubulares, fuselajes y ductos
 
 ## 5.1 Concepto de Flujo Cortante ($f$)
 
-En un tubo de pared delgada sometido a torsión pura, el esfuerzo cortante $\tau$ se distribuye uniformemente a lo largo del espesor de la pared. Para analizar el equilibrio de fuerzas sobre un elemento diferencial de la cubierta, se define el **flujo cortante ($f$)**:
+Cuando un tubo de pared delgada de contorno cerrado se somete a un momento torsor puro, el esfuerzo cortante $\tau$ a través del espesor de la pared se distribuye uniformemente. Para analizar el equilibrio de fuerzas sobre un elemento diferencial de la cubierta, se define el **flujo cortante ($f$)**:
 
 <Formula label="Flujo Cortante Constante">
 $$
@@ -40,6 +40,8 @@ Para determinar la relación entre el torque aplicado $T$ y el esfuerzo cortante
 4. **Despeje de Flujo y Esfuerzo Cortante:**
    $$f = \frac{T}{2 A_m} \implies \tau = \frac{T}{2 t A_m}$$
 </Definition>
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794173870/kyoyb2icbza5xnnguhwg.png" alt="Descripción de la imagen" caption="Figura" />
 
 <Formula label="Esfuerzo Cortante en Pared Delgada">
 $$
@@ -80,13 +82,13 @@ $$
 2. **Tubo Rectangular de Ancho $b$, Alto $h$ y Espesores $t_1, t_2$:**
    $$\int_0^{L_m} \frac{ds}{t} = 2 \left( \frac{b}{t_2} + \frac{h}{t_1} \right)$$
 
-<!-- Búsqueda de Imagen Recomendada: "Tubos de pared delgada seccion circular y rectangular torsion" -->
 <Image 
-  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793491063/jphswfhiph7csfrlc0uk.png" alt="Descripción de la imagen"
+  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793491063/jphswfhiph7csfrlc0uk.png" 
+  alt="Geometría de líneas medias para secciones transversales tubulares circulares y rectangulares"
   caption="Figura 6.5.1: Geometría de líneas medias para secciones transversales tubulares circulares y rectangulares."
 />
 
-
+---
 
 ## Ejemplos Resueltos
 
@@ -112,8 +114,7 @@ Un tubo de aluminio de pared delgada de sección rectangular tiene dimensiones m
 </Example>
 
 <Example number={2} title="Comparación entre Teoría Aprox. de Pared Delgada y Teoría Exacta">
-Un tubo circular hueco con diámetro interior de $230\text{ mm}$ y espesor de pared $t = 30\text{ mm}$ está sometido a un torque $T = 136\text{ kN}\cdot\text{m}$.
-Determine el esfuerzo cortante máximo mediante la teoría de tubos de pared delgada.
+Un tubo circular hueco con diámetro interior de $230\text{ mm}$ y espesor de pared $t = 30\text{ mm}$ está sometido a un torque $T = 136\text{ kN}\cdot\text{m}$. Determine el esfuerzo cortante máximo mediante la teoría de tubos de pared delgada.
 
 <Solution>
 1. **Radio Medio ($r_m$):**
@@ -139,7 +140,7 @@ Por condición de equilibrio de fuerzas cortantes longitudinales sobre la cubier
 </Quiz>
 
 <Summary title="Resumen del Subtema">
-- Para secciones tubulares de pared delgada, el flujo cortante $f = \tau t = \frac{T}{2A_m}$ es constante[cite: 12, 14].
+- El flujo cortante $f = \tau t = \frac{T}{2A_m}$ es constante[cite: 12, 14].
 - El esfuerzo cortante depende inversamente del área media encerrada $A_m$ y del espesor $t$: $\tau = \frac{T}{2 t A_m}$[cite: 14].
 - El ángulo de giro $\theta$ se calcula integrando la geometría del contorno mediante $\theta = \frac{TL}{GJ_e}$, donde $J_e = \frac{4A_m^2}{\int \frac{ds}{t}}$[cite: 18].
 </Summary>
