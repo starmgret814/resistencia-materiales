@@ -1,8 +1,8 @@
-# 8.4 Segundo método
+# Vigas no simétricas: ejes centroidales
 
-El **segundo método** evita buscar los ejes principales. Se trabaja con **cualquier par de ejes centroidales** $z$, $y$ y se incluye el producto de inercia $I_{yz}$ en las fórmulas. Es el método más cómodo cuando $I_z$, $I_y$ e $I_{yz}$ ya se conocen o se calculan directamente.
+Esta segunda forma de analizar una viga no simétrica evita buscar los ejes principales. Se trabaja con **cualquier par de ejes centroidales** $z$, $y$ (ejes arbitrarios) y se incluye el producto de inercia $I_{yz}$ en las fórmulas. Es la más cómoda cuando $I_z$, $I_y$ e $I_{yz}$ ya se conocen o se calculan directamente.
 
-<Definition title="Segundo método (ejes centroidales)">
+<Definition title="Análisis con ejes centroidales arbitrarios">
 Se plantea el equilibrio entre los esfuerzos y los momentos usando ejes centroidales arbitrarios $z$, $y$. La fórmula resultante contiene a $I_y$, $I_z$ e $I_{yz}$ y vale para cualquier sección.
 </Definition>
 
@@ -10,17 +10,16 @@ Se plantea el equilibrio entre los esfuerzos y los momentos usando ejes centroid
 
 El análisis se hace en cuatro pasos:
 
-**Paso 1: las secciones planas siguen planas.** La deformación unitaria varía linealmente con la posición. Con las curvaturas $\kappa_y$ y $\kappa_z$ ($\text{1/m}$), el esfuerzo es:
+**Paso 1: esfuerzos normales a la sección.** Las secciones planas siguen planas, así que la deformación unitaria varía linealmente con la posición. Con las curvaturas $\kappa_y$ y $\kappa_z$ ($\text{1/m}$), el esfuerzo es:
 
 $$
 \sigma_x = -\kappa_y E\, y - \kappa_z E\, z
 $$
 
-Donde $E$ es el módulo de elasticidad ($\text{Pa}$) y $y$, $z$ son las coordenadas del punto ($\text{m}$).
+Donde $E$ es el módulo de elasticidad ($\text{Pa}$), $\kappa_y$ y $\kappa_z$ son las curvaturas de la sección en $y$ y en $z$ ($\text{1/m}$), e $y$, $z$ son las coordenadas del punto medidas desde el centroide $C$ ($\text{m}$).
 
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792686400/n8te6mrpgjfazkxrigqi.svg" alt="Sección irregular con ejes centroidales z, y, momentos My y Mz, un punto A y el eje neutro con ángulo beta" 
- caption="Figura 8.7: Segundo método. Los ejes z, y son centroidales pero no principales, por eso Iyz ≠ 0."
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794192553/lagvogeopizpgvpl3nyu.svg" alt="Descripción de la imagen" caption="Figura 8.15: Ejes centroidales z, y arbitrarios (no principales), por eso Iyz ≠ 0. El punto A está en el cuadrante positivo (z > 0, y > 0)."
 />
 
 **Paso 2: no hay fuerza axial.** La fuerza axial debe ser nula, $\int \sigma_x\, dA = 0$, es decir $\kappa_y E\int y\, dA + \kappa_z E\int z\, dA = 0$. Esto se cumple porque los ejes son **centroidales**: $\int y\, dA = \int z\, dA = 0$.
@@ -61,7 +60,7 @@ $$
 
 Donde $I_y = \int z^2 dA$, $I_z = \int y^2 dA$ e $I_{yz} = \int yz\, dA$ se miden en $\text{m}^4$, y los momentos $M_y$, $M_z$ en $\text{N}\cdot\text{m}$.
 
-Cuando $I_{yz} = 0$ (ejes principales o de simetría), las fórmulas se reducen exactamente a las del subtema 8.1.
+Cuando $I_{yz} = 0$ (ejes principales o de simetría), las fórmulas se reducen exactamente a las de los subtemas 8.1 y 8.4.
 
 **Cuidado con el signo de $I_{yz}$:** se calcula con los **mismos ejes** que se usan en $\sigma_x$. Si se invierte la dirección de un eje, $I_{yz}$ cambia de signo.
 
@@ -102,12 +101,12 @@ Una sección tiene respecto a los ejes centroidales $I_y = 4\times 10^6\text{ mm
 
 ## Ejercicio de autoevaluación
 
-<Quiz question="¿Qué pasa con las fórmulas del segundo método si I_yz = 0?">
-Se reducen a las del primer método y a las de doble simetría: $\sigma_x = M_y z/I_y - M_z y/I_z$ y $\tan\beta = M_y I_z/(M_z I_y)$.
+<Quiz question="¿Qué pasa con las fórmulas con ejes centroidales arbitrarios si I_yz = 0?">
+Se reducen a las de ejes principales (subtema 8.4) y a las de doble simetría: $\sigma_x = M_y z/I_y - M_z y/I_z$ y $\tan\beta = M_y I_z/(M_z I_y)$.
 </Quiz>
 
 <Summary title="Resumen">
-- El segundo método usa ejes centroidales cualesquiera y por eso incluye el producto de inercia $I_{yz}$.
+- Se trabaja con ejes centroidales arbitrarios, por eso las fórmulas incluyen el producto de inercia $I_{yz}$.
 - Parte de $\sigma_x = -\kappa_y E y - \kappa_z E z$ y del equilibrio de momentos; de ahí salen las curvaturas.
 - $\sigma_x = [(M_y I_z + M_z I_{yz}) z - (M_z I_y + M_y I_{yz}) y]/(I_y I_z - I_{yz}^2)$.
 - $\tan\beta = (M_y I_z + M_z I_{yz})/(M_z I_y + M_y I_{yz})$.
