@@ -1,0 +1,95 @@
+# Círculo de Mohr
+
+El subtema 8.2 encontró los ejes principales con fórmulas. El **círculo de Mohr** hace lo mismo de forma gráfica: en un solo dibujo se leen las inercias principales, la dirección de los ejes principales y las inercias en cualquier par de ejes girados.
+
+## Ejes principales en la sección
+
+Por el centroide $C$ de cualquier sección pasan dos ejes perpendiculares con producto de inercia nulo, $I_{y'z'} = 0$. Respecto a uno la inercia es máxima ($I_{max}$) y respecto al otro, mínima ($I_{min}$).
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794191875/ruemnplmouubxulpx4hi.svg" alt="Descripción de la imagen" caption="Figura 8.11: Ejes principales de una sección. El eje 1 (girado θp desde z) es el de I máx y el eje 2, perpendicular, el de I mín."
+/>
+
+## Construcción del círculo
+
+Las ecuaciones de giro del subtema 8.2 describen un círculo en un plano con $I$ en el eje horizontal e $I_{yz}$ en el vertical. Se dibuja así:
+
+1. Se trazan dos ejes: $I$ horizontal e $I_{yz}$ vertical (positivo hacia arriba).
+2. El centro $C$ está en $I = (I_z + I_y)/2$, sobre el eje horizontal.
+3. Se ubican los puntos $A = (I_z,\ I_{yz})$ y $B = (I_y,\ -I_{yz})$. Son los extremos de un diámetro.
+4. El círculo pasa por $A$ y $B$; su radio es:
+
+<Formula label="Radio del círculo de Mohr">
+$$
+R = \sqrt{\left(\frac{I_z - I_y}{2}\right)^2 + I_{yz}^2}
+$$
+</Formula>
+
+Donde $I_z$, $I_y$ son los momentos de inercia e $I_{yz}$ el producto de inercia respecto a los ejes centroidales $z$, $y$ ($\text{m}^4$ o $\text{cm}^4$).
+
+5. Donde el círculo corta el eje horizontal están las inercias principales:
+
+<Formula label="Inercias principales en el círculo">
+$$
+I_{max} = \frac{I_z + I_y}{2} + R \qquad I_{min} = \frac{I_z + I_y}{2} - R
+$$
+</Formula>
+
+6. El ángulo desde $CA$ hasta el eje horizontal es $2\theta_p$, el doble del giro que lleva los ejes $z$, $y$ a los ejes principales.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794191931/j65jvdc8kzmnsqwwsiph.svg" alt="Descripción de la imagen" caption="Figura 8.12: Círculo de Mohr del Ejemplo 1 con sus cotas: centro (Iz + Iy)/2, radio R, I máx, I mín y el ángulo 2θp."
+/>
+
+## Giro de ejes en el círculo
+
+Si los ejes giran un ángulo $\theta$, el punto que representa a los nuevos ejes gira **el doble** ($2\theta$) sobre el círculo, en el mismo sentido. Su abscisa es $I_{z'}$ y su ordenada, $I_{y'z'}$. El punto opuesto del diámetro da $I_{y'}$.
+
+Cuando el punto llega al eje horizontal, $I_{y'z'} = 0$: los ejes girados son principales.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794192061/m99xu4m8e3ua2yeduyew.svg" alt="Descripción de la imagen" caption="Figura 8.13: El punto rojo gira 2θ cuando los ejes giran θ. Se detiene en I máx (2θ = 45°) y en I mín (2θ = 225°), donde Iy′z′ = 0."
+/>
+
+<Example number={1} title="Ejes principales con el círculo de Mohr">
+Una sección tiene respecto a sus ejes centroidales $I_z = 80\text{ cm}^4$, $I_y = 20\text{ cm}^4$ e $I_{yz} = -30\text{ cm}^4$ (los mismos datos del Ejemplo 1 del subtema 8.2). Determine con el círculo de Mohr las inercias principales y la dirección de los ejes principales.
+
+<Solution>
+1. **Centro:**
+   $$
+   C = \frac{I_z + I_y}{2} = \frac{80 + 20}{2} = 50\text{ cm}^4
+   $$
+2. **Puntos del diámetro:** $A = (80,\ -30)$ y $B = (20,\ 30)$.
+3. **Radio:**
+   $$
+   R = \sqrt{\left(\frac{80 - 20}{2}\right)^2 + (-30)^2} = \sqrt{30^2 + 30^2} = 42.4\text{ cm}^4
+   $$
+4. **Inercias principales:**
+   $$
+   I_{max} = 50 + 42.4 = 92.4\text{ cm}^4, \qquad I_{min} = 50 - 42.4 = 7.6\text{ cm}^4
+   $$
+5. **Ángulo:** el punto $A$ está $30\text{ cm}^4$ a la derecha del centro y $30\text{ cm}^4$ debajo del eje:
+   $$
+   \tan 2\theta_p = \frac{30}{30} = 1 \implies 2\theta_p = 45° \implies \theta_p = 22.5°
+   $$
+6. **Conclusión:**
+   El punto $A$ llega a $I_{max}$ girando $45°$ sobre el círculo, así que el eje $z'$ que se obtiene girando $z$ un ángulo $22.5°$ hacia $y$ es el de inercia máxima ($92.4\text{ cm}^4$). Coincide con el resultado analítico del subtema 8.2.
+</Solution>
+</Example>
+
+## Ejercicio de autoevaluación
+
+<Quiz question="Si los ejes giran 30°, ¿cuánto gira el punto que los representa en el círculo de Mohr?">
+Gira $60°$, el doble, y en el mismo sentido que los ejes.
+</Quiz>
+
+<Quiz question="¿Qué representa un punto del círculo que está sobre el eje horizontal I?">
+Un par de ejes con $I_{y'z'} = 0$, es decir, ejes principales. Los dos cortes con el eje horizontal son $I_{max}$ e $I_{min}$.
+</Quiz>
+
+<Summary title="Resumen">
+- El círculo de Mohr tiene centro en $(I_z + I_y)/2$ sobre el eje $I$ y radio $R = \sqrt{((I_z - I_y)/2)^2 + I_{yz}^2}$.
+- Los puntos $A = (I_z,\ I_{yz})$ y $B = (I_y,\ -I_{yz})$ son extremos de un diámetro.
+- Los cortes con el eje horizontal dan $I_{max} = C + R$ e $I_{min} = C - R$.
+- Un giro de ejes $\theta$ equivale a un giro $2\theta$ del punto sobre el círculo; el ángulo de $CA$ al eje horizontal es $2\theta_p$.
+</Summary>
