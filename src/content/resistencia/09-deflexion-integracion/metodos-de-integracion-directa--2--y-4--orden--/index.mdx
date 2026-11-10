@@ -2,113 +2,163 @@
 
 La idea es partir de la ecuación diferencial de la curva elástica e integrarla para obtener la pendiente $\theta(x)$ y la deflexión $y(x)$. Si se conoce el momento flector $M(x)$ se usa la ecuación de 2° orden. Si se conoce la carga $q(x)$ se usa la de 4° orden.
 
-## Integración a partir del momento flector (2° orden):
+## Integración a partir del momento flector (2° orden)
 
 El punto de partida es la ecuación simplificada de la sección anterior, que se puede integrar directamente si se conoce la función del momento:
 
 <Formula label="Ecuación diferencial de 2° orden">
 $$
+\footnotesize
 y''(x) = \frac{M(x)}{EI}
 $$
 </Formula>
 
-**Primera integración (pendiente):**
-
+<Formula label="Primera integración (pendiente)">
 $$
+\footnotesize
 \theta(x) = y'(x) = \int \frac{M}{EI}\,dx + C_1
 $$
+</Formula>
 
-**Segunda integración (deflexión):**
-
+<Formula label="Segunda integración (deflexión)">
 $$
+\footnotesize
 y(x) = \int \left( \int \frac{M}{EI}\,dx \right) dx + C_1 x + C_2
 $$
+</Formula>
 
-**Si EI es constante,** al multiplicar por $EI$ quedan las ecuaciones de pendiente y deflexión:
+Si $EI$ es constante, al multiplicar por $EI$ quedan las ecuaciones de pendiente y deflexión:
 
+<Formula label="Pendiente con EI constante">
 $$
-EI \cdot \theta(x) = \int M\,dx + C_1 \qquad EI \cdot y(x) = \int \int M\,dx\,dx + C_1 x + C_2
+\footnotesize
+EI \cdot \theta(x) = \int M\,dx + C_1
 $$
+</Formula>
 
-**Manejo de las constantes:** al integrar dos veces aparecen $C_1$ y $C_2$, por lo que se necesitan **dos condiciones de contorno** para tener la solución del sistema. Si $M(x)$ cambia de expresión por tramos (por ejemplo, con una fuerza concentrada), cada tramo tiene sus propias constantes. Se agregan condiciones de continuidad en el punto de unión: $v_1 = v_2$ y $v'_1 = v'_2$.
+<Formula label="Deflexión con EI constante">
+$$
+\footnotesize
+EI \cdot y(x) = \int \int M\,dx\,dx + C_1 x + C_2
+$$
+</Formula>
 
-## Relaciones diferenciales con el esfuerzo cortante V(x) y la carga q(x):
+**Manejo de las constantes:**
+
+- **Dos condiciones de contorno:** al integrar dos veces aparecen $C_1$ y $C_2$, por lo que se necesitan dos condiciones de contorno para tener la solución del sistema.
+- **Varios tramos:** si $M(x)$ cambia de expresión por tramos (por ejemplo, con una fuerza concentrada), cada tramo tiene sus propias constantes.
+- **Continuidad:** en el punto de unión se agregan las condiciones $v_1 = v_2$ y $v'_1 = v'_2$.
+
+## Relaciones diferenciales con la fuerza cortante V(x) y la carga q(x)
 
 Existen relaciones conocidas entre el momento, la fuerza cortante y la carga distribuida:
 
+<Formula label="Relaciones entre momento, cortante y carga">
 $$
+\footnotesize
 \frac{dM}{dx} = V(x) \qquad\qquad \frac{dV}{dx} = -q(x)
 $$
+</Formula>
 
 Al combinarlas con $EI \cdot y''(x) = M$ se obtiene la cadena de derivadas:
 
+<Formula label="Momento flector">
 $$
+\scriptsize
 EI \cdot \frac{d^2y}{dx^2} = M(x)
 $$
+</Formula>
 
+<Formula label="Fuerza cortante">
 $$
+\scriptsize
 \frac{d}{dx}\left( EI \cdot \frac{d^2y}{dx^2} \right) = V(x)
 $$
+</Formula>
 
+<Formula label="Carga distribuida">
 $$
+\scriptsize
 \frac{d^2}{dx^2}\left( EI \cdot \frac{d^2y}{dx^2} \right) = -q(x)
 $$
+</Formula>
+Cuando $EI$ es constante, cada derivada de la deflexión tiene un significado físico:
 
-Cuando el EI es constante, cada derivada de la deflexión tiene un significado físico:
+<Table title="Significado de las derivadas de la deflexión (EI constante)" width="100%" columnWidths="40%, 60%">
 
 | Derivada | Significado |
 |:---|:---|
-| $y'(x)\quad$ | Pendiente $\theta(x)$ |
-| $EI \cdot y''(x)\quad$ | Momento flector $M(x)$ |
-| $EI \cdot y'''(x)\quad$ | Fuerza cortante $V(x)$ |
-| $EI \cdot y''''(x)\quad$ | Carga distribuida $-q(x)$ |
+| $y'(x)$ | Pendiente $\theta(x)$ |
+| $EI \cdot y''(x)$ | Momento flector $M(x)$ |
+| $EI \cdot y'''(x)$ | Fuerza cortante $V(x)$ |
+| $EI \cdot y''''(x)$ | Carga distribuida $-q(x)$ |
 
-## Integración a partir de la carga distribuida (4° orden):
+</Table>
+
+## Integración a partir de la carga distribuida (4° orden)
 
 Si se conoce la carga y $EI$ es constante, la ecuación diferencial es:
 
 <Formula label="Ecuación diferencial de 4° orden">
 $$
+\footnotesize
 EI \cdot \frac{d^4y}{dx^4} = -q(x)
 $$
 </Formula>
 
 Con ella se hacen 4 integraciones sucesivas, y en cada una aparece una constante nueva:
 
+<Formula label="Primera integración (cortante)">
 $$
+\footnotesize
 \frac{d^3y}{dx^3} = -\int \frac{q(x)}{EI}\,dx + C_1
 $$
+</Formula>
 
+<Formula label="Segunda integración (momento)">
 $$
+\footnotesize
 \frac{d^2y}{dx^2} = -\int \int \frac{q(x)}{EI}\,dx\,dx + C_1 x + C_2
 $$
+</Formula>
 
+<Formula label="Tercera integración (pendiente)">
 $$
+\footnotesize
 \frac{dy}{dx} = -\int \int \int \frac{q(x)}{EI}\,dx\,dx\,dx + C_1 \frac{x^2}{2} + C_2 x + C_3
 $$
+</Formula>
 
+<Formula label="Cuarta integración (deflexión)">
 $$
+\footnotesize
 y(x) = -\int \int \int \int \frac{q(x)}{EI}\,dx\,dx\,dx\,dx + C_1 \frac{x^3}{6} + C_2 \frac{x^2}{2} + C_3 x + C_4
 $$
+</Formula>
 
-**Determinación de $C_1, C_2, C_3, C_4$:** Se necesitan cuatro condiciones de contorno, normalmente dos en cada extremo. En este método no hace falta obtener antes $M(x)$ ni $V(x)$, porque se parte directamente de $q(x)$.
+**Determinación de $C_1, C_2, C_3, C_4$:**
+
+- **Cuatro condiciones de contorno:** se necesitan cuatro, normalmente dos en cada extremo.
+- **Sin calcular $M(x)$ ni $V(x)$:** en este método no hace falta obtenerlos antes, porque se parte directamente de $q(x)$.
 
 ## ¿Cuándo usar cada método?
 
-Para resolver los problemas de este tema, se debe identificar las siguientes informaciones dadas:
+Para resolver los problemas de este tema, primero se identifica qué información se conoce:
+
+<Table title="Elección del método de integración" width="100%" columnWidths="40%, 25%, 35%">
 
 | Si se conoce | Se usa | Ecuación |
 |:---|:---|:---|
-| El momento flector $M(x)$, o se puede obtener por estática.&emsp;&emsp; | Método de segundo orden.&emsp;&emsp; | $EI \cdot y''(x) = M(x)$ |
-| La carga $q(x)$ en toda la viga (con $EI$ constante).&emsp;&emsp; | Método de cuarto orden.&emsp;&emsp; | $EI \cdot y''''(x) = -q(x)$ |
+| El momento flector $M(x)$, o se puede obtener por estática | Método de segundo orden | $EI \cdot y''(x) = M(x)$ |
+| La carga $q(x)$ en toda la viga (con $EI$ constante) | Método de cuarto orden | $EI \cdot y''''(x) = -q(x)$ |
 
-**2° orden:** Primero se calculan las reacciones con equilibrio y luego se corta la viga para escribir $M(x)$. Si hay cargas puntuales o la carga cambia a lo largo de la viga, $M(x)$ cambia de expresión por tramos, y cada tramo tiene sus propias constantes.
+</Table>
 
-**4° orden:** Conviene cuando la carga se describe con una sola expresión (uniforme o triangular). Se hacen más integraciones, pero no hace falta calcular $M(x)$ ni $V(x)$ antes. En muchos casos (empotrado-libre, simplemente apoyada) las condiciones de contorno bastan sin calcular antes las reacciones.
+- **2° orden:** primero se calculan las reacciones con equilibrio y luego se corta la viga para escribir $M(x)$. Si hay cargas puntuales o la carga cambia a lo largo de la viga, $M(x)$ cambia de expresión por tramos y cada tramo tiene sus propias constantes.
+- **4° orden:** conviene cuando la carga se describe con una sola expresión (uniforme o triangular). Se hacen más integraciones, pero no hace falta calcular $M(x)$ ni $V(x)$ antes. En muchos casos (empotrado-libre, simplemente apoyada) las condiciones de contorno bastan sin calcular antes las reacciones.
+- **Varios tramos o cargas puntuales:** más adelante se estudiarán las funciones de discontinuidad, que evitan escribir una ecuación por tramo.
 
-**Varios tramos o cargas puntuales:** Más adelante se estudiarán las funciones de discontinuidad, que evitan escribir una ecuación por tramo.
-
-## Condiciones de contorno según el tipo de apoyo:
+## Condiciones de contorno según el tipo de apoyo
 
 <Definition title="Condiciones de contorno">
 Las condiciones de contorno son valores conocidos de la deflexión $y$, la pendiente $y'$, el momento $M$ o la cortante $V$ en puntos específicos de la viga (apoyos y extremos). Permiten determinar $C_1, C_2, \dots$.
@@ -116,23 +166,47 @@ Las condiciones de contorno son valores conocidos de la deflexión $y$, la pendi
 
 En cualquier punto de la viga se pueden expresar cuatro magnitudes:
 
+<Formula label="Magnitudes en un punto de la viga">
 $$
+\footnotesize
 y = v \qquad y' = \theta \qquad EI \cdot y'' = M \qquad EI \cdot y''' = V
 $$
+</Formula>
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792806621/wkz4emflyrjc6ialpcnz.png" alt="Descripción de la imagen" caption="Figura" />
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794098472/f7qv0rozcko2kouyvqno.jpg" alt="Descripción de la imagen" caption="Figura" />
 
 
-Cada apoyo fija dos de ellas. Las condiciones cinemáticas son las que se imponen sobre $y$ y $y'$, y las estáticas son las que se imponen sobre $M$ y $V$. En el método de 2° orden solo se usan las cinemáticas, porque el momento ya está adentro de la ecuación $EI \cdot y'' = M(x)$. En el 4° orden se necesitan además las estáticas.
+- **Cada apoyo** fija dos de estas magnitudes.
+- **Condiciones cinemáticas:** son las que se imponen sobre $y$ y $y'$.
+- **Condiciones estáticas:** son las que se imponen sobre $M$ y $V$.
+- **Método de 2° orden:** solo se usan las cinemáticas, porque el momento ya está dentro de la ecuación $EI \cdot y'' = M(x)$.
+- **Método de 4° orden:** además de las cinemáticas se necesitan las estáticas.
 
-### Condiciones en los extremos:
+### Condiciones en los extremos
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792806513/qcvmysyhjhilf6mirwxi.png" alt="Descripción de la imagen" caption="Figura" />
 
-### Condiciones en puntos intermedios:
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794109694/og7o07b0jj70s3b3dnuz.jpg" alt="Descripción de la imagen" caption="Figura" />
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792806491/yqkbjahq1lilw6xoixyx.png" alt="Descripción de la imagen" caption="Figura" />
 
-## Convención de signos:
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792806411/urv3l9iq4tz0huvj9rgu.png" alt="Descripción de la imagen" caption="Figura" />
+
+### Condiciones en puntos intermedios
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794109830/c9m1vzfua57sijoauajz.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+## Convención de signos
+
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794024896/ywrjbsjb9wt1syif7qwk.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+
+
+<Summary title="Resumen">
+- **2° orden:** $EI \cdot y''(x) = M(x)$. Se integra dos veces, aparecen $C_1$ y $C_2$ y se necesitan dos condiciones de contorno.
+- **4° orden:** $EI \cdot y''''(x) = -q(x)$. Se integra cuatro veces, aparecen $C_1, C_2, C_3, C_4$ y se necesitan cuatro condiciones de contorno, sin calcular antes $M(x)$ ni $V(x)$.
+- **Significado físico de las derivadas (con $EI$ constante):** $y'$ es la pendiente, $EI \cdot y''$ es el momento, $EI \cdot y'''$ es la cortante y $EI \cdot y''''$ es $-q$.
+- **Varios tramos:** cada tramo tiene sus constantes y se agregan condiciones de continuidad $v_1 = v_2$ y $v'_1 = v'_2$.
+- **Condiciones de contorno:** las cinemáticas ($y$, $y'$) se usan en ambos métodos. Las estáticas ($M$, $V$) se necesitan además en el de 4° orden.
+</Summary>
