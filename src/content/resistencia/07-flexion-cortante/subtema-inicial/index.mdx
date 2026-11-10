@@ -1,3 +1,80 @@
-# Subtema inicial
+# Introducción y Sistemas de Apoyo
 
-Empieza a escribir aquí...
+En la ingeniería estructural y mecánica, las vigas son elementos prismáticos fundamentales diseñados principalmente para soportar cargas transversales a su eje longitudinal (como se observa en puentes, edificaciones y componentes de maquinaria). Cuando una estructura de este tipo es sometida a cargas externas —tales como fuerzas puntuales, cargas distribuidas o momentos aplicados—, dichas acciones no solo generan reacciones en los apoyos, sino que también inducen fuerzas y momentos internos a lo largo de todo el elemento.   El estudio de este capítulo se centra en analizar cómo se transmiten estas cargas a través de la estructura, cómo se representan mediante diagramas y cómo el material de la viga responde internamente ante dichos efectos para evitar la falla estructural.
+
+## Tipos de apoyo
+
+Cada apoyo reacciona de diferente manera, algunos de estos son:
+
+### Apoyo rodillo
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792820196/kqk4kf4yvdloe1vwr2ot.png" 
+alt="1 reacción vertical" 
+caption="Figura 7.1.1: Apoyo rodillo" />
+
+### Apoyo pasador o apoyo fijo
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792819730/hpuby8igmn86oaygtk9g.png" 
+alt="2 reacciones horizontal y vertical" 
+caption="Figura 7.1.2: Apoyo fijo" />
+
+### Empotramiento
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792820458/uvlqbtyozn46sxxobujt.png" 
+alt="2 reacciones y 1 momento" 
+caption="Figura 7.1.3: Empotramiento" />
+
+## Liberaciones internas (releases) y continuidad
+
+### Liberación axial (N=0)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792821112/ltddatyhgxr6rkzhdwah.png" alt="liberacion axial" caption="Figura 7.1.4: Liberación axial" />
+
+### Liberación de torsión (T=0)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792821119/q80y8tr5mpaiw5naq9xv.png" alt="Liberación torsión" caption="Figura 7.1.5: Liberación torsión" />
+
+### Liberación de cortante (V=0)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792821124/uwuas5gg2adhgiutrwbc.png" alt="Liberación cortante" caption="Figura 7.1.6: Liberación cortante" />
+
+### Liberación de momento (M=0)
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792821135/izgcnodwbwh4g9vmhtao.png" alt="Liberación momento" caption="Figura 7.1.7: Liberación momento" />
+
+## Tipo de cargas
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1792823941/gfbdhs231kbew1mokaua.png" alt="Descripción de la imagen" caption="Figura 7.1.8: Cargas" />
+
+## Fórmulas escenciales
+
+<Formula label="Condición estática">
+$$
+1. \sum Fx = 0  
+$$
+$$
+2. \sum Fy = 0  
+$$
+$$
+3. \sum M = 0  
+$$
+</Formula>
+
+Donde:
+- $F$ es fuerza ($\text{N}$).
+- $M$ es momento ($\text{N.m}$).
+
+## Ejercicio de Autoevaluación
+
+<Quiz question="¿Cuál es la diferencia entre carga puntual y distribuida?">
+La carga puntual se aplica de manera concentrada en un único punto de la viga; mientras que la carga distribuida actúa de forma continua a lo largo de una longitud o área (expresada en unidades de fuerza por longitud). Nota: Para fines de equilibrio, la carga distribuida se puede reemplazar por una fuerza resultante equivalente aplicada en el centroide de su diagrama..
+</Quiz>
+
+<Summary title="Resumen">
+- El apoyo fijo o de pasador, genera 2 fuerzas.
+- El apoyo de rodillo, genera 1 fuerza.
+- El empotramiento, genera 2 fuerzas y 1 momento.
+</Summary>
+<Summary title="NOTA">
+Es importante saber cuantas variables (fuerzas y momentos) se debe colocar para que el SEL tenga solución.
+</Summary>
