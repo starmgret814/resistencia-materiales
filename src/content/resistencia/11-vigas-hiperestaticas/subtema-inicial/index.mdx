@@ -1,3 +1,51 @@
-# Subtema inicial
+# ¿Qué son y cómo se resuelven?
 
-Empieza a escribir aquí...
+## ¿Qué es una viga hiperestática?
+
+
+<Definition title="Definición">
+Es aquella en la que el numero de incognitas supera al numero de ecuaciones independientes de equilibrio estatico disponibles.
+</Definition>
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793813462/zzszyh3jjdta5j2m8gru.png" alt="Descripción de la imagen" caption="Figura 1" />
+
+## ¿Cómo se resuelven?
+
+Se requiere de condiciones de compatibilidad de deformaciones para determinar sus reacciones.
+
+## ¿Métodos de resolución?
+
+### Método de integración
+
+        El metodo de integracion requiere 2 integraciones de la ecuacion diferencial:  
+$$
+\frac{d^2v}{dx^2} = \frac{M}{EI}
+$$
+        Una vez que el momento interno M se expresa en funcion de x, 
+        se pueden encontras las incognitas a partir de las condiciones de frontera y continuidad.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793815418/qhaf95nefny74lwteby9.png" alt="Descripción de la imagen" caption="Figura" />
+
+### Método del momento de área**
+
+        Para usar el metodo del momento de area para determinar 
+        las redundantes desconocidas debe dibujarse el diagrama: 
+$$
+\frac{M}{EI}
+$$
+        de modo que en el se representen las redundantes como incognitas.
+        Una vez establecido el diagrama, pueden aplicarse los dos teoremas del 
+        momento de area. 
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793815515/khfrp4yohqj39za8koki.png" alt="Descripción de la imagen" caption="Figura" />
+
+### Método de superposición
+
+        Este metodo consiste en descomponer la estructura en la suma de varios sistemas 
+        estaticamente determinados equivalentes.
+
+        Para este metodo, el material debe cumplir la ley de Hooke y las 
+        deformaciones deben ser pequeñas.
+    
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793815448/ohqfgnp1ahc8o9w4hl1s.png" alt="Descripción de la imagen" caption="Figura" />
