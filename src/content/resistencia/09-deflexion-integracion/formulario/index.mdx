@@ -1,0 +1,235 @@
+# Formulario
+
+## Notación y convención de signos
+
+| Símbolo | Significado |
+|:---:|:---|
+| $y = v(x)$ | Deflexión o flecha en la posición $x$. |
+| $y_{\max}$ | Deflexión máxima. |
+| $\theta = y'$ | Giro o pendiente de la tangente. |
+| $E, I$ | Módulo de elasticidad, momento de inercia. |
+| $M, V$ | Momento flector y fuerza cortante. |
+| $q$ | Carga distribuida (positiva hacia abajo). |
+| $w = -q$ | Función de carga (positiva hacia arriba). |
+| $\rho$ | Radio de curvatura. |
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794024896/ywrjbsjb9wt1syif7qwk.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+## Curvatura y ecuación diferencial de la elástica
+
+**Pendiente:**
+
+<Formula label="Pendiente de la curva elástica">
+$$
+{\footnotesize \tan\theta = y'(x)}
+$$
+</Formula>
+
+**Curvatura exacta:**
+
+<Formula label="Curvatura exacta">
+$$
+{\footnotesize \frac{1}{\rho} = \frac{d\theta}{ds} = y''(x)}
+$$
+</Formula>
+
+**Deformación y esfuerzo:**
+
+<Formula label="Deformación unitaria y esfuerzo">
+$$
+{\footnotesize \varepsilon = -\frac{y}{\rho}   \quad \sigma = E \cdot \varepsilon = -\frac{E \cdot y}{\rho}}
+$$
+</Formula>
+
+**Momento:**
+
+<Formula label="Relación momento-curvatura">
+$$
+{\footnotesize \frac{1}{\rho} = \frac{M}{E \cdot I}}
+$$
+</Formula>
+<Formula label="Ecuación para pequeñas deformaciones">
+$$
+{\footnotesize y''(x) = \frac{M}{E \cdot I}}
+$$
+</Formula>
+
+## Integración directa
+
+**Ecuación diferencial básica:**
+
+<Formula label="Ecuación diferencial de la elástica">
+$$
+{\footnotesize EI\,y''(x) = M(x)}
+$$
+</Formula>
+
+**Pendiente/Rotación:**
+
+<Formula label="Rotación por segundo orden">
+$$
+{\footnotesize EI \cdot \theta = EI \cdot y' = \int M(x)\,dx + C_1}
+$$
+</Formula>
+
+**Deflexión/Flecha:**
+
+<Formula label="Deflexión por segundo orden">
+$$
+{\footnotesize EI \cdot y = \int \left( \int M(x)\,dx \right) dx + C_1 x + C_2}
+$$
+</Formula>
+
+**Condiciones y consideraciones adicionales:**
+
+- Se necesitan 2 condiciones de contorno (solo cinemáticas: $v$, $v'$).
+- Si $M(x)$ cambia por tramos hay 2 constantes por tramo, y en cada unión se imponen condiciones de continuidad: $v_1 = v_2$ y $v'_1 = v'_2$.
+
+### Cuarto orden (se conocen q(x) y EI constantes)
+
+**Carga distribuida:**
+
+<Formula label="Ecuación diferencial de cuarto orden">
+$$
+{\footnotesize EI \cdot y'''' = -q(x)}
+$$
+</Formula>
+
+**Fuerza cortante ($V$):**
+
+<Formula label="Fuerza cortante">
+$$
+{\footnotesize EI\,y''' = V(x) = -\int q(x)\,dx + C_1}
+$$
+</Formula>
+
+**Momento flector ($M(x)$):**
+
+<Formula label="Momento flector">
+$$
+{\footnotesize EI\,y'' = M(x) = -\iint q(x)\,dx\,dx + C_1 x + C_2}
+$$
+</Formula>
+
+**Pendiente/Rotación ($\theta$):**
+
+<Formula label="Pendiente o rotación">
+$$
+{\footnotesize EI\,y' = EI\,\theta = -\iiint q(x)\,dx\,dx\,dx + \frac{C_1 x^2}{2} + C_2 x + C_3}
+$$
+</Formula>
+
+**Deflexión/Flecha ($y$):**
+
+<Formula label="Deflexión general">
+$$
+{\footnotesize EI\,y = -\int\mkern-10mu\int\mkern-10mu\int\mkern-10mu\int q(x)\,dx\,dx\,dx\,dx + \frac{C_1 x^3}{6} + \frac{C_2 x^2}{2} + C_3 x + C_4}
+$$
+</Formula>
+
+**Condiciones generales:**
+
+- Se necesitan 4 condiciones de contorno (normalmente 2 en cada extremo, cinemáticas y estáticas).
+- No hace falta calcular antes $M(x)$ ni $V(x)$.
+
+<Table title="Cadena de derivadas (EI constantes)" columnWidths="35%, 65%">
+
+| Derivada | Significado |
+|:---:|:---|
+| $y$ | Deflexión $v$. |
+| $y'$ | Pendiente $\theta(x)$ |
+| $EI\,y''$ | Momento flector $M(x)$ |
+| $EI\,y'''$ | Fuerza cortante $V(x)$ |
+| $EI\,y''''$ | Carga distribuida $-q(x)$ |
+
+</Table>
+
+<Table title="¿Qué método usar?" columnWidths="38%, 28%, 34%">
+
+| Si se conoce: | Método | Ecuación |
+|:---|:---:|:---:|
+| $M(x)$, o se obtiene por estática. | 2.° orden | $EI\,y'' = M(x)$ |
+| $q(x)$ en toda la viga con el $EI$ constante. | 4.° orden | $EI\,y'''' = -q(x)$ |
+| Varias cargas puntuales o cargas parciales | Funciones de discontinuidad | Ver la sección *Funciones de discontinuidad* |
+
+</Table>
+
+## Condiciones de contorno
+
+**Extremos de la viga:**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794194525/nmphkfhdjgch2qjrkpnm.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+**Puntos intermedios:**
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794194635/buyb2xj2kzhkh3tjgx4i.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+## Funciones de discontinuidad
+
+<Formula label="Función de discontinuidad">
+$$
+{\footnotesize \langle x - a \rangle^{n} =
+\begin{cases}
+(x - a)^{n}, & \text{si } x \ge a \\
+0, & \text{si } x < a
+\end{cases}}
+$$
+</Formula>
+
+**Propiedades y notas:**
+
+- $a$ es el punto donde empieza a actuar la carga. Al evaluar en un punto $x$ se descartan los términos con $x < a$.
+- $n = 0$: escalón; $n = 1$: rampa; $n = 2$: parábola que parte de cero en $a$.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793512953/zhq6zoyxyzd6xzqt5l39.png" alt="Gráfica de funciones de discontinuidad" caption="Figura: Representación gráfica de las funciones de Macaulay." />
+
+Para $n < 0$ (singularidad), las funciones valen 0 salvo en $x = a$. Representan acciones concentradas:
+
+<Formula label="Fuerza concentrada">
+$$
+{\footnotesize w = P\langle x - a \rangle^{-1} =
+\begin{cases}
+0, & \text{si } x \neq a \\
+P, & \text{si } x = a
+\end{cases}}
+$$
+</Formula>
+
+<Formula label="Par concentrado">
+$$
+{\footnotesize w = M_0\langle x - a \rangle^{-2} =
+\begin{cases}
+0, & \text{si } x \neq a \\
+M_0, & \text{si } x = a
+\end{cases}}
+$$
+</Formula>
+
+**Interpretación física:** una carga distribuida $w = \frac{P}{\varepsilon}$ sobre un ancho $\varepsilon$ que tiende a cero equivale a la fuerza concentrada $P$. Un par de fuerzas opuestas equivale al momento concentrado $M_0$, con $w = \frac{P}{\varepsilon} = \frac{M_0}{\varepsilon^2}$.
+
+Para $w = \frac{P}{\varepsilon}$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794032888/lbd2ik9aivzco1mvsyns.png" alt="Descripción de la imagen" caption="Figura: Límite de carga distribuida para fuerza puntual." />
+
+
+Para $w = \frac{M_0}{\varepsilon^2}$:
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794032804/mtehpy6xi1wb6egqvg7k.png" alt="Descripción de la imagen" caption="Figura: Límite de carga distribuida para par concentrado." />
+
+
+<Table title="Integración y derivación" columnWidths="22%, 56%, 22%">
+
+| Operación | Regla | Válida para |
+|:---|:---|:---:|
+| Integración | $\displaystyle \int \langle x - a \rangle^{n}\,dx = \frac{1}{n+1}\langle x - a \rangle^{n+1}$ | $n \ge 0$ |
+| Integración | $\displaystyle \int \langle x - a \rangle^{n}\,dx = \langle x - a \rangle^{n+1}$ | $n = -1, -2$ |
+| Derivación | $\displaystyle \frac{d}{dx}\langle x - a \rangle^{n} = n\langle x - a \rangle^{n-1}$ | $n \ge 1$ |
+
+</Table>
+
+**Cargas, cortante y momento:**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794194759/oh7gu6dqbibmfzfqoxci.png" alt="Descripción de la imagen" caption="Figura" />
