@@ -1,0 +1,708 @@
+# Resolución de problemas
+
+## Voladizo con carga puntual
+
+<Problem title="Voladizo con carga puntual en el extremo libre">
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794160125/kcfto3q2mku6x2cmwjaw.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la carga puntual $P$ mostrada, aplicada en el extremo libre de la viga en voladizo $AB$ de longitud $L$ y rigidez $EI$ constante, determine:
+
+- **a)** la ecuación de la curva elástica para la viga en voladizo $AB$,
+- **b)** la deflexión en el extremo libre,
+- **c)** la pendiente en el extremo libre.
+
+<Solution>
+1. **Momento flector en un corte a distancia $x$ del empotramiento $A$** ($0 \leq x \leq L$):
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794160251/dl4out8fxvpcjttbrkhb.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+   La fuerza puntual $P$ dirigida hacia abajo actúa a una distancia $(L - x)$ del corte y genera tracción en la fibra superior de la viga. Por eso el momento flector es negativo:
+   $$
+   \scriptsize
+   M(x) = -P(L - x)
+   $$
+
+2. **Ecuación diferencial:**
+   $$
+   \scriptsize
+   EI\frac{d^2y}{dx^2} = -P(L - x)
+   $$
+
+3. **Primera integración (función de la pendiente):**
+   $$
+   \scriptsize
+   EI\frac{dy}{dx} = \frac{Px^2}{2} - PLx + C_1
+   $$
+
+4. **Segunda integración (función de la deflexión):**
+   $$
+   \scriptsize
+   EI\,y = \frac{Px^3}{6} - \frac{PLx^2}{2} + C_1x + C_2
+   $$
+
+5. **Condiciones de contorno en el empotramiento $A$ ($x = 0$):** al ser una viga empotrada, la pendiente y la deflexión son nulas.
+   - Pendiente nula:
+     $$
+     \scriptsize
+     y'(0) = 0 \;\rightarrow\; C_1 = 0
+     $$
+   - Deflexión nula:
+     $$
+     \scriptsize
+     y(0) = 0 \;\rightarrow\; C_2 = 0
+     $$
+
+6. **a) Ecuación de la curva elástica:**
+   $$
+   \scriptsize
+   EI\,y = \frac{Px^3}{6} - \frac{PLx^2}{2}
+   $$
+   $$
+   \scriptsize
+   y(x) = -\frac{Px^2}{6EI}(3L - x)
+   $$
+
+7. **b) Deflexión en el extremo libre $B$ ($x = L$):**
+   $$
+   \scriptsize
+   y_B = y(L) = -\frac{PL^2}{6EI}(3L - L) = -\frac{PL^3}{3EI}
+   $$
+   El signo negativo indica que la deflexión es hacia abajo.
+
+8. **c) Pendiente en el extremo libre $B$ ($x = L$):** con $C_1 = 0$, la pendiente es
+   $$
+   \scriptsize
+   \theta(x) = y'(x) = \frac{P}{EI}\left(\frac{x^2}{2} - Lx\right)
+   $$
+   $$
+   \scriptsize
+   \theta_B = y'(L) = \frac{P}{EI}\left(\frac{L^2}{2} - L^2\right) = -\frac{PL^2}{2EI}
+   $$
+   El signo negativo indica que la sección gira en sentido horario.
+
+**Respuestas:**
+- **a)** $y(x) = -\dfrac{Px^2}{6EI}(3L - x)$
+- **b)** $y_B = -\dfrac{PL^3}{3EI}$ (hacia abajo)
+- **c)** $\theta_B = -\dfrac{PL^2}{2EI}$ (sentido horario)
+</Solution>
+</Problem>
+
+## Voladizo con carga distribuida
+
+En estos problemas el empotramiento está en $B$ y el extremo libre es $A$. El origen de coordenadas se toma en $A$, con $x$ hacia el empotramiento.
+
+<Problem title="Voladizo con carga uniformemente distribuida">
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794160318/tvixgzaskmadjfifpcpq.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la carga uniforme $w$ mostrada sobre la viga en voladizo $AB$ de longitud $L$ y rigidez $EI$ constante, determine:
+
+- **a)** la ecuación de la curva elástica para la viga en voladizo $AB$,
+- **b)** la deflexión en el extremo libre,
+- **c)** la pendiente en el extremo libre.
+
+<Solution>
+1. **Fuerza cortante y momento flector en la sección $x$:** el extremo $A$ es libre, por lo que $V(0) = 0$ y $M(0) = 0$. La fuerza cortante en $x$ es
+   $$
+   \scriptsize
+   V(x) = -wx
+   $$
+   Integrando, se obtiene el momento flector en $x$:
+   $$
+   \scriptsize
+   M(x) = -\frac{wx^2}{2}
+   $$
+
+2. **Ecuación diferencial:**
+   $$
+   \scriptsize
+   EI\frac{d^2y}{dx^2} = -\frac{wx^2}{2}
+   $$
+
+3. **Primera integración (pendiente):**
+   $$
+   \scriptsize
+   EI\frac{dy}{dx} = -\frac{wx^3}{6} + C_1
+   $$
+
+4. **Segunda integración (deflexión):**
+   $$
+   \scriptsize
+   EI\,y = -\frac{wx^4}{24} + C_1x + C_2
+   $$
+
+5. **Condiciones de contorno en el empotramiento $B$ ($x = L$):**
+   - Pendiente nula:
+     $$
+     \scriptsize
+     y'(L) = 0 \;\rightarrow\; -\frac{wL^3}{6} + C_1 = 0 \;\rightarrow\; C_1 = \frac{wL^3}{6}
+     $$
+   - Deflexión nula:
+     $$
+     \scriptsize
+     y(L) = 0 \;\rightarrow\; -\frac{wL^4}{24} + \frac{wL^4}{6} + C_2 = 0 \;\rightarrow\; C_2 = \frac{wL^4}{24} - \frac{4wL^4}{24} = -\frac{wL^4}{8}
+     $$
+
+6. **a) Ecuación de la curva elástica:**
+   $$
+   \scriptsize
+   EI\,y = -\frac{wx^4}{24} + \frac{wL^3}{6}x - \frac{wL^4}{8}
+   $$
+   $$
+   \scriptsize
+   y(x) = -\frac{w}{24EI}\left(x^4 - 4L^3x + 3L^4\right)
+   $$
+
+7. **b) Deflexión en el extremo libre $A$ ($x = 0$):**
+   $$
+   \scriptsize
+   y(0) = -\frac{w}{24EI}\left(3L^4\right) = -\frac{wL^4}{8EI}
+   $$
+   El signo negativo indica que la deflexión es hacia abajo.
+
+8. **c) Pendiente en el extremo libre $A$:** con $C_1 = \frac{wL^3}{6}$, la ecuación de la pendiente es
+   $$
+   \scriptsize
+   \theta(x) = y'(x) = \frac{w}{6EI}\left(L^3 - x^3\right)
+   $$
+   Entonces:
+   $$
+   \scriptsize
+   \theta_A = \frac{wL^3}{6EI}
+   $$
+   El signo positivo indica que la sección gira en sentido antihorario.
+
+**Respuestas:**
+- **a)** $y(x) = -\dfrac{w}{24EI}\left(x^4 - 4L^3x + 3L^4\right)$
+- **b)** $y_A = -\dfrac{wL^4}{8EI}$ (hacia abajo)
+- **c)** $\theta_A = \dfrac{wL^3}{6EI}$ (sentido antihorario)
+</Solution>
+</Problem>
+
+<Problem title="Voladizo con carga triangular">
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794160348/a7qrk46jf1h12jkdccky.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la carga distribuida mostrada sobre la viga en voladizo $AB$ de longitud $L$ y rigidez $EI$ constante, que varía linealmente desde $w_0$ hacia arriba en $A$, pasa por cero en el punto medio $C$ y llega a $w_0$ hacia abajo en $B$, determine:
+
+- **a)** la ecuación de la curva elástica para la viga en voladizo $AB$,
+- **b)** la deflexión en el extremo libre,
+- **c)** la pendiente en el extremo libre.
+
+<Solution>
+1. **Función de carga:** la carga hacia arriba disminuye linealmente de $w_0$ en $A$ a $0$ en $C$. La carga hacia abajo aumenta de $0$ en $C$ a $w_0$ en $B$. Las dos rampas tienen la misma pendiente, así que forman una sola recta en toda la viga. Con $q$ positiva hacia abajo:
+   $$
+   \scriptsize
+   q(x) = w_0\left(\frac{2x}{L} - 1\right)
+   $$
+   Comprobación: $q(0) = -w_0$ (hacia arriba), $q\left(\frac{L}{2}\right) = 0$ y $q(L) = w_0$ (hacia abajo).
+
+2. **Fuerza cortante:** como $\frac{dV}{dx} = -q$ y $V(0) = 0$ en el extremo libre:
+   $$
+   \scriptsize
+   V(x) = -w_0\left(\frac{x^2}{L} - x\right)
+   $$
+
+3. **Momento flector:** como $\frac{dM}{dx} = V$ y $M(0) = 0$ en el extremo libre:
+   $$
+   \scriptsize
+   M(x) = -w_0\left(\frac{x^3}{3L} - \frac{x^2}{2}\right) = w_0\left(\frac{x^2}{2} - \frac{x^3}{3L}\right)
+   $$
+
+4. **Ecuación diferencial:**
+   $$
+   \scriptsize
+   EI\frac{d^2y}{dx^2} = w_0\left(\frac{x^2}{2} - \frac{x^3}{3L}\right)
+   $$
+
+5. **Primera integración (pendiente):**
+   $$
+   \scriptsize
+   EI\frac{dy}{dx} = w_0\left(\frac{x^3}{6} - \frac{x^4}{12L}\right) + C_1
+   $$
+
+6. **Segunda integración (deflexión):**
+   $$
+   \scriptsize
+   EI\,y = w_0\left(\frac{x^4}{24} - \frac{x^5}{60L}\right) + C_1x + C_2
+   $$
+
+7. **Condiciones de contorno en el empotramiento $B$ ($x = L$):**
+   - Pendiente nula:
+     $$
+     \scriptsize
+     y'(L) = 0 \;\rightarrow\; w_0\left(\frac{L^3}{6} - \frac{L^3}{12}\right) + C_1 = 0 \;\rightarrow\; C_1 = -\frac{w_0L^3}{12}
+     $$
+   - Deflexión nula:
+     $$
+     \scriptsize
+     y(L) = 0 \;\rightarrow\; \frac{w_0L^4}{40} - \frac{w_0L^4}{12} + C_2 = 0
+     $$
+     $$
+     \scriptsize
+     C_2 = \frac{7w_0L^4}{120}
+     $$
+
+8. **a) Ecuación de la curva elástica:**
+   $$
+   \scriptsize
+   y(x) = \frac{w_0}{120EIL}\left(-2x^5 + 5Lx^4 - 10L^4x + 7L^5\right)
+   $$
+
+9. **b) Deflexión en el extremo libre $A$ ($x = 0$):**
+   $$
+   \scriptsize
+   y_A = \frac{7w_0L^4}{120EI}
+   $$
+   El signo positivo indica que la deflexión es hacia arriba.
+
+10. **c) Pendiente en el extremo libre $A$:** con $C_1 = -\frac{w_0L^3}{12}$, la ecuación de la pendiente es
+    $$
+    \scriptsize
+    \theta(x) = y'(x) = \frac{w_0}{12EIL}\left(2Lx^3 - x^4 - L^4\right)
+    $$
+    Entonces:
+    $$
+    \scriptsize
+    \theta_A = -\frac{w_0L^3}{12EI}
+    $$
+    El signo negativo indica que la sección gira en sentido horario.
+
+**Respuestas:**
+- **a)** $y(x) = \dfrac{w_0}{120EIL}\left(-2x^5 + 5Lx^4 - 10L^4x + 7L^5\right)$
+- **b)** $y_A = \dfrac{7w_0L^4}{120EI}$ (hacia arriba)
+- **c)** $\theta_A = -\dfrac{w_0L^3}{12EI}$ (sentido horario)
+</Solution>
+</Problem>
+
+<Problem title="Curva elástica de una viga en voladizo con cargas de sentido contrario (Caso 1)">
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794172939/efexhbw2ppr12ng6dbai.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la viga en voladizo y la carga mostrada, determine:
+
+- **(a)** la ecuación de la curva elástica para la sección $AB$ de la viga,
+- **(b)** la deflexión en el punto $B$,
+- **(c)** la pendiente en el punto $B$.
+
+La viga está empotrada en $A$ y tiene rigidez $EI$ constante. En el tramo $AB$ (de longitud $a$) actúa una carga distribuida $w$ hacia abajo, y en el tramo $BC$ (de longitud $\frac{a}{2}$) actúa una carga distribuida $\frac{w}{2}$ hacia arriba.
+
+<Solution>
+**Solución a): ecuación de la curva elástica en $AB$**
+
+1. **Reacción en $A$:** por estática se halla la reacción vertical en el empotramiento. Para ello se reemplazan las cargas distribuidas por sus resultantes:
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794173087/xmnymeunqvlpc5pjylhr.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+   $$
+   \scriptsize
+   P_1 = wa \qquad P_2 = \frac{w}{2}\cdot\frac{a}{2} = \frac{wa}{4}
+   $$
+   $P_1$ actúa hacia abajo en el punto medio de $AB$ (a $\frac{a}{2}$ de $A$) y $P_2$ hacia arriba en el punto medio de $BC$ (a $\frac{5a}{4}$ de $A$).
+2. **Equilibrio vertical:**
+   $$
+   \scriptsize
+   \sum F_y = 0: \quad A_y + \frac{wa}{4} - wa = 0 \quad\Longrightarrow\quad A_y = \frac{3wa}{4}
+   $$
+
+3. **Fuerza cortante en $AB$:** como $\frac{dV}{dx} = -w$ y la cortante en $x = 0$ es $V_A = A_y$:
+   $$
+   \scriptsize
+   V(x) - V_A = -wx \quad\Longrightarrow\quad V(x) = \frac{3wa}{4} - wx
+   $$
+
+4. **Momento flector en $AB$:** como $\frac{dM}{dx} = V$, y $M_A$ es el momento flector en $x = 0$:
+   $$
+   \scriptsize
+   M(x) - M_A = \int_0^x V\,dx = \frac{3wa}{4}\,x - \frac{wx^2}{2}
+   $$
+
+5. **Momento en el empotramiento:** $M_A$ es el momento de las cargas respecto a $A$, con giro antihorario positivo:
+   $$
+   \scriptsize
+   M_A = \frac{wa}{4}\cdot\frac{5a}{4} - wa\cdot\frac{a}{2} = -\frac{3wa^2}{16}
+   $$
+   El signo negativo indica que la fibra superior está en tracción, como corresponde a un voladizo con carga neta hacia abajo.
+
+6. **Ecuación del momento:**
+   $$
+   \scriptsize
+   M(x) = \frac{3wa}{4}\,x - \frac{wx^2}{2} - \frac{3wa^2}{16}
+   $$
+
+7. **Ecuación diferencial de 2° orden:**
+   $$
+   \scriptsize
+   EI\,y'' = M(x) = \frac{3wa}{4}\,x - \frac{wx^2}{2} - \frac{3wa^2}{16}
+   $$
+
+8. **Primera integración (pendiente):**
+   $$
+   \scriptsize
+   EI\,y' = -\frac{wx^3}{6} + \frac{3wa\,x^2}{8} - \frac{3wa^2x}{16} + C_1
+   $$
+
+9. **Segunda integración (deflexión):**
+   $$
+   \scriptsize
+   EI\,y = -\frac{wx^4}{24} + \frac{wa\,x^3}{8} - \frac{3wa^2x^2}{32} + C_1x + C_2
+   $$
+
+10. **Condiciones de contorno:** en el empotramiento $A$ la deflexión y la pendiente son nulas:
+    $$
+    \scriptsize
+    y'(0) = 0 \;\Rightarrow\; C_1 = 0 \qquad\qquad y(0) = 0 \;\Rightarrow\; C_2 = 0
+    $$
+
+11. **Ecuación de la curva elástica en $AB$:**
+    $$
+    \scriptsize
+    EI\,y = -\frac{wx^4}{24} + \frac{wa\,x^3}{8} - \frac{3wa^2x^2}{32} = \frac{wx^2}{96}\left(-9a^2 + 12ax - 4x^2\right)
+    $$
+    Al factorizar, $-9a^2 + 12ax - 4x^2 = -(3a - 2x)^2$, y se obtiene:
+    $$
+    \scriptsize
+    y(x) = -\frac{wx^2}{96EI}\,(3a - 2x)^2 \qquad (0 \le x \le a)
+    $$
+
+**Solución b): deflexión en $B$**
+
+Se evalúa la curva elástica en $x = a$:
+$$
+\scriptsize
+y_B = y(a) = -\frac{wa^2}{96EI}\,(3a - 2a)^2 = -\frac{wa^4}{96EI}
+$$
+
+**Solución c): pendiente en $B$**
+
+Se usa $\theta = y'(x)$ con $C_1 = 0$:
+$$
+\scriptsize
+\theta(x) = y'(x) = \frac{wx}{48EI}\left(-9a^2 + 18ax - 8x^2\right)
+$$
+Se evalúa en $x = a$:
+$$
+\scriptsize
+\theta_B = \theta(a) = \frac{wa}{48EI}\left(-9a^2 + 18a^2 - 8a^2\right) = \frac{wa^3}{48EI}
+$$
+
+**Conclusión**
+
+- **(a)** $y(x) = -\dfrac{wx^2}{96EI}\,(3a - 2x)^2$, para $0 \le x \le a$.
+- **(b)** $y_B = -\dfrac{wa^4}{96EI}$, con signo negativo: el punto $B$ baja.
+- **(c)** $\theta_B = \dfrac{wa^3}{48EI}$, con signo positivo: el giro es antihorario.
+
+El punto $B$ baja y, sin embargo, su pendiente es positiva. Esto ocurre porque la pendiente se anula en $x = \frac{3a}{4}$, donde la viga alcanza su mayor descenso, y desde ahí la curva sube hacia $B$ por la carga hacia arriba del tramo $BC$.
+</Solution>
+</Problem>
+<Problem title="Curva elástica de una viga en voladizo con carga distribuida y momento en el extremo (Caso 2)">
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794176176/xxlzg93rulrnpjbjzlpj.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la viga en voladizo y la carga mostrada, determine:
+
+- **(a)** la ecuación de la curva elástica para la sección $AB$ de la viga,
+- **(b)** la deflexión en el punto $B$,
+- **(c)** la pendiente en el punto $B$.
+
+La viga está empotrada en $A$ y tiene rigidez $EI$ constante. En el tramo $AB$ (de longitud $L$) actúa una carga distribuida $w$ hacia abajo. En el extremo libre $C$, ubicado a una distancia $a$ de $B$, actúa un momento antihorario $M_C = \frac{wL^2}{6}$.
+
+<Solution>
+**Solución a): ecuación de la curva elástica en $AB$**
+
+1. **Reacciones en $A$:** por estática se halla la reacción vertical, hacia arriba, y el momento en el empotramiento. Para ello se reemplaza la carga distribuida por su resultante:
+   $$
+   \scriptsize
+   P = wL
+   $$
+   $P$ actúa hacia abajo en el punto medio de $AB$ (a $\frac{L}{2}$ de $A$).
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794176250/lslnjk1auiwvxyxtzbsx.jpg" alt="Descripción de la imagen" caption="Figura" />
+
+
+2. **Equilibrio vertical:** el momento $M_C$ no interviene en el equilibrio de fuerzas.
+   $$
+   \scriptsize
+   \sum F_y = 0: \quad A_y - wL = 0 \quad\Longrightarrow\quad A_y = wL
+   $$
+
+3. **Fuerza cortante en $AB$:** como $\frac{dV}{dx} = -w$ y la cortante en $x = 0$ es $V_A = A_y$:
+   $$
+   \scriptsize
+   V(x) - V_A = -wx \quad\Longrightarrow\quad V(x) = wL - wx
+   $$
+
+4. **Momento flector en $AB$:** como $\frac{dM}{dx} = V$, y $M_A$ es el momento flector en $x = 0$:
+   $$
+   \scriptsize
+   M(x) - M_A = \int_0^x V\,dx = wL\,x - \frac{wx^2}{2}
+   $$
+
+5. **Momento en el empotramiento:** $M_A$ es el momento de las cargas respecto a $A$, con giro antihorario positivo. El momento $M_C$ suma y la carga $P$, que actúa hacia abajo, resta:
+   $$
+   \scriptsize
+   M_A = \frac{wL^2}{6} - wL\cdot\frac{L}{2} = -\frac{wL^2}{3}
+   $$
+
+6. **Ecuación del momento:**
+   $$
+   \scriptsize
+   M(x) = -\frac{wx^2}{2} + wL\,x - \frac{wL^2}{3}
+   $$
+
+7. **Ecuación diferencial de 2° orden:**
+   $$
+   \scriptsize
+   EI\,y'' = M(x) = -\frac{wx^2}{2} + wL\,x - \frac{wL^2}{3}
+   $$
+
+8. **Primera integración (pendiente):**
+   $$
+   \scriptsize
+   EI\,y' = -\frac{wx^3}{6} + \frac{wL\,x^2}{2} - \frac{wL^2x}{3} + C_1
+   $$
+
+9. **Segunda integración (deflexión):**
+   $$
+   \scriptsize
+   EI\,y = -\frac{wx^4}{24} + \frac{wL\,x^3}{6} - \frac{wL^2x^2}{6} + C_1x + C_2
+   $$
+
+10. **Condiciones de contorno:** en el empotramiento $A$ la deflexión y la pendiente son nulas:
+    $$
+    \scriptsize
+    y'(0) = 0 \;\Rightarrow\; C_1 = 0 \qquad\qquad y(0) = 0 \;\Rightarrow\; C_2 = 0
+    $$
+
+11. **Ecuación de la curva elástica en $AB$:**
+    $$
+    \scriptsize
+    EI\,y = -\frac{wx^4}{24} + \frac{wL\,x^3}{6} - \frac{wL^2x^2}{6} = -\frac{wx^2}{24}\left(x^2 - 4Lx + 4L^2\right)
+    $$
+    Como $x^2 - 4Lx + 4L^2 = (2L - x)^2$, se obtiene:
+    $$
+    \scriptsize
+    y(x) = -\frac{wx^2}{24EI}\,(2L - x)^2 \qquad (0 \le x \le L)
+    $$
+
+**Solución b): deflexión en $B$**
+
+Se evalúa la curva elástica en $x = L$:
+$$
+\scriptsize
+y_B = y(L) = -\frac{wL^2}{24EI}\,(2L - L)^2 = -\frac{wL^4}{24EI}
+$$
+
+**Solución c): pendiente en $B$**
+
+Se usa $\theta = y'(x)$ con $C_1 = 0$. Al factorizar $EI\,y'$:
+$$
+\scriptsize
+EI\,y' = -\frac{wx^3}{6} + \frac{wL\,x^2}{2} - \frac{wL^2x}{3} = -\frac{wx}{6}\left(x^2 - 3Lx + 2L^2\right)
+$$
+Como $x^2 - 3Lx + 2L^2 = (L - x)(2L - x)$:
+$$
+\scriptsize
+\theta(x) = y'(x) = -\frac{wx}{6EI}\,(L - x)(2L - x)
+$$
+Se evalúa en $x = L$:
+$$
+\scriptsize
+\theta_B = \theta(L) = -\frac{wL}{6EI}\,(L - L)(2L - L) = 0
+$$
+
+**Conclusión**
+
+- **(a)** $y(x) = -\dfrac{wx^2}{24EI}\,(2L - x)^2$, para $0 \le x \le L$.
+- **(b)** $y_B = -\dfrac{wL^4}{24EI}$, con signo negativo: el punto $B$ baja.
+- **(c)** $\theta_B = 0$: la tangente a la curva elástica en $B$ es horizontal.
+
+El momento $M_C = \frac{wL^2}{6}$ hace que la pendiente en $B$ se anule. En el tramo $AB$ la pendiente es negativa para $0 < x < L$ y se anula en $B$, así que $y_B$ es la mayor deflexión de ese tramo.
+</Solution>
+</Problem>
+
+<Problem title="Reacciones y deflexión de una viga con tres apoyos usando funciones de discontinuidad">
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794189071/mo43brhdcj6dqg3shkeh.png" alt="Descripción de la imagen" caption="Figura" />
+
+
+Para la viga mostrada en la figura, suponga que $EI = 200\,000\text{ kN}\cdot\text{m}^2$ y use funciones de discontinuidad para determinar:
+
+- **(a)** las reacciones en $A$, $C$ y $D$.
+- **(b)** la deflexión de la viga en el punto $B$.
+
+La viga tiene un apoyo de rodillo en $A$ y en $C$, y un apoyo de pasador en $D$. Una carga distribuida de $120\text{ kN/m}$ actúa hacia abajo sobre el tramo $AC$. Las distancias son $AB = 3\text{ m}$, $BC = 3\text{ m}$ y $CD = 4\text{ m}$.
+
+<Solution>
+**Convenciones**
+
+- **Ejes:** el origen está en $A$, $x$ positivo hacia la derecha y $y$ positivo hacia arriba.
+- **Funciones de discontinuidad:** la función de carga $w(x)$ es positiva hacia arriba, y se cumple $V = \int w\,dx$ y $M = \int V\,dx$.
+- **Curva elástica:** se usa la ecuación de 2° orden $EI\,y'' = M(x)$.
+- **Apoyos:** los tres apoyos impiden el desplazamiento vertical, así que $y = 0$ en $A$, $C$ y $D$.
+
+**Solución a): reacciones en $A$, $C$ y $D$**
+
+1. **Grado de indeterminación y equilibrio:** hay tres reacciones verticales ($R_A$, $R_C$ y $R_D$) y solo dos ecuaciones de equilibrio, porque la reacción horizontal es nula al no haber cargas horizontales. La viga es estáticamente indeterminada de primer grado y falta una condición de deformación. La resultante de la carga distribuida es $120 \times 6 = 720\text{ kN}$, aplicada a $3\text{ m}$ de $A$ y a $7\text{ m}$ de $D$. Al tomar momentos respecto a $D$ y sumar fuerzas verticales:
+   $$
+   \scriptsize
+   \sum M_D = 0: \quad 10R_A + 4R_C - 720(7) = 0 \;\Longrightarrow\; 10R_A + 4R_C = 5040 \qquad (1)
+   $$
+
+   $$
+   \scriptsize
+   \sum F_y = 0: \quad R_A + R_C + R_D = 720 \qquad (2)
+   $$
+
+2. **Función de carga:** la carga distribuida se escribe como una carga hacia abajo que empieza en $A$ y se anula en $C$. Los apoyos $A$ y $C$ son fuerzas concentradas ($n = -1$):
+   $$
+   \scriptsize
+   w(x) = R_A\langle x\rangle^{-1} - 120\langle x\rangle^{0} + 120\langle x-6\rangle^{0} + R_C\langle x-6\rangle^{-1}
+   $$
+   El apoyo $D$ está en el extremo $x = 10$, así que su término no influye en $V$, $M$, $y'$ ni $y$ para $x < 10$. Por eso no se escribe, y $R_D$ se obtiene después de la ecuación (2).
+
+3. **Cortante y momento flector:** se integra con $\int\langle x-a\rangle^{n}dx = \langle x-a\rangle^{n+1}$ para $n = -1, -2$ y con $\frac{1}{n+1}\langle x-a\rangle^{n+1}$ para $n \ge 0$:
+   $$
+   \scriptsize
+   V(x) = R_A\langle x\rangle^{0} - 120\langle x\rangle^{1} + 120\langle x-6\rangle^{1} + R_C\langle x-6\rangle^{0}
+   $$
+
+   $$
+   \scriptsize
+   M(x) = R_A\langle x\rangle^{1} - 60\langle x\rangle^{2} + 60\langle x-6\rangle^{2} + R_C\langle x-6\rangle^{1}
+   $$
+   No aparecen constantes de integración, porque $w(x)$ ya contiene todas las cargas y reacciones.
+
+4. **Ecuación diferencial y primera integración (pendiente):** con $EI\,y'' = M(x)$:
+   $$
+   \scriptsize
+   EI\,y' = \frac{R_A}{2}\langle x\rangle^{2} - 20\langle x\rangle^{3} + 20\langle x-6\rangle^{3} + \frac{R_C}{2}\langle x-6\rangle^{2} + C_1
+   $$
+
+5. **Segunda integración (deflexión):**
+   $$
+   \scriptsize
+   EI\,y = \frac{R_A}{6}\langle x\rangle^{3} - 5\langle x\rangle^{4} + 5\langle x-6\rangle^{4} + \frac{R_C}{6}\langle x-6\rangle^{3} + C_1x + C_2
+   $$
+   Es una sola expresión válida para toda la viga, así que la continuidad de $y$ y de $y'$ en el apoyo intermedio $C$ se cumple automáticamente.
+
+6. **Condiciones de contorno:** son $y(0) = 0$, $y(6) = 0$ y $y(10) = 0$. Los términos $\langle x-6\rangle$ valen cero para $x < 6$.
+   $$
+   \scriptsize
+   x = 0: \quad C_2 = 0
+   $$
+
+   $$
+   \scriptsize
+   x = 6: \quad \frac{R_A}{6}(6)^3 - 5(6)^4 + 6C_1 = 0 \;\Longrightarrow\; C_1 = 1080 - 6R_A \qquad (3)
+   $$
+
+   $$
+   \scriptsize
+   x = 10: \quad \frac{R_A}{6}(10)^3 - 5(10)^4 + 5(4)^4 + \frac{R_C}{6}(4)^3 + 10C_1 = 0
+   $$
+
+   $$
+   \scriptsize
+   \frac{500}{3}R_A + \frac{32}{3}R_C + 10C_1 = 48720 \qquad (4)
+   $$
+
+7. **Sistema de ecuaciones:** se sustituye (3) en (4) y se multiplica por 3:
+   $$
+   \scriptsize
+   500R_A + 32R_C + 30(1080 - 6R_A) = 146160 \;\Longrightarrow\; 320R_A + 32R_C = 113760
+   $$
+
+   $$
+   \scriptsize
+   10R_A + R_C = 3555 \qquad (5)
+   $$
+   Se resta (5) de (1):
+   $$
+   \scriptsize
+   3R_C = 5040 - 3555 = 1485 \;\Longrightarrow\; R_C = 495\text{ kN}
+   $$
+
+   $$
+   \scriptsize
+   10R_A = 3555 - 495 = 3060 \;\Longrightarrow\; R_A = 306\text{ kN}
+   $$
+
+8. **Reacción en $D$ y constante $C_1$:** de la ecuación (2) y de la (3):
+   $$
+   \scriptsize
+   R_D = 720 - 306 - 495 = -81\text{ kN}
+   $$
+
+   $$
+   \scriptsize
+   C_1 = 1080 - 6(306) = -756\text{ kN}\cdot\text{m}^2
+   $$
+   El signo negativo indica que $R_D$ actúa hacia abajo: el pasador sujeta el extremo $D$, que tiende a levantarse por la carga del tramo $AC$.
+
+9. **Verificación del equilibrio:** se toman momentos respecto a $A$, con $R_D$ hacia abajo:
+   $$
+   \scriptsize
+   \sum M_A = 495(6) - 81(10) - 720(3) = 2970 - 810 - 2160 = 0 \;\checkmark
+   $$
+
+**Solución b): deflexión en $B$**
+
+Con las reacciones y la constante halladas, la ecuación de la curva elástica es:
+$$
+\scriptsize
+EI\,y = 51\langle x\rangle^{3} - 5\langle x\rangle^{4} + 5\langle x-6\rangle^{4} + 82.5\langle x-6\rangle^{3} - 756\,x
+$$
+El punto $B$ está en $x = 3\text{ m}$. Como $3 < 6$, los términos con $\langle x-6\rangle$ valen cero:
+$$
+\scriptsize
+EI\,y_B = 51(3)^3 - 5(3)^4 - 756(3) = 1377 - 405 - 2268 = -1296\text{ kN}\cdot\text{m}^3
+$$
+
+$$
+\scriptsize
+y_B = -\frac{1296}{200\,000} = -6.48\times 10^{-3}\text{ m} = -6.48\text{ mm}
+$$
+
+**Verificación por superposición**
+
+El momento flector en $C$ es $M_C = M(6) = 306(6) - 60(6)^2 = -324\text{ kN}\cdot\text{m}$. El tramo $AC$ equivale a una viga simplemente apoyada con la carga uniforme y el momento $M_C$ aplicado en $C$. Se resuelve cada caso por integración con $y(0) = y(6) = 0$ y se suman:
+$$
+\scriptsize
+EI\,y_w = 60x^3 - 5x^4 - 1080x \;\Longrightarrow\; EI\,y_w(3) = -2025
+$$
+
+$$
+\scriptsize
+EI\,y_M = -9x^3 + 324x \;\Longrightarrow\; EI\,y_M(3) = +729
+$$
+
+$$
+\scriptsize
+EI\,y_B = -2025 + 729 = -1296\text{ kN}\cdot\text{m}^3 \;\checkmark
+$$
+
+**Conclusión**
+
+- **(a)** $R_A = 306\text{ kN}$ hacia arriba, $R_C = 495\text{ kN}$ hacia arriba y $R_D = 81\text{ kN}$ hacia abajo.
+- **(b)** $y_B = -6.48\text{ mm}$: el punto $B$ desciende $6.48\text{ mm}$.
+
+El apoyo central $C$ toma la mayor reacción, y el momento flector sobre él es negativo ($M_C = -324\text{ kN}\cdot\text{m}$). Por eso el tramo $CD$, sin carga, se comporta como un brazo que sujeta hacia abajo el extremo $D$.
+
+**Curva elástica generada:**
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1794191194/h6ii8bh2caxh6bplbwdn.webp" alt="Descripción de la imagen" caption="Figura" />
+</Solution>
+
+</Problem>
