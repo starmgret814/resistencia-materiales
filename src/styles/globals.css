@@ -13,6 +13,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "STIX Two Text", "Times New Roman", Times, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -161,7 +163,9 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
+
 }
 
 /* ─── MDX Content Typography & Formatting ─── */
@@ -201,10 +205,20 @@
 .dark .mohr-circle-line { stroke: #d4a5a2; }
 
 .mdx-content {
-  --course-font-size: 0.96875rem;
-  color: #4d3838;
+  font-family: var(--font-serif);
+  --course-font-size: 1.125rem;
+  color: #403333;
   font-size: var(--course-font-size);
-  line-height: 1.75;
+  line-height: 1.8;
+  font-kerning: normal;
+  font-variant-numeric: lining-nums;
+  overflow-wrap: break-word;
+}
+
+/* Reading stays serif; embedded controls and interactive tools use the interface font. */
+.mdx-content :is(button, input, select, textarea, summary),
+.mdx-content .course-tool {
+  font-family: var(--font-sans);
 }
 
 /* Evitar que el header fijo tape los títulos al hacer clic en el índice */
@@ -267,7 +281,7 @@
 }
 
 .mdx-content strong {
-  font-weight: 600;
+  font-weight: 700;
   color: #4b1719;
 }
 
@@ -318,31 +332,77 @@
 
 
 
-/* One base size for inline math, display equations and Formula, in every container. */
+/* KaTeX owns its internal font metrics; never override fraction or script sizes. */
 .katex,
-math,
 .math-large,
 .katex-large {
-  font-size: var(--course-font-size, 0.96875rem);
+  font-size: 1em;
   font-style: normal;
   letter-spacing: normal;
 }
 
-/* Slightly enlarge Formula equations and captions relative to course text. */
 .formula-block {
-  --course-font-size: 0.96875rem;
   font-family: inherit;
-  font-size: var(--course-font-size, 0.96875rem);
+  font-size: inherit;
   font-style: normal;
   letter-spacing: normal;
   color: inherit;
 }
 
 .formula-block .formula-label {
-  font: inherit;
-  color: inherit;
+  font-family: var(--font-sans);
+  font-size: .75rem;
+  line-height: 1.6;
+  color: #765e5e;
   text-transform: none;
   letter-spacing: normal;
+}
+
+.formula-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.formula-row-numbered { grid-template-columns: 3.5rem minmax(0, 1fr) 3.5rem; }
+
+.formula-equation {
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+  font-size: inherit;
+}
+
+.formula-equation .katex-display {
+  margin: 0;
+}
+
+.formula-equation-boxed {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: center;
+  border: 1.5px solid #7f0303;
+  border-radius: 0.25rem;
+  background: #fbf2f0;
+  padding: 0.4rem 0.9rem;
+}
+
+.formula-equation-bold,
+.formula-equation-bold math,
+.formula-equation-bold .katex {
+  font-weight: 700;
+}
+
+.formula-number {
+  justify-self: end;
+  white-space: nowrap;
+  font-size: 0.95em;
+}
+
+.dark .formula-equation-boxed {
+  border-color: #fca5a5;
+  background: #281517;
 }
 
 .katex-display {
@@ -352,22 +412,20 @@ math,
   padding-block: 0.25rem;
 }
 
-/* ─── Mostrar MathML nativo y ocultar versión HTML de KaTeX ─── */
-.katex-html {
-  display: none !important;
+.mdx-content .katex-display { margin-block: 1.5rem; padding-block: .5rem; }
+.mdx-content .formula-equation .katex-display { margin: 0; }
+.mdx-content .academic-body { font-size: inherit; line-height: inherit; }
+.mdx-content .academic-label { font-family: var(--font-sans); font-size: .7rem; font-weight: 700; line-height: 1.5; letter-spacing: .08em; margin-block: 0 .75rem; }
+.tool-equation { font-size: 1.0625rem; line-height: 1.7; }
+.tool-equation .katex-display { margin-block: .5rem; }
+.dark .formula-block .formula-label { color: #cbb0ae; }
+@media (max-width: 640px) {
+  .mdx-content { --course-font-size: 1.0625rem; }
+  .formula-row-numbered { grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem; gap: .3rem; }
+  .formula-number { font-size: .8em; }
 }
 
-.katex-mathml {
-  /* Restablecer propiedades para que MathML sea visible si estaba oculto */
-  position: static !important;
-  width: auto !important;
-  height: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: visible !important;
-  clip: auto !important;
-  white-space: normal !important;
-}
+/* KaTeX conserva sus propias fuentes matemáticas para integrales, límites y fracciones. */
 
 /* ─── Modo Oscuro para MDX ─── */
 .dark .mdx-content {
@@ -430,3 +488,125 @@ math,
 .course-table-grid > .course-table-block {
   align-self: start;
 }
+/* Course landing and reading navigation. */
+.textbook-shell :is(a, button, summary, input, select):focus-visible {
+  outline: 2px solid #9e3434;
+  outline-offset: 3px;
+}
+.dark .textbook-shell :is(a, button, summary, input, select):focus-visible { outline-color: #fca5a5; }
+.course-search-field { background: #f1e9e6; }
+.dark .course-search-field { background: #302024; }
+.textbook-shell .course-search-field input:is(:focus, :focus-visible) { outline: none; box-shadow: none; }
+.course-search-field input::-webkit-search-cancel-button,
+.course-search-field input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.chapter-context { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.1rem; border-bottom: 1px solid #e3caca; }
+.chapter-context-title { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.chapter-context-number { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.5rem; height: 2.75rem; border-right: 1px solid #dcc3c3; padding-right: .6rem; color: #7f0303; font-family: var(--font-serif); font-size: 2rem; font-weight: 600; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.04em; line-height: 1; }
+.chapter-context-label { font-size: .65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #866b6b; margin-bottom: .2rem; }
+.chapter-context-name { font-size: .85rem; line-height: 1.45; font-weight: 600; }
+.chapter-switcher { position: relative; flex-shrink: 0; }
+.chapter-switcher summary { display: flex; align-items: center; gap: .5rem; cursor: pointer; list-style: none; padding: .65rem .75rem; border: 1px solid #dcc3c3; border-radius: .4rem; font-size: .75rem; font-weight: 500; }
+.chapter-switcher summary::-webkit-details-marker { display: none; }
+.chapter-switcher-count { color: #866b6b; font-variant-numeric: tabular-nums; }
+.chapter-switcher[open] summary > svg { transform: rotate(180deg); }
+.chapter-switcher nav { position: absolute; z-index: 35; right: 0; top: calc(100% + .5rem); width: min(22rem, calc(100vw - 2.5rem)); max-height: min(24rem, 60dvh); overflow-y: auto; overscroll-behavior: contain; padding: .4rem; border: 1px solid #e3caca; border-radius: .5rem; background: #fffaf8; box-shadow: 0 8px 24px #3a171818; }
+.chapter-switcher nav a { display: flex; gap: .6rem; align-items: baseline; padding: .75rem; border-radius: .3rem; font-size: .8rem; line-height: 1.5; }
+.chapter-switcher nav a > span:first-child { flex-shrink: 0; color: #866b6b; }
+.chapter-switcher nav a:hover, .chapter-switcher nav a[aria-current="page"] { background: #f2e2df; color: #7f0303; }
+.chapter-switcher nav a[aria-current="page"] { font-weight: 600; }
+.dark .chapter-context, .dark .chapter-switcher :is(summary,nav) { border-color: #422527; }
+.dark .chapter-context-number { color: #fca5a5; border-color: #543336; }
+.dark .chapter-switcher nav a:hover, .dark .chapter-switcher nav a[aria-current="page"] { background: #381618; color: #fca5a5; }
+.dark .chapter-context-label, .dark .chapter-switcher-count, .dark .chapter-switcher nav a > span:first-child { color: #cbb0ae; }
+.dark .chapter-switcher nav { background: #231416; }
+@media (max-width: 640px) { .chapter-context { flex-wrap: wrap; } .chapter-switcher { margin-left: 3.25rem; } .chapter-switcher nav { left: -3.25rem; right: auto; } }
+.skip-to-content { position: fixed; top: .75rem; left: 1rem; z-index: 100; padding: .8rem 1rem; border-radius: .4rem; background: #7f0303; color: white; transform: translateY(-180%); }
+.skip-to-content:focus { transform: translateY(0); }
+#main-content { scroll-margin-top: 5rem; }
+.course-sidebar-scroll, .reading-toc, .course-search-results { scrollbar-width: thin; scrollbar-color: #bd9995 transparent; }
+.reading-toc a { display: block; padding-block: .25rem; line-height: 1.5; }
+.reading-position { position: fixed; top: 68px; left: 0; right: 0; height: 2px; z-index: 41; pointer-events: none; }
+.reading-position > span { display: block; width: 100%; height: 100%; background: #9e3434; transform-origin: left; }
+.reading-back-top { position: fixed; right: 1.25rem; bottom: max(1.25rem, env(safe-area-inset-bottom)); z-index: 30; display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border: 1px solid #dcc3c3; border-radius: 50%; color: #7f0303; background: #fffaf8; box-shadow: 0 2px 12px #3a171814; }
+.reading-back-top:hover { background: #f3e0df; }
+.dark .reading-back-top { background: #281719; color: #fca5a5; border-color: #543336; }
+.dark .reading-position > span { background: #fca5a5; }
+@media (max-width: 1023px) {
+  .course-sidebar-closed { visibility: hidden; pointer-events: none; }
+  .textbook-shell > header button { min-width: 44px; min-height: 44px; }
+  .course-sidebar nav a { min-height: 44px; line-height: 1.5; }
+}
+@media (max-width: 640px) {
+  .course-search-modal { top: 1rem; }
+  .course-search-results { max-height: min(45dvh, calc(100dvh - 16rem)); }
+  .reading-mobile-index a { padding-block: .4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .textbook-shell *, #navigation-progress, #navigation-progress-bar { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+.course-home { color: inherit; container: course-home / inline-size; }
+.course-home h1 { font-size: clamp(2.15rem, 4vw, 3.15rem); font-weight: 700; line-height: 1.12; letter-spacing: -.04em; margin: 1.25rem 0 1rem; text-wrap: balance; }
+.course-home h2 { font-size: 1.5rem; font-weight: 650; letter-spacing: -.025em; line-height: 1.3; margin-bottom: 1rem; }
+.home-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .095em; text-transform: uppercase; color: #8f2525; }
+.home-identity { display: inline-flex; align-items: center; gap: .65rem; font-size: .8rem; font-weight: 700; letter-spacing: .075em; }
+.home-identity > span { opacity: .4; }
+.home-intro { font-size: 1.025rem; line-height: 1.75; max-width: 38rem; color: #6b5150; }
+.home-hero { padding: 1rem 0 .5rem; text-align: center; }
+.home-hero .home-intro { margin-inline: auto; }
+.home-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .85rem; margin: 1.75rem 0 0; font-size: .85rem; font-weight: 600; }
+.home-actions > a { display: inline-flex; align-items: center; justify-content: center; gap: .65rem; min-height: 2.9rem; min-width: 12.5rem; padding: .75rem 1.15rem; border: 1px solid transparent; border-radius: .4rem; }
+.home-actions > .home-secondary { border-color: #dcc3c3; color: #604747; background: transparent; }
+.home-actions > .home-secondary:hover { background: #f3e0df; border-color: #b78383; }
+.home-primary { display: inline-flex; align-items: center; justify-content: center; gap: .65rem; background: #7f0303; color: #fff; border-radius: .4rem; padding: .8rem 1.15rem; font-size: .85rem; font-weight: 600; text-decoration: none; }
+.home-overview { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem 1.5rem; align-items: center; border-bottom: 1px solid #e3caca; padding: 0 0 1.5rem; margin: 1.5rem 0 1.75rem; font-size: .75rem; color: #765e5e; }
+.home-overview > span { display: inline-flex; align-items: center; gap: .4rem; }
+.home-overview strong { color: #7f0303; font-weight: 700; }
+.home-text-link { display: inline-flex; align-items: center; gap: .5rem; }
+.home-primary svg, .home-text-link svg, .home-section-arrow { flex-shrink: 0; }
+.home-section-arrow { margin-left: auto; align-self: center; }
+.home-primary:hover { background: #a22020; }
+.home-path { border-bottom: 1px solid #e3caca; padding: .25rem 0 1.5rem; margin-bottom: 2rem; }
+.home-path > div { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.25rem; }
+.home-path p { line-height: 1.7; font-size: .85rem; color: #6b5150; }
+.home-path strong { display: block; margin-bottom: .5rem; color: #7f0303; font-weight: 700; }
+.home-chapters { border-top: 1px solid #e3caca; }
+.home-chapter { border-bottom: 1px solid #e3caca; }
+.home-chapter summary { display: flex; align-items: center; gap: 1rem; padding: 1.25rem .4rem; cursor: pointer; list-style: none; font-size: 1.15rem; }
+.home-chapter summary::-webkit-details-marker { display: none; }
+.home-chapter summary:hover { background: #7f030308; }
+.home-chapter-number { color: #9b5757; font-size: 1.5rem; min-width: 2rem; }
+.home-chapter small { display: block; font-size: .85rem; opacity: .7; margin-top: .25rem; }
+.home-expand { margin-left: auto; color: #7f0303; flex-shrink: 0; transition: transform .15s ease; }
+.home-chapter[open] .home-expand { transform: rotate(45deg); }
+.home-chapter ul { list-style: none; padding: 0 0 1rem 3.4rem; }
+.home-chapter li a { display: flex; gap: .75rem; padding: .6rem .5rem; border-radius: .3rem; }
+.home-chapter li a:hover { background: #7f03030c; }
+.home-unavailable { display: block; padding: .6rem .5rem; opacity: .6; }
+.home-exams { display: grid; gap: 1.25rem; align-items: center; margin-top: 2rem; padding: 1.5rem; border: 1px solid #e3caca; border-radius: .6rem; background: #f8efed; }
+.home-exams .home-eyebrow { display: flex; align-items: center; gap: .5rem; }
+.home-exams-action { justify-self: start; white-space: nowrap; }
+@container course-home (min-width: 660px) { .home-exams { grid-template-columns: minmax(0,1fr) auto; } }
+.home-exams-copy { min-width: 0; }
+.home-exams h2 { margin: .5rem 0; font-size: 1.35rem; }
+.home-exams p:not(.home-eyebrow) { line-height: 1.7; font-size: .85rem; color: #6b5150; }
+.home-exam-types { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; padding: 0; margin: .85rem 0 0; }
+.home-exam-types li { border: 1px solid #e3caca; border-radius: .3rem; padding: .3rem .5rem; font-size: .7rem; font-weight: 500; }
+.home-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; font-size: .7rem; color: #765e5e; }
+.home-back-top { transform: rotate(180deg); }
+.reading-mobile-index { border-block: 1px solid #e3caca; padding: 1rem 0; }
+.reading-mobile-index summary { cursor: pointer; font-weight: bold; }
+.reading-mobile-index nav { display: grid; gap: .75rem; padding-top: 1rem; }
+.formula-block, .mdx-content :is(h1,h2,h3,h4), #contenido { scroll-margin-top: 6rem; }
+.formula-number a { color: inherit; text-decoration: none; }
+.formula-number a:hover { text-decoration: underline; }
+.course-home a:focus-visible, .reading-mobile-index a:focus-visible { outline: 2px solid #a22020; outline-offset: 4px; }
+.dark .home-eyebrow, .dark .home-path strong, .dark .home-expand { color: #fca5a5; }
+.dark .home-exams { background: #251214; border-color: #422225; }
+.dark :is(.home-path,.home-chapters,.home-chapter,.reading-mobile-index,.home-overview,.home-exam-types li) { border-color: #422225; }
+.dark .home-overview strong { color: #fca5a5; }
+.dark .home-actions > .home-secondary { color: #ead4d2; border-color: #543336; }
+.dark .home-actions > .home-secondary:hover { background: #2d191b; border-color: #ab8e8e; }
+@container course-home (max-width: 450px) { .home-actions { flex-direction: column; align-items: stretch; } .home-actions > a { min-width: 0; width: 100%; } }
+.dark :is(.home-intro,.home-path p,.home-overview,.home-footer,.home-exams p:not(.home-eyebrow)) { color: #cbb0ae; }
+@media (max-width: 640px) { .home-path > div { grid-template-columns: 1fr; gap: 1rem; } .home-chapter ul { padding-left: .5rem; } .home-exams { padding: 1.1rem; gap: 1rem; } }

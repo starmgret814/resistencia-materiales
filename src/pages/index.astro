@@ -1,11 +1,48 @@
 ---
 import { getLiveChapters } from '@/lib/course-service';
-import { allSections } from '@/lib/course-data';
+import Layout from '@/src/layouts/Layout.astro';
+import TextbookLayout from '@/components/textbook-layout';
+import { ArrowRight, ArrowDown, Plus, FileText, Layers, GraduationCap } from 'lucide-react';
 
 const liveChapters = await getLiveChapters();
-const firstLive = liveChapters.flatMap(c => c.sections).find(s => Boolean(s.slug));
-const first = allSections.find((s) => s.slug !== null);
-const targetUrl = firstLive?.slug ? `/curso/${firstLive.slug}` : (first?.slug ? `/curso/${first.slug}` : '/curso/01-esfuerzos-falla/subtema-inicial');
-
-return Astro.redirect(targetUrl);
+const firstLive = liveChapters.flatMap(chapter => chapter.sections).find(section => Boolean(section.slug));
+const sectionCount = liveChapters.reduce((total, chapter) => total + chapter.sections.filter(section => section.slug).length, 0);
 ---
+
+<Layout title="Resistencia de Materiales | UNI" description="Teoría, ejemplos, herramientas interactivas y exámenes de Resistencia de Materiales.">
+  <TextbookLayout activeSlug={null} variant="home" customChapters={liveChapters} client:load>
+    <div class="course-home">
+      <section class="home-hero" aria-labelledby="home-title">
+        <div class="home-hero-copy">
+          <p class="home-eyebrow home-identity"><GraduationCap size={18} aria-hidden="true" />UNI <span aria-hidden="true">/</span> MC361</p>
+          <h1 id="home-title">Resistencia de Materiales</h1>
+          <p class="home-intro">Comprende cómo responden los elementos estructurales a las cargas. Explora la teoría, conecta los conceptos y practica a tu ritmo.</p>
+          <div class="home-actions">
+            {firstLive?.slug && <a class="home-primary" href={`/curso/${firstLive.slug}`}>Comenzar a estudiar <ArrowRight size={18} aria-hidden="true" /></a>}
+            <a class="home-secondary" href="#contenido">Explorar capítulos <ArrowDown size={18} aria-hidden="true" /></a>
+          </div>
+        </div>
+      </section>
+      <div class="home-overview" aria-label="Recursos disponibles"><span><Layers size={17} aria-hidden="true" /><strong>{liveChapters.length}</strong> capítulos</span><span><FileText size={17} aria-hidden="true" /><strong>{sectionCount}</strong> secciones disponibles</span><span>Teoría, ejemplos y práctica</span></div>
+      <section class="home-path" aria-labelledby="como-estudiar">
+        <h2 id="como-estudiar">Una ruta para aprender</h2>
+        <div><p><strong>01 · Comprende</strong>Lee los fundamentos y reconoce las hipótesis de cada modelo.</p><p><strong>02 · Explora</strong>Relaciona las ecuaciones con las figuras y las herramientas de los temas.</p><p><strong>03 · Practica</strong>Resuelve los problemas y consulta las soluciones disponibles.</p></div>
+      </section>
+      <section id="contenido" aria-labelledby="contenido-titulo">
+        <p class="home-eyebrow">Mapa del curso · {liveChapters.length} capítulos</p>
+        <h2 id="contenido-titulo">Explora el contenido</h2>
+        <div class="home-chapters">
+          {liveChapters.map(chapter => <details class="home-chapter">
+            <summary><span class="home-chapter-number">{chapter.number}</span><span>{chapter.title}<small>{chapter.sections.filter(section => section.slug).length} secciones disponibles</small></span><Plus className="home-expand" size={20} aria-hidden="true" /></summary>
+            <ul>{chapter.sections.map(section => <li>{section.slug ? <a href={`/curso/${section.slug}`}><span>{section.id}</span>{section.title}<ArrowRight className="home-section-arrow" size={17} aria-hidden="true" /></a> : <span class="home-unavailable">{section.id} · {section.title} · Próximamente</span>}</li>)}</ul>
+          </details>)}
+        </div>
+      </section>
+      <section class="home-exams" aria-labelledby="home-exams-title">
+        <div class="home-exams-copy"><p class="home-eyebrow"><FileText size={16} aria-hidden="true" />Practica lo aprendido</p><h2 id="home-exams-title">Exámenes pasados</h2><p>Encuentra evaluaciones organizadas por periodo académico.</p><ul class="home-exam-types" aria-label="Tipos de evaluación"><li>Prácticas calificadas</li><li>Parciales</li><li>Finales</li><li>Sustitutorios</li></ul></div>
+        <a class="home-primary home-exams-action" href="/examenes">Ver evaluaciones <ArrowRight size={18} aria-hidden="true" /></a>
+      </section>
+      <footer class="home-footer"><span>UNI · Resistencia de Materiales</span><a href="#home-title" class="home-text-link">Volver al inicio <ArrowDown className="home-back-top" size={16} aria-hidden="true" /></a></footer>
+    </div>
+  </TextbookLayout>
+</Layout>

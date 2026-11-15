@@ -24,7 +24,7 @@ function CalculatorTool({ tool, title }: { tool: ToolDefinition; title?: string 
       <button type="button" onClick={() => setInputs(initial())} className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs hover:bg-[#efdcda] focus-visible:outline-2 focus-visible:outline-[#7f0303] dark:hover:bg-[#381618]" aria-label={`Restablecer ${title || tool.title}`}><RotateCcw className="size-3.5" aria-hidden="true" /><span className="hidden sm:inline">Restablecer</span></button>
     </header>
     <div className="p-5">
-      <div className="mb-5 overflow-x-auto text-center" dangerouslySetInnerHTML={{ __html: katex.renderToString(tool.formula, { displayMode: true, output: 'mathml', throwOnError: false }) }} />
+      <div className="tool-equation mb-5 overflow-x-auto text-center" dangerouslySetInnerHTML={{ __html: katex.renderToString(tool.formula, { displayMode: true, output: 'htmlAndMathml', throwOnError: false }) }} />
       <div className="grid gap-4 sm:grid-cols-2">
         {tool.fields.map(field => {
           const id = `${instance}-${field.key}`

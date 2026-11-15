@@ -75,6 +75,8 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
         'data-course-title': title,
         'data-course-tool': node.attributes?.id || '',
         'data-course-number': number,
+        'data-course-boxed': node.attributes?.boxed || '',
+        'data-course-bold': node.attributes?.bold || '',
         'data-course-image': node.attributes?.image || '',
         'data-course-image-alt': node.attributes?.imageAlt || '',
         'data-course-image-caption': node.attributes?.imageCaption || '',
@@ -101,6 +103,8 @@ function CourseDirective({
   toolId,
   title,
   number,
+  boxed,
+  bold,
   image,
   imageAlt,
   imageCaption,
@@ -123,6 +127,8 @@ function CourseDirective({
   toolId?: string;
   title?: string;
   number?: string;
+  boxed?: string;
+  bold?: string;
   image?: string;
   imageAlt?: string;
   imageCaption?: string;
@@ -159,7 +165,7 @@ function CourseDirective({
     return <ImageGrid columns={columns === '3' ? 3 : columns === '4' ? 4 : 2}>{children}</ImageGrid>
   }
   if (kind === 'formula') {
-    return <Formula label={title}>{children}</Formula>
+    return <Formula label={title} number={number} boxed={boxed === 'true'} bold={bold === 'true'}>{children}</Formula>
   }
   if (kind === 'solution') {
     return <Solution>{children}</Solution>
@@ -203,6 +209,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   if (!kind) return <div {...rest}>{children}</div>
   const title = String(rest['data-course-title' as keyof typeof rest] || '')
   const number = String(rest['data-course-number' as keyof typeof rest] || '')
+  const boxed = String(rest['data-course-boxed' as keyof typeof rest] || '')
+  const bold = String(rest['data-course-bold' as keyof typeof rest] || '')
   const question = String(rest['data-course-question' as keyof typeof rest] || '')
   const position = String(rest['data-course-position' as keyof typeof rest] || '')
   const columnWidths = String(rest['data-course-column-widths' as keyof typeof rest] || '')
@@ -220,6 +228,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
       toolId={String(rest['data-course-tool' as keyof typeof rest] || '')}
       title={title}
       number={number}
+      boxed={boxed}
+      bold={bold}
       image={String(rest['data-course-image' as keyof typeof rest] || '')}
       imageAlt={String(rest['data-course-image-alt' as keyof typeof rest] || '')}
       imageCaption={String(rest['data-course-image-caption' as keyof typeof rest] || '')}

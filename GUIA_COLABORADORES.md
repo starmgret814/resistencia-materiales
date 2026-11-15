@@ -133,7 +133,13 @@ Para escribir fórmulas y símbolos matemáticos se utiliza una notación están
 
 ---
 
-## 5. Componentes del libro
+### Calidad visual de las ecuaciones
+
+Usa `$I_z + I_y$` para matemáticas dentro del texto. Para ecuaciones centradas, deja `$$` en líneas independientes antes y después de la expresión. También se admiten los delimitadores LaTeX `\(...\)` y `\[...\]` al pegar contenido.
+
+Escribe funciones como `\sin\theta` y `\cos\theta`, y palabras o unidades con `\text{máx}` o `\mathrm{MPa}`. Así no aparecen como variables en cursiva. Por ejemplo: `$\tau_{\text{máx}} = 25\,\mathrm{MPa}$`. Los subíndices, las fracciones y los límites conservan sus proporciones matemáticas; no necesitas asignarles un tamaño de letra manual.
+
+## 5. Componentes del contenido
 
 ### Herramientas interactivas
 
@@ -185,11 +191,17 @@ El esfuerzo normal $\sigma$ representa la intensidad de las fuerzas internas que
 ```
 
 ### 2. `<Formula>`
-Bloque central destacado para resaltar la ecuación más importante del tema.
+Bloque central para ecuaciones. Usa `number` para alinear el número a la derecha, `boxed="true"` para destacar un resultado y `bold="true"` para una ecuación en negrita.
 ```markdown
-<Formula label="Ecuación de Deformación Axial">
+<Formula number="8.3.1">
 $$
-\delta = \frac{P \cdot L}{E \cdot A}
+N(x) = \int_{A(x)} \sigma\,dA
+$$
+</Formula>
+
+<Formula number="8.3.2" boxed="true" bold="true">
+$$
+\sigma = \frac{N}{A}
 $$
 </Formula>
 ```
@@ -539,3 +551,7 @@ Para mostrar dos o más tablas una al lado de otra, usa:
 `columns` acepta `2`, `3` o `4`. Agrega tantas tablas como necesites: las siguientes pasan a otra fila. Las tablas se alinean por arriba y en pantallas pequeñas se apilan. Dentro de la cuadrícula cada tabla ocupa su columna; puedes seguir usando `columnWidths` y `align` en cada una.
 
 El menú de componentes del editor incluye **Tablas en una fila** para insertar esta plantilla.
+# Enlaces a ecuaciones
+
+Las fórmulas con `number` tienen un enlace directo. Por ejemplo, para citar una fórmula con `number="8.3.1"`, escribe `[ecuación (8.3.1)](#eq-8.3.1)` en el mismo tema. También puedes enlazarla desde otro tema usando `/curso/ruta-del-tema#eq-8.3.1`. Usa un número único para cada fórmula dentro de una página.
+

@@ -25,8 +25,8 @@ let sectionData: any = null;
 if (sectionIndex !== -1) {
   sectionData = {
     section: allLiveSections[sectionIndex],
-    previous: sectionIndex > 0 ? allLiveSections[sectionIndex - 1] : null,
-    next: sectionIndex < allLiveSections.length - 1 ? allLiveSections[sectionIndex + 1] : null,
+    previous: allLiveSections.slice(0, sectionIndex).reverse().find(section => section.slug) || null,
+    next: allLiveSections.slice(sectionIndex + 1).find(section => section.slug) || null,
   };
 } else {
   sectionData = findSectionBySlug(slug!);

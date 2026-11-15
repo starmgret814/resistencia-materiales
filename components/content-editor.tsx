@@ -532,7 +532,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   onFocus={event => event.currentTarget.select()}
                   onChange={event => setTitleInput(event.target.value)}
                   readOnly={isRenaming}
-                  className="min-w-0 flex-1 border-b-2 border-[#8B0000] bg-transparent py-0.5 font-serif text-lg font-bold text-[#4b1719] outline-none"
+                  className="min-w-0 flex-1 border-b-2 border-[#8B0000] bg-transparent py-0.5 font-sans text-lg font-bold text-[#4b1719] outline-none"
                   onBlur={() => { void renameSubtopic(); }}
                   onKeyDown={event => {
                     if (event.key === 'Enter') { event.preventDefault(); void renameSubtopic(); }
@@ -550,7 +550,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                     {currentSection.id}
                   </span>
                 )}
-                <h2 className="break-words font-serif text-lg font-bold text-[#4b1719]">{document.title}</h2>
+                <h2 className="break-words font-sans text-lg font-bold text-[#4b1719]">{document.title}</h2>
                 <button
                   type="button"
                   disabled={isSaving}

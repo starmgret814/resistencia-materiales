@@ -1,20 +1,24 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Search, FileText, ArrowRight } from 'lucide-react'
-import { chapters, allSections } from '@/lib/course-data'
+import { Search, FileText, ArrowRight, ArrowUp, ArrowDown, CornerDownLeft, X } from 'lucide-react'
+import { chapters, type Chapter } from '@/lib/course-data'
+import { searchCourse } from '@/lib/course-search'
+import { useModalFocus } from '@/lib/use-modal-focus'
 import { cn } from '@/lib/utils'
 
 /**
  * Command-palette-style search for course content.
  * Opens with Ctrl+K (or Cmd+K on Mac).
  */
-export default function CourseSearch() {
+export default function CourseSearch({ courseChapters = chapters }: { courseChapters?: Chapter[] }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
+  useModalFocus(open, modalRef, () => setOpen(false))
 
   // ─── Keyboard shortcut ─────────────────────────────────────────────
   useEffect(() => {
@@ -35,7 +39,7 @@ export default function CourseSearch() {
   useEffect(() => {
     if (open) {
       setQuery('')
-      setSelectedIndex(0)
+      setSelectedIndex(-1)
       // Small delay to ensure the modal is rendered
       const timer = setTimeout(() => inputRef.current?.focus(), 50)
       return () => clearTimeout(timer)
@@ -43,31 +47,14 @@ export default function CourseSearch() {
   }, [open])
 
   // ─── Search logic ──────────────────────────────────────────────────
-  const results = useMemo(() => {
-    if (!query.trim()) {
-      // Show all sections grouped by chapter when no query
-      return allSections
-        .filter((s) => s.slug !== null)
-        .slice(0, 12)
-    }
-
-    const q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-
-    return allSections
-      .filter((s) => {
-        if (!s.slug) return false
-        const title = s.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        const chapter = s.chapterTitle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        const id = s.id.toLowerCase()
-        return title.includes(q) || chapter.includes(q) || id.includes(q) || s.slug.includes(q)
-      })
-      .slice(0, 10)
-  }, [query])
+  const matches = useMemo(() => searchCourse(courseChapters, query), [courseChapters, query])
+  const results = matches.slice(0, query.trim() ? 30 : 6)
 
   // Reset selected index when results change
   useEffect(() => {
-    setSelectedIndex(0)
-  }, [results])
+    setSelectedIndex(-1)
+    if (listRef.current) listRef.current.scrollTop = 0
+  }, [query, courseChapters])
 
   // Scroll selected item into view
   useEffect(() => {
@@ -77,14 +64,14 @@ export default function CourseSearch() {
     if (selected) {
       selected.scrollIntoView({ block: 'nearest' })
     }
-  }, [selectedIndex])
+  }, [selectedIndex, query])
 
   // ─── Navigate to result ────────────────────────────────────────────
   const navigateTo = useCallback((slug: string) => {
     setOpen(false)
     if (typeof window !== 'undefined') {
       import('astro:transitions/client').then(({ navigate }) => {
-        navigate(`/curso/${slug}`)
+        return navigate(`/curso/${slug}`)
       }).catch(() => {
         window.location.href = `/curso/${slug}`
       })
@@ -95,13 +82,13 @@ export default function CourseSearch() {
   function handleInputKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelectedIndex((i) => Math.min(i + 1, results.length - 1))
+      setSelectedIndex((i) => results.length ? Math.min(i + 1, results.length - 1) : -1)
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedIndex((i) => Math.max(i - 1, 0))
+      setSelectedIndex((i) => results.length ? (i <= 0 ? results.length - 1 : i - 1) : -1)
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      const result = results[selectedIndex]
+      const result = results[Math.max(0, selectedIndex)]
       if (result?.slug) {
         navigateTo(result.slug)
       }
@@ -114,34 +101,39 @@ export default function CourseSearch() {
     <>
       {/* Backdrop */}
       <div
+        data-modal-backdrop
         className="fixed inset-0 z-50 bg-[#3a1718]/40 backdrop-blur-sm"
         onClick={() => setOpen(false)}
         aria-hidden
       />
 
       {/* Modal */}
-      <div className="fixed inset-x-0 top-[15vh] z-50 mx-auto w-full max-w-lg px-4">
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="course-search-title" tabIndex={-1} className="course-search-modal fixed inset-x-0 top-[10vh] z-50 mx-auto w-full max-w-lg px-4">
         <div className="overflow-hidden rounded-xl border border-[#e3caca] dark:border-[#382022] bg-[#fbf7f4] dark:bg-[#1a0f10] shadow-2xl shadow-[#7f0303]/10">
+          <div className="flex items-center justify-between gap-3 px-5 pb-1 pt-3">
+            <h2 id="course-search-title" className="text-[13px] font-semibold text-[#4b1719] dark:text-[#ead4d2]">Buscar en el curso</h2>
+            <button type="button" onClick={() => setOpen(false)} className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-[#866b6b] hover:bg-[#f2dddd] dark:text-[#cbb0ae] dark:hover:bg-[#381618]" aria-label="Cerrar búsqueda"><X className="size-3.5" strokeWidth={1.75} aria-hidden="true" /></button>
+          </div>
           {/* Search input */}
-          <div className="flex items-center gap-3 border-b border-[#e3caca] dark:border-[#382022] px-4">
-            <Search className="size-4 shrink-0 text-[#967070] dark:text-[#a08282]" />
+          <div className="course-search-field mx-5 mb-3 flex items-center gap-2.5 rounded-lg px-3">
+            <Search className="size-3.5 shrink-0 text-[#967070] dark:text-[#a08282]" />
             <input
               ref={inputRef}
-              type="text"
+              data-modal-autofocus
+              type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleInputKeyDown}
-              placeholder="Buscar en el curso..."
-              className="h-12 flex-1 bg-transparent text-sm text-[#3b2022] dark:text-[#f3e6e4] outline-none placeholder:text-[#b28a8a] dark:placeholder:text-[#7d5e60]"
+              placeholder="Tema, capítulo o número de sección"
+              className="h-10 min-w-0 flex-1 bg-transparent text-sm text-[#3b2022] dark:text-[#f3e6e4] outline-none placeholder:text-[#967070] dark:placeholder:text-[#ab8e8e]"
               aria-label="Buscar en el curso"
+              aria-describedby="course-search-hint"
             />
-            <kbd className="hidden rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1.5 py-0.5 text-[10px] text-[#967070] dark:text-[#a08282] sm:inline-flex">
-              ESC
-            </kbd>
           </div>
 
           {/* Results list */}
-          <div ref={listRef} className="max-h-[50vh] overflow-y-auto p-2">
+          <p id="course-search-hint" className="px-5 pb-1 text-xs font-medium text-[#765e5e] dark:text-[#cbb0ae]" role="status">{query.trim() ? `${matches.length} ${matches.length === 1 ? 'resultado' : 'resultados'}${matches.length > 30 ? ' · mostrando los primeros 30' : ''}` : 'Explora las secciones'}</p>
+          <div ref={listRef} className="course-search-results max-h-[45vh] overflow-y-auto px-3 pb-3 pt-1">
             {results.length === 0 ? (
               <div className="px-3 py-8 text-center">
                 <p className="text-sm text-[#967070] dark:text-[#a08282]">No se encontraron resultados</p>
@@ -153,11 +145,12 @@ export default function CourseSearch() {
                   key={section.slug}
                   onClick={() => section.slug && navigateTo(section.slug)}
                   onMouseEnter={() => setSelectedIndex(index)}
+                  onFocus={() => setSelectedIndex(index)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors',
+                    'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors',
                     index === selectedIndex
-                      ? 'bg-[#f2dddd] dark:bg-[#381618] text-[#7f0303] dark:text-[#fca5a5]'
-                      : 'text-[#604747] dark:text-[#dfc2c0] hover:bg-[#f2dddd]/50 dark:hover:bg-[#2e1517]'
+                      ? 'bg-[#f3e7e4] dark:bg-[#381618] text-[#7f0303] dark:text-[#fca5a5]'
+                      : 'text-[#604747] dark:text-[#dfc2c0] hover:bg-[#f3e7e4] dark:hover:bg-[#2e1517]'
                   )}
                 >
                   <FileText className={cn(
@@ -166,7 +159,7 @@ export default function CourseSearch() {
                   )} />
                   <div className="min-w-0 flex-1">
                     <p className={cn(
-                      'truncate text-sm font-medium transition-colors',
+                      'truncate text-[13px] font-medium transition-colors',
                       index === selectedIndex ? 'text-[#7f0303] dark:text-[#fca5a5]' : 'text-[#4b1719] dark:text-[#e8d2d0]'
                     )}>
                       {section.title}
@@ -187,13 +180,13 @@ export default function CourseSearch() {
           </div>
 
           {/* Footer hints */}
-          <div className="flex items-center gap-4 border-t border-[#e3caca] dark:border-[#382022] bg-[#f7f0ee]/40 dark:bg-[#140b0c]/40 px-4 py-2.5">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#e3caca] dark:border-[#382022] px-5 py-3">
             <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">
-              <kbd className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5">↑↓</kbd>
+              <kbd aria-label="Flechas arriba y abajo" className="inline-flex rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5"><ArrowUp className="size-3" aria-hidden="true" /><ArrowDown className="size-3" aria-hidden="true" /></kbd>
               <span>navegar</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">
-              <kbd className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5">↵</kbd>
+              <kbd aria-label="Enter" className="rounded border border-[#e3caca] dark:border-[#382022] bg-[#f7f5f0] dark:bg-[#140b0c] px-1 py-0.5"><CornerDownLeft className="size-3" aria-hidden="true" /></kbd>
               <span>abrir</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-[#967070] dark:text-[#a08282]">

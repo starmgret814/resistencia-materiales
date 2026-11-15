@@ -157,7 +157,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <h2 className="text-3xl font-serif font-bold text-[#4b1719]">Gestión de Colaboradores</h2>
+        <h2 className="text-3xl font-sans font-bold text-[#4b1719]">Gestión de Colaboradores</h2>
         <button 
           onClick={handleOpenAddModal}
           className="flex items-center gap-2 px-4 py-2.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors shrink-0"

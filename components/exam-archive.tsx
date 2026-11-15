@@ -58,7 +58,7 @@ export default function ExamArchive() {
         return <details key={`${item}-${hasFilters}-${period}`} open={evaluations.length > 0 || index === 0 || period !== 'all'} className="group/period overflow-hidden rounded-xl border border-[#e3caca] bg-white dark:border-[#382022] dark:bg-[#1a0f10]">
           <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-5 transition-colors hover:bg-[#fdf8f6] focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#7f0303] sm:px-6 dark:hover:bg-[#231416] [&::-webkit-details-marker]:hidden">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#f8eeeb] text-[#9b6262] dark:bg-[#2d191b] dark:text-[#d4a5a2]"><Archive className="size-4" aria-hidden="true" /></span>
-            <h2 className="flex-1 font-serif text-xl font-semibold tracking-tight">{item}</h2>
+            <h2 className="flex-1 font-sans text-xl font-semibold tracking-tight">{item}</h2>
             <span className="text-[11px] text-[#967070] dark:text-[#ab8e8e]">{evaluations.length ? `${evaluations.length} ${evaluations.length === 1 ? 'evaluación' : 'evaluaciones'}` : 'Por completar'}</span>
             <ChevronDown className="size-4 text-[#a47b7b] transition-transform group-open/period:rotate-180" aria-hidden="true" />
           </summary>

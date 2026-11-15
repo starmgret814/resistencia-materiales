@@ -11,10 +11,20 @@ export function normalizeLegacyMdx(markdown: string): string {
     fenced.push(block)
     return `COURSECODEBLOCK${fenced.length - 1}END`
   })
+  markdown = markdown.replace(/(`+)([\s\S]*?)\1(?!`)/g, code => {
+    fenced.push(code)
+    return `COURSECODEBLOCK${fenced.length - 1}END`
+  })
   // Text copied from chats/editors commonly escapes Markdown punctuation and inserts space entities.
   let normalized = markdown
     .replace(/&#x20;|&nbsp;/gi, ' ')
     .replace(/\\([#*<>_])/g, '$1')
+
+  // Accept standard LaTeX delimiters pasted from academic sources, outside code.
+  normalized = normalized
+    .replace(/(?<!\\)\\\(([\s\S]*?)(?<!\\)\\\)/g, (_match, latex) => `$${latex.trim()}$`)
+    .replace(/(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g, (_match, latex) => `\n\n$$\n${latex.trim()}\n$$\n\n`)
+    .replace(/^([ \t]*)\$\$([^$\n]+?)\$\$[ \t]*$/gm, (_match, indent, latex) => `${indent}$$\n${indent}${latex.trim()}\n${indent}$$`)
 
   normalized = normalized.replace(/<Tool\b([^>]*?)\s*\/>/gi, (_match, attrs) => {
     const id = attribute(attrs, 'id')
@@ -83,8 +93,12 @@ export function normalizeLegacyMdx(markdown: string): string {
 
   normalized = normalized.replace(/<Formula([^>]*)>\s*([\s\S]*?)\s*<\/Formula>/gi, (_match, attrs, body) => {
     const label = attribute(attrs, 'label')
+    const number = attribute(attrs, 'number')
+    const boxed = attribute(attrs, 'boxed')
+    const bold = attribute(attrs, 'bold')
     const latex = body.trim().replace(/^\$\$\s*/, '').replace(/\s*\$\$$/, '')
-    return `:::formula${label ? `{title="${label}"}` : ''}\n$$\n${latex}\n$$\n:::`
+    const options = [label && `title="${label}"`, number && `number="${number}"`, boxed && `boxed="${boxed}"`, bold && `bold="${bold}"`].filter(Boolean).join(' ')
+    return `:::formula${options ? `{${options}}` : ''}\n$$\n${latex}\n$$\n:::`
   })
 
   return normalized.replace(/COURSECODEBLOCK(\d+)END/g, (_match, index) => fenced[Number(index)])

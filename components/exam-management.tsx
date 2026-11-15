@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { ExternalLink, Plus } from 'lucide-react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
@@ -72,29 +73,29 @@ export default function ExamManagement() {
   }
 
   return <div className="text-[#4d3838]">
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><h1 className="font-serif text-3xl font-bold text-[#4b1719]">Exámenes pasados</h1><p className="mt-2 text-sm">Publica evaluaciones como páginas web, con fórmulas, imágenes y soluciones.</p></div><a href="/examenes" className="text-sm font-semibold text-[#7f0303]">Ver archivo público ↗</a></div>
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><h1 className="font-sans text-3xl font-bold text-[#4b1719]">Exámenes pasados</h1><p className="mt-2 text-sm">Publica evaluaciones como páginas web, con fórmulas, imágenes y soluciones.</p></div><a href="/examenes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7f0303]">Ver archivo público <ExternalLink className="size-3.5" aria-hidden="true" /></a></div>
     {message && <p role="status" className="mb-5 rounded-lg bg-green-50 p-4 text-sm text-green-800">{message}</p>}
     {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-800">{error}</p>}
     <div className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
       <aside className="rounded-xl border border-[#e3caca] bg-white p-4">
-        <button disabled={busy} onClick={() => select(starter())} className="mb-4 w-full rounded-lg bg-[#7f0303] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">+ Nueva evaluación</button>
+        <button disabled={busy} onClick={() => select(starter())} className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#7f0303] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Plus className="size-4" aria-hidden="true" />Nueva evaluación</button>
         {loading ? <p role="status" className="text-sm">Cargando…</p> : !exams.length ? <p className="text-sm">Aún no hay evaluaciones.</p> : <ul className="space-y-3">{exams.map(exam => <li key={exam.id} className="rounded-lg border border-[#eadada] p-3"><button disabled={busy} onClick={() => select(exam)} className="w-full text-left text-sm"><span className="block text-xs text-[#967070]">{exam.period} · {examTypes.find(type => type.id === exam.type)?.label}</span><span className="mt-1 block font-semibold">{exam.title}</span></button><button disabled={busy || !ready} onClick={() => remove(exam)} className="mt-2 text-xs text-red-700 disabled:opacity-50">Eliminar</button></li>)}</ul>}
       </aside>
       <form onSubmit={save} className="min-w-0 rounded-xl border border-[#e3caca] bg-white p-5">
-        <h2 className="mb-5 font-serif text-xl font-bold">{current.id ? 'Editar evaluación' : 'Nueva evaluación'}</h2>
+        <h2 className="mb-5 font-sans text-xl font-bold">{current.id ? 'Editar evaluación' : 'Nueva evaluación'}</h2>
         <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
           <label className="text-xs font-semibold">Periodo<input className={`${input} mt-2`} required pattern="[0-9]{4}-[12]" placeholder="2026-1" value={current.period} onChange={event => change({ period: event.target.value })} /><span className="mt-1 block text-[11px] font-normal">Año y semestre; por ejemplo, 2025-2.</span></label>
           <label className="text-xs font-semibold">Tipo<select className={`${input} mt-2`} value={current.type} onChange={event => change({ type: event.target.value as PastExam['type'] })}>{examTypes.map(type => <option key={type.id} value={type.id}>{type.label}</option>)}</select></label>
           <label className="text-xs font-semibold sm:col-span-2">Título<input className={`${input} mt-2`} required maxLength={160} placeholder="Práctica calificada 1" value={current.title} onChange={event => change({ title: event.target.value })} /></label>
         </fieldset>
-        <div className="mb-3 mt-6 flex flex-wrap items-center justify-between gap-3"><h3 className="text-sm font-semibold">Contenido Markdown</h3><a href="/guia-colaboradores" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#7f0303]">Guía de formato ↗</a></div>
+        <div className="mb-3 mt-6 flex flex-wrap items-center justify-between gap-3"><h3 className="text-sm font-semibold">Contenido Markdown</h3><a href="/guia-colaboradores" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7f0303]">Guía de formato <ExternalLink className="size-3.5" aria-hidden="true" /></a></div>
         <p className="mb-3 text-xs leading-5">Usa el mismo formato del curso: Problem, Solution, Formula, Table y TableGrid. Para imágenes, utiliza una URL completa o una ruta pública como /imagenes/figura.png.</p>
         <div className="overflow-hidden rounded-lg border border-[#dcc3c3]">
           <Suspense fallback={<p className="p-5 text-sm">Cargando editor…</p>}><Editor height="400px" language="markdown" value={current.contentMarkdown} onChange={value => change({ contentMarkdown: value || '' })} options={{ minimap: { enabled: false }, wordWrap: 'on', fontSize: 14, readOnly: busy, scrollBeyondLastLine: false, automaticLayout: true }} /></Suspense>
         </div>
-        <div className="mt-5 flex flex-wrap items-center gap-4"><button disabled={busy || !ready || loading} className="rounded-lg bg-[#7f0303] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy ? 'Guardando…' : current.id ? 'Publicar cambios' : 'Publicar evaluación'}</button>{current.id && <a href={`/examenes/${current.id}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[#7f0303]">Ver página publicada ↗</a>}</div>
+        <div className="mt-5 flex flex-wrap items-center gap-4"><button disabled={busy || !ready || loading} className="rounded-lg bg-[#7f0303] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy ? 'Guardando…' : current.id ? 'Publicar cambios' : 'Publicar evaluación'}</button>{current.id && <a href={`/examenes/${current.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#7f0303]">Ver página publicada <ExternalLink className="size-3.5" aria-hidden="true" /></a>}</div>
         <h3 className="mb-4 mt-8 border-t border-[#eadada] pt-6 text-sm font-semibold">Vista previa</h3>
-        <div className="rounded-lg bg-[#faf5f3] p-4"><h2 className="font-serif text-2xl font-bold">{current.title || 'Título de la evaluación'}</h2><Suspense fallback={<p>Cargando vista previa…</p>}><ContentRenderer document={{ schemaVersion: 2, chapterId: current.period, slug: current.id || 'nueva-evaluacion', title: current.title, contentMarkdown: current.contentMarkdown }} /></Suspense></div>
+        <div className="rounded-lg bg-[#faf5f3] p-4"><h2 className="font-sans text-2xl font-bold">{current.title || 'Título de la evaluación'}</h2><Suspense fallback={<p>Cargando vista previa…</p>}><ContentRenderer document={{ schemaVersion: 2, chapterId: current.period, slug: current.id || 'nueva-evaluacion', title: current.title, contentMarkdown: current.contentMarkdown }} /></Suspense></div>
       </form>
     </div>
   </div>

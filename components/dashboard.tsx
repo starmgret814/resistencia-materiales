@@ -409,7 +409,7 @@ export default function Dashboard({ session }: { session: any }) {
       )}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-[#4b1719]">Contenido</h1>
+          <h1 className="text-3xl font-sans font-bold text-[#4b1719]">Contenido</h1>
           <p className="text-sm text-[#8b6d6d] mt-1">Abre un capítulo para gestionar sus subtemas. Recordaremos los que dejes abiertos.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -442,7 +442,7 @@ export default function Dashboard({ session }: { session: any }) {
                 >
                   <ChevronRight aria-hidden="true" className={`size-4 shrink-0 text-[#8b6d6d] transition-transform ${expandedChapters.includes(chapter.number) ? 'rotate-90' : ''}`} />
                   <Folder aria-hidden="true" className="size-5 shrink-0 text-[#8b6d6d]" />
-                  <span className="min-w-0 flex-1 font-serif text-lg font-bold text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</span>
+                  <span className="min-w-0 flex-1 font-sans text-lg font-bold text-[#4b1719]">Capítulo {chapter.number}: {chapter.title}</span>
                   <span className="hidden shrink-0 text-xs font-normal text-[#8b6d6d] sm:inline">{chapter.sections.length} {chapter.sections.length === 1 ? 'subtema' : 'subtemas'}</span>
                 </button>
               </h2>

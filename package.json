@@ -16,6 +16,8 @@
     "test:login": "node scripts/test-client-login.mjs",
     "test:dashboard": "node scripts/test-dashboard-loading.mjs",
     "test:headings": "node scripts/test-heading-numbering.mjs",
+    "test:ux": "node scripts/test-course-ux.mjs",
+    "test:math": "node scripts/test-math-rendering.mjs",
     "test:problems": "node scripts/test-problem-numbering.mjs",
     "test:tools": "node scripts/test-interactive-tools.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-mc361-permissions \"node scripts/test-firestore.mjs\""
@@ -38,7 +40,7 @@
     "clsx": "^2.1.1",
     "firebase": "^12.19.0",
     "jose": "^6.2.12",
-    "katex": "^0.18.9",
+    "katex": "^0.16.47",
     "lucide-react": "^0.477.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

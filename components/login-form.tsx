@@ -72,7 +72,7 @@ export default function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-[#FCF9F7] px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl shadow-[#4b1719]/5 border border-[#E5D7D4]">
         <div>
-          <h2 className="mt-2 text-center font-serif text-3xl font-bold tracking-tight text-[#3E3030]">
+          <h2 className="mt-2 text-center font-sans text-3xl font-bold tracking-tight text-[#3E3030]">
             Acceso a la Plataforma
           </h2>
           <p className="mt-3 text-center text-sm text-[#756565]">

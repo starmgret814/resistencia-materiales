@@ -6,16 +6,23 @@ import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
 
 export function Definition({ children, title = 'Definición' }: { children: ReactNode; title?: string }) {
-  return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] dark:border-l-[#f87171] bg-[#f8eaea] dark:bg-[#281517] px-5 py-4"><p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e] dark:text-[#fca5a5]">{title}</p><div className="text-sm leading-7 text-[#4d3838] dark:text-[#ead4d2]">{children}</div></aside>
+  return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] dark:border-l-[#f87171] bg-[#f8eaea] dark:bg-[#281517] px-5 py-4"><p className="academic-label mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e] dark:text-[#fca5a5]">{title}</p><div className="academic-body text-[#4d3838] dark:text-[#ead4d2]">{children}</div></aside>
 }
 
-export function Formula({ children, label }: { children: ReactNode; label?: string }) {
-  return <div className="formula-block my-2 px-4 py-0 text-center"><div>{children}</div>{label && <p className="formula-label mt-3">{label}</p>}</div>
+export function Formula({ children, label, number, boxed = false, bold = false }: { children: ReactNode; label?: string; number?: string; boxed?: boolean; bold?: boolean }) {
+  return <figure id={number ? `eq-${number}` : undefined} className="formula-block my-5 px-4 py-0">
+    <div className={cn('formula-row', number && 'formula-row-numbered')}>
+      {number && <span aria-hidden="true" />}
+      <div className={cn('formula-equation', boxed && 'formula-equation-boxed', bold && 'formula-equation-bold')}>{children}</div>
+      {number && <span className="formula-number"><a href={`#eq-${number}`} aria-label={`Enlace a la ecuación ${number}`}>({number})</a></span>}
+    </div>
+    {label && <figcaption className="formula-label mt-3">{label}</figcaption>}
+  </figure>
 }
 
 export function Example({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {
   const displayTitle = number ? `Ejemplo ${number}${title ? `: ${title}` : ''}` : (title || 'Ejemplo resuelto')
-  return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
+  return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="academic-body text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
 export function Problem({ children, title, number, image, imageAlt, imageCaption, imageWidth = '38%', imagePosition = 'right' }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageWidth?: string; imagePosition?: 'left' | 'right' }) {
@@ -23,7 +30,7 @@ export function Problem({ children, title, number, image, imageAlt, imageCaption
   const parts = Children.toArray(children)
   const isSolution = (child: ReactNode) => isValidElement<{ 'data-course-kind'?: string }>(child) && (child.type === Solution || child.props['data-course-kind'] === 'solution')
   const width = /^(?:\d+(?:\.\d+)?)(?:px|%|rem|em)$/.test(imageWidth) ? imageWidth : '38%'
-  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">
+  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="academic-body text-[#604747] dark:text-[#ead4d2]">
     {image ? <>
       <div className={`problem-illustrated problem-image-${imagePosition}`} style={{ '--problem-image-width': width } as CSSProperties}>
         <div className="min-w-0">{parts.filter(child => !isSolution(child))}</div>
@@ -45,7 +52,7 @@ export function Solution({ children }: { children?: ReactNode }) {
           Mostrar Solución
         </span>
       </summary>
-      <div className="mt-4 pl-4 border-l-2 border-[#e3caca] dark:border-[#382022] text-base leading-relaxed text-[#604747] dark:text-[#ead4d2]">
+      <div className="mt-4 pl-4 border-l-2 border-[#e3caca] dark:border-[#382022] academic-body text-[#604747] dark:text-[#ead4d2]">
         {children}
       </div>
     </details>
@@ -53,7 +60,7 @@ export function Solution({ children }: { children?: ReactNode }) {
 }
 
 export function Summary({ children, title = 'Resumen' }: { children: ReactNode; title?: string }) {
-  return <section className="my-8 rounded-lg border border-[#dec4c1] dark:border-[#422225] bg-[#f9ebe9] dark:bg-[#251214] p-5 sm:p-6"><p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7f0303] dark:text-[#f87171]">{title}</p><div className="text-sm leading-7 text-[#4d3838] dark:text-[#ead4d2]">{children}</div></section>
+  return <section className="my-8 rounded-lg border border-[#dec4c1] dark:border-[#422225] bg-[#f9ebe9] dark:bg-[#251214] p-5 sm:p-6"><p className="academic-label mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7f0303] dark:text-[#f87171]">{title}</p><div className="academic-body text-[#4d3838] dark:text-[#ead4d2]">{children}</div></section>
 }
 
 export function Image({ 
@@ -162,7 +169,7 @@ export const Table: FC<TableProps> = ({ children, title, caption, align = 'cente
   return (
     <div className="my-7">
       {displayTitle && (
-        <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7f0303] dark:text-[#fca5a5]">
+        <p className="academic-label mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7f0303] dark:text-[#fca5a5]">
           {displayTitle}
         </p>
       )}

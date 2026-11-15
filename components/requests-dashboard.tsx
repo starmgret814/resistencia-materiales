@@ -100,7 +100,7 @@ export default function RequestsDashboard() {
     <div className="max-w-6xl mx-auto p-6 text-[#3b2022]">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-[#4b1719]">Solicitudes de Revisión</h1>
+          <h1 className="text-3xl font-sans font-bold text-[#4b1719]">Solicitudes de Revisión</h1>
           <p className="text-sm text-[#8b6d6d] mt-1">Revisa y aprueba el contenido editado por los colaboradores.</p>
         </div>
       </div>

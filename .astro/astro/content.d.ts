@@ -159,9 +159,30 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"01-esfuerzos-falla/fundamentos-del-esfuerzo/index.mdx": {
+	id: "01-esfuerzos-falla/fundamentos-del-esfuerzo/index.mdx";
+  slug: "01-esfuerzos-falla/fundamentos-del-esfuerzo";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"01-esfuerzos-falla/problemas/index.mdx": {
+	id: "01-esfuerzos-falla/problemas/index.mdx";
+  slug: "01-esfuerzos-falla/problemas";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "01-esfuerzos-falla/prueba-2/index.mdx": {
 	id: "01-esfuerzos-falla/prueba-2/index.mdx";
   slug: "01-esfuerzos-falla/prueba-2";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"01-esfuerzos-falla/resistencia-y-seguridad/index.mdx": {
+	id: "01-esfuerzos-falla/resistencia-y-seguridad/index.mdx";
+  slug: "01-esfuerzos-falla/resistencia-y-seguridad";
   body: string;
   collection: "resistencia";
   data: any
@@ -176,6 +197,34 @@ declare module 'astro:content' {
 "01-esfuerzos-falla/xd/index.mdx": {
 	id: "01-esfuerzos-falla/xd/index.mdx";
   slug: "01-esfuerzos-falla/xd";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"02-deformaciones-ley-hooke/concepto-de-deformacion/index.mdx": {
+	id: "02-deformaciones-ley-hooke/concepto-de-deformacion/index.mdx";
+  slug: "02-deformaciones-ley-hooke/concepto-de-deformacion";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"02-deformaciones-ley-hooke/deformacion-de-elementos-sometidos-a-carga-axial/index.mdx": {
+	id: "02-deformaciones-ley-hooke/deformacion-de-elementos-sometidos-a-carga-axial/index.mdx";
+  slug: "02-deformaciones-ley-hooke/deformacion-de-elementos-sometidos-a-carga-axial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"02-deformaciones-ley-hooke/efecto-poisson-y-estado-multiaxial/index.mdx": {
+	id: "02-deformaciones-ley-hooke/efecto-poisson-y-estado-multiaxial/index.mdx";
+  slug: "02-deformaciones-ley-hooke/efecto-poisson-y-estado-multiaxial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"02-deformaciones-ley-hooke/problemas/index.mdx": {
+	id: "02-deformaciones-ley-hooke/problemas/index.mdx";
+  slug: "02-deformaciones-ley-hooke/problemas";
   body: string;
   collection: "resistencia";
   data: any
@@ -201,6 +250,13 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"03-cambio-temperatura-hiperestaticos/cambios-de-temperaturas/index.mdx": {
+	id: "03-cambio-temperatura-hiperestaticos/cambios-de-temperaturas/index.mdx";
+  slug: "03-cambio-temperatura-hiperestaticos/cambios-de-temperaturas";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "03-cambio-temperatura-hiperestaticos/subtema-inicial/index.mdx": {
 	id: "03-cambio-temperatura-hiperestaticos/subtema-inicial/index.mdx";
   slug: "03-cambio-temperatura-hiperestaticos/subtema-inicial";
@@ -215,6 +271,13 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"04-transformacion-esfuerzos/transformacion-de-deformaciones/index.mdx": {
+	id: "04-transformacion-esfuerzos/transformacion-de-deformaciones/index.mdx";
+  slug: "04-transformacion-esfuerzos/transformacion-de-deformaciones";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "05-recipientes-presion/subtema-inicial/index.mdx": {
 	id: "05-recipientes-presion/subtema-inicial/index.mdx";
   slug: "05-recipientes-presion/subtema-inicial";
@@ -222,9 +285,37 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"06-torsion/deformaciones-de-ejes/index.mdx": {
+	id: "06-torsion/deformaciones-de-ejes/index.mdx";
+  slug: "06-torsion/deformaciones-de-ejes";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"06-torsion/diseno-de-ejes-y-transmision-de-potencia/index.mdx": {
+	id: "06-torsion/diseno-de-ejes-y-transmision-de-potencia/index.mdx";
+  slug: "06-torsion/diseno-de-ejes-y-transmision-de-potencia";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"06-torsion/ejes-compuestos-y-estaticamente-indeterminados/index.mdx": {
+	id: "06-torsion/ejes-compuestos-y-estaticamente-indeterminados/index.mdx";
+  slug: "06-torsion/ejes-compuestos-y-estaticamente-indeterminados";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "06-torsion/subtema-inicial/index.mdx": {
 	id: "06-torsion/subtema-inicial/index.mdx";
   slug: "06-torsion/subtema-inicial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"06-torsion/tubos-de-pared-delgada-y-concentracion-de-esfuerzos/index.mdx": {
+	id: "06-torsion/tubos-de-pared-delgada-y-concentracion-de-esfuerzos/index.mdx";
+  slug: "06-torsion/tubos-de-pared-delgada-y-concentracion-de-esfuerzos";
   body: string;
   collection: "resistencia";
   data: any

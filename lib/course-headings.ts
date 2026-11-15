@@ -16,7 +16,7 @@ export async function getCourseHeadings(markdown: string, prefix?: string): Prom
     }]],
   })
   await processor.render(normalizeLegacyMdx(markdown))
-  return headings.filter(heading => heading.level === 2 || heading.level === 3)
+  return headings.filter(heading => heading.level >= 1 && heading.level <= 3)
 }
 
 export async function countCourseProblems(markdown: string): Promise<number> {
