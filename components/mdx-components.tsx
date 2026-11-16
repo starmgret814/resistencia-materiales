@@ -1,7 +1,8 @@
 'use client'
 
 import type { ReactNode, CSSProperties, FC } from 'react'
-import { Children, isValidElement, useMemo, useState } from 'react'
+import { Children, isValidElement, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
 
@@ -9,15 +10,54 @@ export function Definition({ children, title = 'Definición' }: { children: Reac
   return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] dark:border-l-[#f87171] bg-[#f8eaea] dark:bg-[#281517] px-5 py-4"><p className="academic-label mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e] dark:text-[#fca5a5]">{title}</p><div className="academic-body text-[#4d3838] dark:text-[#ead4d2]">{children}</div></aside>
 }
 
-export function Formula({ children, label, number, boxed = false, bold = false }: { children: ReactNode; label?: string; number?: string; boxed?: boolean; bold?: boolean }) {
-  return <figure id={number ? `eq-${number}` : undefined} className="formula-block my-5 px-4 py-0">
+export function Formula({ children, label, number, id, boxed = false, bold = false }: { children: ReactNode; label?: string; number?: string; id?: string; boxed?: boolean; bold?: boolean }) {
+  const anchor = id || (number ? `eq-${number}` : undefined)
+  return <figure id={anchor} className="formula-block my-5 px-4 py-0">
     <div className={cn('formula-row', number && 'formula-row-numbered')}>
       {number && <span aria-hidden="true" />}
       <div className={cn('formula-equation', boxed && 'formula-equation-boxed', bold && 'formula-equation-bold')}>{children}</div>
-      {number && <span className="formula-number"><a href={`#eq-${number}`} aria-label={`Enlace a la ecuación ${number}`}>({number})</a></span>}
+      {number && <span className="formula-number"><a href={`#${anchor}`} aria-label={`Enlace a la ecuación ${number}`}>({number})</a></span>}
     </div>
     {label && <figcaption className="formula-label mt-3">{label}</figcaption>}
   </figure>
+}
+
+export function Term({ children, definition }: { children: ReactNode; definition: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const [position, setPosition] = useState<{ left: number; top: number } | null>(null)
+  const root = useRef<HTMLSpanElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const tooltip = useRef<HTMLSpanElement>(null)
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>()
+  const descriptionId = useId()
+  const show = () => { clearTimeout(hideTimer.current); if (!open) { setPosition(null); setOpen(true) } }
+  const contains = (target: Node | null) => root.current?.contains(target) || tooltip.current?.contains(target)
+  const hide = () => { hideTimer.current = setTimeout(() => { if (!contains(document.activeElement)) setOpen(false) }, 180) }
+  useEffect(() => () => clearTimeout(hideTimer.current), [])
+  useEffect(() => {
+    if (!open) return
+    const place = () => {
+      if (!trigger.current || !tooltip.current) return
+      const target = trigger.current.getBoundingClientRect()
+      const box = tooltip.current.getBoundingClientRect()
+      const left = Math.max(16, Math.min(target.left + target.width / 2 - box.width / 2, window.innerWidth - box.width - 16))
+      const below = target.bottom + 8
+      const top = below + box.height <= window.innerHeight - 16 ? below : Math.max(16, target.top - box.height - 8)
+      setPosition({ left, top })
+    }
+    const outside = (event: PointerEvent) => { if (!contains(event.target as Node)) setOpen(false) }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false) }
+    place()
+    document.addEventListener('pointerdown', outside)
+    document.addEventListener('keydown', escape)
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true) }
+  }, [open, definition])
+  return <span ref={root} className="course-term" onMouseEnter={show} onMouseLeave={hide} onBlur={event => { if (!contains(event.relatedTarget as Node)) setOpen(false) }}>
+    <button ref={trigger} type="button" className="course-term-trigger" aria-expanded={open} aria-describedby={open ? descriptionId : undefined} onFocus={show} onClick={show}>{children}</button>
+    {open && createPortal(<span ref={tooltip} id={descriptionId} role="tooltip" className="course-term-tooltip" onMouseEnter={show} onMouseLeave={hide} style={{ left: position?.left ?? 0, top: position?.top ?? 0, visibility: position ? 'visible' : 'hidden' }}>{definition}</span>, document.body)}
+  </span>
 }
 
 export function Example({ children, title, number }: { children: ReactNode; title?: string; number?: number | string }) {
@@ -25,16 +65,18 @@ export function Example({ children, title, number }: { children: ReactNode; titl
   return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="academic-body text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
-export function Problem({ children, title, number, image, imageAlt, imageCaption, imageWidth = '38%', imagePosition = 'right' }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageWidth?: string; imagePosition?: 'left' | 'right' }) {
+export function Problem({ children, title, number, image, imageAlt, imageCaption, imageNumber, imageWidth = '38%', imagePosition = 'right', imageLayout = 'auto' }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageNumber?: string; imageWidth?: string; imagePosition?: 'left' | 'right'; imageLayout?: 'auto' | 'wrap' | 'stacked' }) {
   const displayTitle = number ? `Problema ${number}${title ? `: ${title}` : ''}` : (title || 'Problema propuesto')
   const parts = Children.toArray(children)
   const isSolution = (child: ReactNode) => isValidElement<{ 'data-course-kind'?: string }>(child) && (child.type === Solution || child.props['data-course-kind'] === 'solution')
   const width = /^(?:\d+(?:\.\d+)?)(?:px|%|rem|em)$/.test(imageWidth) ? imageWidth : '38%'
-  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="academic-body text-[#604747] dark:text-[#ead4d2]">
+  const wideImage = width.endsWith('%') && Number.parseFloat(width) >= 50
+  const stacked = imageLayout === 'stacked' || (imageLayout === 'auto' && wideImage)
+  return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="problem-content academic-body text-[#604747] dark:text-[#ead4d2]">
     {image ? <>
-      <div className={`problem-illustrated problem-image-${imagePosition}`} style={{ '--problem-image-width': width } as CSSProperties}>
-        <div className="min-w-0">{parts.filter(child => !isSolution(child))}</div>
-        <div className="problem-figure min-w-0 [&>figure]:my-0"><Image src={image} alt={imageAlt || title || 'Figura del problema'} caption={imageCaption} /></div>
+      <div className={cn('problem-illustrated', `problem-image-${imagePosition}`, stacked ? 'problem-layout-stacked' : 'problem-layout-wrap')} style={{ '--problem-image-width': width } as CSSProperties}>
+        <div className="problem-figure min-w-0 [&>figure]:my-0"><Image src={image} alt={imageAlt || title || 'Figura del problema'} caption={imageCaption} number={imageNumber} /></div>
+        <div className="problem-statement min-w-0">{parts.filter(child => !isSolution(child))}</div>
       </div>
       {parts.filter(isSolution)}
     </> : children}
@@ -67,6 +109,8 @@ export function Image({
   src, 
   alt, 
   caption, 
+  number,
+  id,
   slug: propSlug,
   size = 'full',
   align = 'center',
@@ -76,6 +120,8 @@ export function Image({
   src: string; 
   alt: string; 
   caption?: string; 
+  number?: string;
+  id?: string;
   slug?: string;
   size?: 'small' | 'medium' | 'large' | 'full';
   align?: 'left' | 'center' | 'right';
@@ -84,6 +130,7 @@ export function Image({
 }) {
   const contextSlug = useContentSlug()
   const slug = propSlug || contextSlug
+  const anchor = id || (number ? `fig-${number}` : undefined)
 
   // Resolve relative paths (./image.png or image.png) to the content API
   let resolvedSrc = src
@@ -114,8 +161,9 @@ export function Image({
   }
 
   return (
-    <figure 
-      className={cn("my-8 w-full", alignClasses[align], !width && sizeClasses[size])}
+    <figure
+      id={anchor}
+      className={cn("course-figure my-8 w-full", alignClasses[align], !width && sizeClasses[size])}
       style={maxWidthStyle}
     >
       <img 
@@ -125,7 +173,7 @@ export function Image({
         style={imgStyle}
         loading="lazy" 
       />
-      {caption && <figcaption className="mt-2 text-center text-xs text-[#765e5e] dark:text-[#bca4a3]">{caption}</figcaption>}
+      {(caption || number) && <figcaption className="mt-2 text-center text-xs text-[#765e5e] dark:text-[#bca4a3]">{number && <><a className="course-reference" href={`#${anchor}`}>Figura {number}</a>{caption ? '. ' : ''}</>}{caption}</figcaption>}
     </figure>
   )
 }
@@ -180,6 +228,6 @@ export const Table: FC<TableProps> = ({ children, title, caption, align = 'cente
   );
 };
 
-export const mdxComponents = { Definition, Formula, Example, Problem, Solution, Summary, Image, ImageGrid, Table };
+export const mdxComponents = { Definition, Formula, Term, Example, Problem, Solution, Summary, Image, ImageGrid, Table };
 
 export default mdxComponents;

@@ -1,21 +1,22 @@
 # Prueba
 
 Las cargas transmitidas por los elementos y sus conexiones producen esfuerzos sobre las secciones y superficies de contacto. Para analizarlos, se relacionan las fuerzas internas resultantes con las áreas que las transmiten. Las expresiones de esta sección permiten calcular esfuerzos promedio; la distribución real puede variar dentro de cada área.
+
 ## 1.2.1. Esfuerzo normal
 
-Cuando un elemento está sometido a una carga axial, la fuerza interna actúa perpendicularmente a su sección transversal y produce esfuerzo normal. Si la fuerza axial resultante es $P$ y el área de la sección es $A$, el esfuerzo normal promedio es:
+Cuando un elemento está sometido a una carga axial, la fuerza interna actúa perpendicularmente a su sección transversal y produce <Term definition="Actúa perpendicularmente a la superficie de corte y puede ser de tensión o compresión.">esfuerzo normal</Term>. Si la fuerza axial resultante es $P$ y el área de la sección es $A$, el <Term definition="Fuerza normal resultante dividida entre el área de la sección.">esfuerzo normal promedio</Term> es:
+
+<Formula number="1.6.1" id="eq-esfuerzo-normal-promedio" boxed="true">
 
 $$
 \sigma_{\mathrm{prom}}=\frac{P}{A}.
 $$
 
-En una barra de armadura, por ejemplo, primero se determina la fuerza axial que soporta el miembro. Luego, al dividirla entre el área de su sección transversal, se obtiene el esfuerzo normal promedio. Si la carga tiende a alargar el elemento, el esfuerzo es de tensión; si tiende a acortarlo, es de compresión.
+</Formula>
 
-<Image
-  src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793411265/rqpwnilohnehayh63rra.png"
-  alt="Miembro de una armadura sometido a una fuerza axial; se muestra su sección transversal de área A y la distribución de fuerzas normales sobre ella."
-  caption="Figura 5. Fuerza axial y esfuerzo normal promedio en la sección de un miembro."
-/>
+En una barra de armadura, por ejemplo, primero se determina la fuerza axial que soporta el miembro. Luego, al dividirla entre el área de su sección transversal, se obtiene el esfuerzo normal promedio. Si la carga tiende a alargar el elemento, el <Term definition="Intensidad de la fuerza interna transmitida por unidad de área.">esfuerzo</Term> es de tensión; si tiende a acortarlo, es de compresión.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793411265/rqpwnilohnehayh63rra.png" alt="Miembro de una armadura sometido a una fuerza axial; se muestra su sección transversal de área A y la distribución de fuerzas normales sobre ella." caption="Fuerza axial y esfuerzo normal promedio en la sección de un miembro." number="5" id="fig-5" />
 
 ## 1.2.2. Principio de Saint-Venant
 

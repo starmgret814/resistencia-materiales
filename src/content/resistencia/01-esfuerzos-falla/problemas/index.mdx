@@ -1,10 +1,6 @@
-<Problem 
-title="Área de un enlace para un factor de seguridad de 3.20"
-image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793460537/a8um1ah0xhdsi1rbzyf0.png"
-imageAlt="Diagrama del enlace"
-imagePosition="right"
-imageWidth="50%">
-El enlace AB estará hecho de un acero cuyo esfuerzo normal último es de $65\ \mathrm{ksi}$. Determine el área de la sección transversal de AB para la cual el factor de seguridad sea de $3.20$. Suponga que el enlace estará adecuadamente reforzado alrededor de los pasadores en A y B.
+<Problem title="Área de un enlace para un factor de seguridad de 3.20" image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793460537/a8um1ah0xhdsi1rbzyf0.png" imageAlt="Diagrama del enlace" imageWidth="50%" imagePosition="right" imageNumber="1.4.1">
+
+El enlace AB estará hecho de un acero cuyo <Term definition="Actúa perpendicularmente a la superficie de corte y puede ser de tensión o compresión.">esfuerzo normal</Term> último es de $65\ \mathrm{ksi}$. Determine el área de la sección transversal de AB para la cual el [factor de seguridad](/curso/01-esfuerzos-falla/resistencia-y-seguridad#eq-factor-seguridad) sea de $3.20$. Suponga que el enlace estará adecuadamente reforzado alrededor de los pasadores en A y B.
 
 <Solution>
 
@@ -48,7 +44,7 @@ El enlace AB trabaja a **tracción**.
 
 **3. Área para el factor de seguridad especificado**
 
-El factor de seguridad respecto del esfuerzo último es:
+El factor de seguridad respecto del <Term definition="Valor máximo de esfuerzo que alcanza la curva esfuerzo-deformación.">esfuerzo último</Term> es:
 
 $$
 F.S.=\frac{\sigma_u}{\sigma},
@@ -70,15 +66,13 @@ A=\frac{(3.20)(5.456988)}{65}
 $$
 
 </Solution>
+
 </Problem>
 
-<Problem title="Longitud de placas de empalme encoladas"
-image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474501/r7anoody6qztmvlczsu9.png"
-imageAlt="Diagrama de las placas de empalme"
-imagePosition="right"
-imageWidth="20%">
+<Problem title="Longitud de placas de empalme encoladas" image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474501/r7anoody6qztmvlczsu9.png" imageAlt="Diagrama de las placas de empalme" imageWidth="20%" imagePosition="right" imageNumber="1.4.2">
+
 Dos elementos de madera están unidos mediante placas de empalme de madera contrachapada que están completamente encoladas en las superficies de contacto.
-Sabiendo que el espacio entre los extremos de los elementos es de $6\ \mathrm{mm}$ y que el esfuerzo cortante último en la unión encolada es de $2.5\ \mathrm{MPa}$, determine la longitud $L$ para la cual el factor de seguridad es de $2.75$ bajo la carga mostrada de $16\ \mathrm{kN}$. El ancho de los elementos y de las placas es de $125\ \mathrm{mm}$.
+Sabiendo que el espacio entre los extremos de los elementos es de $6\ \mathrm{mm}$ y que el <Term definition="Actúa paralelamente a la superficie de corte y tiende a producir un deslizamiento relativo.">esfuerzo cortante</Term> último en la unión encolada es de $2.5\ \mathrm{MPa}$, determine la longitud $L$ para la cual el factor de seguridad es de $2.75$ bajo la carga mostrada de $16\ \mathrm{kN}$. El ancho de los elementos y de las placas es de $125\ \mathrm{mm}$.
 
 <Solution>
 
@@ -109,7 +103,7 @@ $$
 A=b\ell.
 $$
 
-Cada una de estas superficies transmite los $8\ \mathrm{kN}$ de la placa. Considerando el esfuerzo cortante promedio:
+Cada una de estas superficies transmite los $8\ \mathrm{kN}$ de la placa. Considerando el [esfuerzo cortante promedio](/curso/01-esfuerzos-falla/fundamentos-del-esfuerzo#eq-esfuerzo-cortante-promedio):
 
 $$
 \tau_{\mathrm{adm}}=\frac{F}{b\ell}.
@@ -146,13 +140,11 @@ L=2(70.4)+6
 $$
 
 </Solution>
+
 </Problem>
 
-<Problem number={3} title="Dimensionamiento de una placa de anclaje"
-image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474659/zatel5np18fnvujtdbok.png"
-imageAlt="Diagrama de una placa de anclaje"
-imagePosition="right"
-imageWidth="60%">
+<Problem title="Dimensionamiento de una placa de anclaje" number="3" image="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793474659/zatel5np18fnvujtdbok.png" imageAlt="Diagrama de una placa de anclaje" imageWidth="60%" imagePosition="right" imageNumber="1.4.3">
+
 Una placa de acero de $1/4\ \mathrm{in}$ de espesor está empotrada en una pared de concreto para anclar un cable de alta resistencia, como se muestra. El diámetro del agujero en la placa es de $3/4\ \mathrm{in}$, la resistencia última del acero utilizado es de $36\ \mathrm{ksi}$ y la resistencia última de adherencia entre la placa y el concreto es de $300\ \mathrm{psi}$.
 
 Sabiendo que se desea un factor de seguridad de $3.60$ cuando $P=2.5\ \mathrm{kips}$, determine:
@@ -190,13 +182,13 @@ $$
 A_{\mathrm{neta}}=(a-d)t.
 $$
 
-El esfuerzo normal promedio en esta sección es:
+El [esfuerzo normal promedio](/curso/01-esfuerzos-falla/fundamentos-del-esfuerzo#eq-esfuerzo-normal-promedio) en esta sección es:
 
 $$
 \sigma=\frac{P}{(a-d)t}.
 $$
 
-Para obtener el factor de seguridad especificado, se iguala este esfuerzo al admisible:
+Para obtener el factor de seguridad especificado, se iguala este <Term definition="Intensidad de la fuerza interna transmitida por unidad de área.">esfuerzo</Term> al admisible:
 
 $$
 \frac{P}{(a-d)t}=\sigma_{\mathrm{adm}}.
@@ -262,4 +254,5 @@ $$
 $$
 
 </Solution>
+
 </Problem>

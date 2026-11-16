@@ -7,6 +7,7 @@ import {
   Pencil,
   Code2,
   Download,
+  FileInput,
   Eye,
   Heading1,
   Heading2,
@@ -33,8 +34,10 @@ import { db } from '@/lib/firebase'
 import { workspaceFetch } from '@/lib/workspace-api'
 import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
 import Editor from '@monaco-editor/react'
+import PreviewErrorBoundary from '@/components/preview-error-boundary'
 import { chapters, type Chapter } from '@/lib/course-data'
 import { findSubtopicNumber, findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
+import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision'
 import {
   starterDocument,
   validateCourseDocument,
@@ -44,12 +47,13 @@ import {
 const inputClass = 'w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15'
 const selectClass = 'appearance-none w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition hover:border-[#9c4d4d] focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15 bg-[url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%238b6d6d\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")] bg-[length:1.25rem_1.25rem] bg-[position:right_0.5rem_center] bg-no-repeat pr-10 cursor-pointer'
 const labelClass = 'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-[#7d6060]'
-const ContentRenderer = lazy(() => import('@/components/content-renderer'))
 
 export default function ContentEditor({ session, initialChapter, initialSlug }: { session?: any, initialChapter: string, initialSlug: string }) {
   const [document, setDocument] = useState<CourseDocument>(() => ({ ...structuredClone(starterDocument), chapterId: initialChapter, slug: initialSlug }))
   const deferredDocument = useDeferredValue(document)
   const [previewExpanded, setPreviewExpanded] = useState(false)
+  const [previewAttempt, setPreviewAttempt] = useState(0)
+  const ContentRenderer = useMemo(() => lazy(() => import('@/components/content-renderer')), [previewAttempt])
   const validation = useMemo(() => validateCourseDocument(document), [document])
 
   const [assignedChapters, setAssignedChapters] = useState<string[]>([])
@@ -58,6 +62,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [problemNumberError, setProblemNumberError] = useState(false)
   const [numberingRetry, setNumberingRetry] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const [projectRevisionLoaded, setProjectRevisionLoaded] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const [isRenaming, setIsRenaming] = useState(false)
@@ -157,6 +163,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const loadDraft = async (chapterId: string, slug: string) => {
     if (!session?.email) return;
+    setProjectRevisionLoaded(false);
     try {
       const draftId = `${chapterId}_${slug}`;
       const [structureSnap, snap] = await Promise.all([
@@ -173,7 +180,19 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const currentTitle = findSubtopicTitle(list, chapterId, slug);
       if (snap && snap.exists()) {
         const data = snap.data();
-        setDocument(withSubtopicTitle(data as CourseDocument, currentTitle));
+        let loaded = data as CourseDocument;
+        if (await matchesPreviousChapterOneRevision(chapterId, slug, data.contentMarkdown)) {
+          try {
+            const parameters = new URLSearchParams({ chapter: chapterId, slug });
+            const response = await fetch(`/api/mdx?${parameters}`, { cache: 'no-store' });
+            const source = await response.json();
+            if (response.ok && typeof source.content === 'string' && source.content.trim()) {
+              loaded = { ...loaded, contentMarkdown: source.content };
+              setProjectRevisionLoaded(true);
+            }
+          } catch { /* Preserve the original draft when the source cannot load. */ }
+        }
+        setDocument(withSubtopicTitle(loaded, currentTitle));
       } else {
         // No hay borrador ni versión en Firestore -> Subtema nuevo en blanco
         const initialTitle = currentTitle || 'Subtema';
@@ -415,9 +434,40 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     URL.revokeObjectURL(url)
   }
 
+  async function importProjectMarkdown() {
+    if (isImporting || isSaving) return
+    setIsImporting(true)
+    try {
+      const parameters = new URLSearchParams({ chapter: document.chapterId, slug: document.slug })
+      const response = await fetch(`/api/mdx?${parameters}`, { cache: 'no-store' })
+      const data = await response.json()
+      if (!response.ok || typeof data.content !== 'string' || !data.content.trim()) {
+        throw new Error(response.status === 404 ? 'Este tema no tiene un archivo Markdown en el proyecto.' : 'No se pudo leer el Markdown del proyecto.')
+      }
+      const editor = editorRef.current
+      const model = editor?.getModel()
+      if (!model || model.isDisposed()) throw new Error('Espera a que cargue el área de escritura antes de importar.')
+      const current = model.getValue()
+      if (data.content === current) return showToast('Ya tienes esta versión en el editor.', 'success')
+      if (!window.confirm('¿Cargar el Markdown del proyecto en este editor? Reemplazará el texto que estás viendo. No se guardará ni publicará automáticamente. Puedes deshacer la importación con Ctrl + Z.')) return
+      editor.pushUndoStop()
+      editor.executeEdits('import-project-markdown', [{ range: model.getFullModelRange(), text: data.content, forceMoveMarkers: true }])
+      editor.pushUndoStop()
+      editor.focus()
+      showToast('Markdown importado. Revisa la vista previa antes de guardar o publicar.', 'success')
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'No se pudo importar el Markdown.', 'error')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
   function insertEducationalBlock(kind: string) {
     if (kind === 'definition') insertMarkdown('\n<Definition title="Definición">\n', '\n</Definition>\n', 'Escribe la definición.')
     else if (kind === 'note') insertMarkdown('\n<Note title="Nota importante">\n', '\n</Note>\n', 'Escribe la observación.')
+    else if (kind === 'term') insertMarkdown('<Term definition="Explicación breve del concepto.">', '</Term>', 'término')
+    else if (kind === 'equation-ref') insertMarkdown('[', '](#eq-1.1.1)', 'ecuación (1.1.1)')
+    else if (kind === 'numbered-image') insertMarkdown('\n\n<Image src="figura.png" alt="Descripción de la figura" number="1.1" caption="Explicación de la figura" />\n\n')
     else if (kind === 'example') insertMarkdown('\n<Example number={1} title="Ejemplo resuelto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Example>\n', 'Escribe el enunciado.')
     else if (kind === 'problem') insertMarkdown('\n<Problem title="Problema propuesto">\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el problema.')
     else if (kind === 'problemimage') insertMarkdown('\n<Problem title="Título del problema" image="figura.png" imageAlt="Diagrama del problema" imageWidth="38%" imagePosition="right">\n\n', '\n\n<Solution>\nDescribe la solución paso a paso.\n</Solution>\n</Problem>\n', 'Escribe el enunciado. La imagen aparecerá a su costado.')
@@ -491,6 +541,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   }
 
   return <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
+    {projectRevisionLoaded && <p role="status" className="shrink-0 border-b border-[#e3caca] bg-[#fbf2f0] px-5 py-2.5 text-xs leading-relaxed text-[#6a2022]">Se cargó el Markdown actualizado del capítulo 1 con sus referencias y términos. Revisa la vista previa y guarda o publica para conservar esta versión en la plataforma.</p>}
     {toast && (
       <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
         {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />}
@@ -568,7 +619,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
               </div>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={importProjectMarkdown} disabled={isSaving || isImporting || isEditingTitle} className="inline-flex items-center gap-2 rounded-md border border-[#d8c1c1] bg-white px-3 py-1.5 text-xs font-semibold text-[#6a2022] hover:bg-[#f1dddd] disabled:opacity-50" title="Cargar el archivo MDX del proyecto; no guarda ni publica automáticamente">
+              {isImporting ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <FileInput className="size-4" aria-hidden="true" />}
+              {isImporting ? 'Importando…' : 'Importar del proyecto'}
+            </button>
             <a
               href="/guia-colaboradores"
               target="_blank"
@@ -581,7 +636,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             </a>
              <button
               onClick={() => saveDraft('draft')}
-              disabled={isSaving || isEditingTitle}
+              disabled={isSaving || isImporting || isEditingTitle}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#d8c1c1] hover:bg-[#f1dddd] text-[#3b2022] text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
               title="Guardar progreso en la nube (borrador)"
             >
@@ -591,7 +646,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             {session?.role === 'admin' ? (
               <button
                 onClick={publishDraft}
-                disabled={isSaving || isEditingTitle}
+                disabled={isSaving || isImporting || isEditingTitle}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#1c663b] hover:bg-[#15502e] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Publicar directamente en la web"
               >
@@ -606,7 +661,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   }
                   saveDraft('pending_approval');
                 }}
-                disabled={isSaving || isEditingTitle}
+                disabled={isSaving || isImporting || isEditingTitle}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Enviar a revisión del administrador"
               >
@@ -774,9 +829,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto bg-[#fbf7f4] p-5 sm:p-8 [&::-webkit-scrollbar]:w-[14px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(100,100,100,0.4)] [&::-webkit-scrollbar-thumb:hover]:!bg-[rgba(100,100,100,0.7)] [&::-webkit-scrollbar-thumb:active]:!bg-[rgba(100,100,100,0.9)]">
             <div className="editor-preview-content mx-auto max-w-[760px]">
+              <PreviewErrorBoundary key={previewAttempt} resetKey={deferredDocument.contentMarkdown} onRetry={() => setPreviewAttempt(value => value + 1)}>
               <Suspense fallback={<p role="status" className="text-sm text-[#8b6d6d]">Cargando vista previa...</p>}>
                 {problemOffset !== null ? <ContentRenderer document={deferredDocument} headingPrefix={findSubtopicNumber(courseChapters, deferredDocument.chapterId, deferredDocument.slug)} problemOffset={problemOffset} /> : problemNumberError ? <p role="alert" className="text-sm text-[#8b2020]">No se pudo comprobar la numeración del capítulo. <button type="button" onClick={() => setNumberingRetry(value => value + 1)} className="underline">Reintentar</button></p> : <p role="status" className="text-sm">Calculando numeración de problemas…</p>}
               </Suspense>
+              </PreviewErrorBoundary>
             </div>
           </div>
         </div>
@@ -863,6 +920,9 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
   const options = [
     { value: 'definition', label: 'Definición' },
     { value: 'note', label: 'Nota' },
+    { value: 'term', label: 'Término con explicación' },
+    { value: 'equation-ref', label: 'Referencia a ecuación' },
+    { value: 'numbered-image', label: 'Figura numerada' },
     { value: 'example', label: 'Ejemplo' },
     { value: 'problem', label: 'Problema' },
     { value: 'problemimage', label: 'Problema con imagen al costado' },

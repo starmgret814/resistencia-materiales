@@ -25,7 +25,7 @@ try {
   compile('lib/course-markdown.ts', 'markdown.mjs')
   compile('components/content-renderer.tsx', 'renderer.mjs', [
     ["'@/lib/remark-number-headings'", "'./headings.mjs'"], ["'@/lib/course-markdown'", "'./markdown.mjs'"], ["'@/components/interactive-tools'", "'./tools.mjs'"],
-    [/import \{ Image,.*from '@\/components\/mdx-components'/, 'const Table = ({children}) => <div>{children}</div>; const Image = Table, ImageGrid = Table, Definition = Table, Formula = Table, Example = Table, Problem = Table, Solution = Table, Summary = Table;'],
+    [/import \{ Image,.*from '@\/components\/mdx-components'/, 'const Table = ({children}) => <div>{children}</div>; const Image = Table, ImageGrid = Table, Definition = Table, Formula = Table, Example = Table, Problem = Table, Solution = Table, Summary = Table, Term = Table;'],
   ])
   const { getInteractiveTool, evaluateTool } = await import(pathToFileURL(path.join(temporary, 'models.mjs')).href)
   const { transformMohr, parseMohrValues, expandMohrRange, elementArrows } = await import(pathToFileURL(path.join(temporary, 'mohr-model.mjs')).href)

@@ -2,6 +2,8 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { chapters as defaultChapters, type Chapter, type Section } from '@/lib/course-data';
 import { countCourseProblems } from '@/lib/course-headings';
+import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision';
+import { loadProjectMarkdown } from '@/lib/project-markdown';
 
 export async function getLiveChapters(): Promise<Chapter[]> {
   try {
@@ -35,11 +37,18 @@ export async function getApprovedSubtopic(chapterNumber: string, slug: string, s
       const data = snap.data();
       const publishedText = data.publishedContent || (data.status === 'approved' ? data.contentMarkdown : null);
       if (publishedText) {
+        let contentMarkdown = publishedText;
+        // Bridge the old published chapter to its explicit, annotated MDX. A
+        // different published revision always keeps priority over the project.
+        if (await matchesPreviousChapterOneRevision(chapterNumber, cleanSlug, publishedText)) {
+          try { contentMarkdown = await loadProjectMarkdown(chapterNumber, cleanSlug) || publishedText; }
+          catch { /* Keep the published content if the project source is unavailable. */ }
+        }
         return {
           title: data.publishedTitle || data.title,
           chapterId: data.chapterId,
           slug: data.slug,
-          contentMarkdown: publishedText,
+          contentMarkdown,
           updatedAt: data.publishedAt || data.updatedAt,
           authorEmail: data.publishedBy || data.authorEmail,
         };

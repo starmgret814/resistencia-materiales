@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { visit } from 'unist-util-visit'
-import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary, Table } from '@/components/mdx-components'
+import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summary, Table, Term } from '@/components/mdx-components'
 import type { CourseDocument } from '@/lib/content-schema'
 import { Tool } from '@/components/interactive-tools'
 
@@ -52,6 +52,12 @@ function InlineMarkdown({ children }: { children: string }) {
 function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterNumber?: string; problemOffset?: number } = {}) {
   return (tree: unknown) => {
     let problemIndex = problemOffset
+    visit(tree as never, 'textDirective', (node: any) => {
+      if (node.name !== 'term') return
+      node.data ||= {}
+      node.data.hName = 'span'
+      node.data.hProperties = { 'data-course-term': node.attributes?.definition || '' }
+    })
     visit(tree as never, ['containerDirective', 'leafDirective'], (node: any) => {
       if (!allowedDirectives.has(node.name)) return
       let title = node.attributes?.title || node.label || ''
@@ -72,6 +78,7 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
       node.data.hName = 'div'
       node.data.hProperties = {
         'data-course-kind': node.name,
+        'data-course-id': node.attributes?.id || '',
         'data-course-title': title,
         'data-course-tool': node.attributes?.id || '',
         'data-course-number': number,
@@ -82,6 +89,8 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
         'data-course-image-caption': node.attributes?.imageCaption || '',
         'data-course-image-width': node.attributes?.imageWidth || '',
         'data-course-image-position': node.attributes?.imagePosition || '',
+        'data-course-image-layout': node.attributes?.imageLayout || '',
+        'data-course-image-number': node.attributes?.imageNumber || '',
         'data-course-question': node.attributes?.question || '',
         'data-course-column-widths': node.attributes?.columnWidths || '',
         'data-course-columns': node.attributes?.columns || '',
@@ -100,6 +109,7 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
 
 function CourseDirective({
   kind,
+  anchorId,
   toolId,
   title,
   number,
@@ -110,6 +120,8 @@ function CourseDirective({
   imageCaption,
   imageWidth,
   imagePosition,
+  imageLayout,
+  imageNumber,
   question,
   columns,
   columnWidths,
@@ -124,6 +136,7 @@ function CourseDirective({
   children
 }: {
   kind: string;
+  anchorId?: string;
   toolId?: string;
   title?: string;
   number?: string;
@@ -134,6 +147,8 @@ function CourseDirective({
   imageCaption?: string;
   imageWidth?: string;
   imagePosition?: string;
+  imageLayout?: string;
+  imageNumber?: string;
   question?: string;
   columns?: string;
   columnWidths?: string;
@@ -154,6 +169,8 @@ function CourseDirective({
         src={src || ''}
         alt={alt || 'Imagen del curso'}
         caption={caption || title || undefined}
+        number={number || undefined}
+        id={anchorId || undefined}
         width={width || undefined}
         height={height || undefined}
         size={(size as any) || undefined}
@@ -165,7 +182,7 @@ function CourseDirective({
     return <ImageGrid columns={columns === '3' ? 3 : columns === '4' ? 4 : 2}>{children}</ImageGrid>
   }
   if (kind === 'formula') {
-    return <Formula label={title} number={number} boxed={boxed === 'true'} bold={bold === 'true'}>{children}</Formula>
+    return <Formula label={title} number={number} id={anchorId} boxed={boxed === 'true'} bold={bold === 'true'}>{children}</Formula>
   }
   if (kind === 'solution') {
     return <Solution>{children}</Solution>
@@ -177,7 +194,7 @@ function CourseDirective({
     return <Example title={title || undefined} number={number}>{children}</Example>
   }
   if (kind === 'problem') {
-    return <Problem title={title || undefined} number={number} image={image} imageAlt={imageAlt} imageCaption={imageCaption} imageWidth={imageWidth} imagePosition={imagePosition === 'left' ? 'left' : 'right'}>{children}</Problem>
+    return <Problem title={title || undefined} number={number} image={image} imageAlt={imageAlt} imageCaption={imageCaption} imageWidth={imageWidth} imagePosition={imagePosition === 'left' ? 'left' : 'right'} imageLayout={imageLayout === 'stacked' || imageLayout === 'wrap' ? imageLayout : 'auto'} imageNumber={imageNumber}>{children}</Problem>
   }
   if (kind === 'summary') {
     return <Summary title={title}>{children}</Summary>
@@ -225,6 +242,7 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
   return (
     <CourseDirective
       kind={kind}
+      anchorId={String(rest['data-course-id' as keyof typeof rest] || '') || undefined}
       toolId={String(rest['data-course-tool' as keyof typeof rest] || '')}
       title={title}
       number={number}
@@ -235,6 +253,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
       imageCaption={String(rest['data-course-image-caption' as keyof typeof rest] || '')}
       imageWidth={String(rest['data-course-image-width' as keyof typeof rest] || '')}
       imagePosition={String(rest['data-course-image-position' as keyof typeof rest] || '')}
+      imageLayout={String(rest['data-course-image-layout' as keyof typeof rest] || '')}
+      imageNumber={String(rest['data-course-image-number' as keyof typeof rest] || '')}
       question={question}
       columns={columns}
       columnWidths={columnWidths}
@@ -258,6 +278,10 @@ export function ContentRenderer({ document, headingPrefix, problemOffset = 0 }: 
       remarkPlugins={[remarkGfm, remarkMath, remarkDirective, [remarkCourseDirectives, { chapterNumber: headingPrefix?.split('.')[0], problemOffset }], [remarkNumberHeadings, { prefix: headingPrefix }]]}
       rehypePlugins={[rehypeKatex]}
       components={{
+        span: ({ node: _node, children, ...rest }: ComponentPropsWithoutRef<'span'> & { node?: unknown }) => {
+          const definition = rest['data-course-term' as keyof typeof rest]
+          return definition ? <Term definition={<InlineMarkdown>{String(definition)}</InlineMarkdown>}>{children}</Term> : <span {...rest}>{children}</span>
+        },
         img: ({ src, alt, title }: any) => <Image src={src || ''} alt={alt || ''} caption={title || undefined} />,
         div: DirectiveDiv,
         table: MarkdownTable,

@@ -17,5 +17,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Portals are used by the lazy Markdown preview. Prebundle this entry before
+    // navigation so discovering it later does not invalidate active editor modules.
+    optimizeDeps: {
+      include: ['react-dom', 'react-dom/client'],
+    },
   },
 });

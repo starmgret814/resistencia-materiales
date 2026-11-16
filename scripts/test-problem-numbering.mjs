@@ -34,6 +34,8 @@ try {
   ])
   // Fake Firestore responses: these tests never connect to production.
   compile('lib/course-service.ts', 'service.mjs', [
+    [/import \{ matchesPreviousChapterOneRevision \} from '[^']+';/, 'const matchesPreviousChapterOneRevision = async () => false;'],
+    [/import \{ loadProjectMarkdown \} from '[^']+';/, 'const loadProjectMarkdown = async () => null;'],
     [/import \{ db \} from '[^']+';/, 'const db = {};'],
     [/import \{ doc, getDoc \} from 'firebase\/firestore';/, 'const doc = (_db, _collection, id) => id; const getDoc = async id => { const data = globalThis.testPublished[id]; if (data instanceof Error) throw data; return { exists: () => Boolean(data), data: () => data }; };'],
     [/import \{ chapters as defaultChapters, type Chapter, type Section \} from '[^']+';/, 'const defaultChapters = [];'],
@@ -67,7 +69,16 @@ try {
   assert(html.includes('--problem-image-width:40%'))
   assert(html.includes('/api/imagen/05-course/section/diagrama.png'))
   assert(html.includes('alt="Diagrama del enlace"'))
-  assert(html.indexOf('<details') > html.indexOf('</figure></div></div>'), 'Solution must follow the statement/image grid')
+  assert(html.includes('problem-layout-wrap'), 'Small illustrations can use flowing text')
+  assert.match(html, /class="problem-statement[^\"]*"><p>Carga de 20 kN\.<\/p><\/div><\/div><details/, 'Solution must follow the entire illustration and statement')
+  html = render(illustrated.replace('40%', '60%'))
+  assert(html.includes('problem-layout-stacked'), 'Wide diagrams must not squeeze the statement into a narrow column')
+  html = render(illustrated.replace('imageWidth="40%"', 'imageWidth="40%" imageLayout="stacked"'))
+  assert(html.includes('problem-layout-stacked'), 'Authors can place any diagram below the statement')
+  html = render(illustrated.replace('imageWidth="40%"', 'imageWidth="60%" imageLayout="wrap"'))
+  assert(html.includes('problem-layout-wrap'), 'Explicit wrapping remains available with CSS readability limits')
+  html = render(illustrated.replace('40%', '150%'))
+  assert(html.includes('problem-layout-stacked'), 'Oversized percentages must use a bounded stacked illustration')
   html = render('::::problem{title="Problem 1: Área 3.20"}\n\nTexto\n\n::::', 2)
   assert(html.includes('Problema 5.3: Área 3.20'))
   assert(!html.includes('Problem 1:'))

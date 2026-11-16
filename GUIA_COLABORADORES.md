@@ -206,6 +206,39 @@ $$
 </Formula>
 ```
 
+### Referencias y términos explicados
+
+El capítulo 1 incluye estas ayudas escritas directamente en sus archivos MDX: ecuaciones numeradas, figuras enlazables y términos con explicación. Puedes copiarlas o modificarlas desde el editor; no hay una transformación automática especial para ese capítulo.
+
+Para conectar esos archivos con las versiones antiguas que ya estaban publicadas, la página y el editor cargan el MDX actualizado únicamente si el texto coincide exactamente con la revisión anterior conocida. Un borrador o una publicación con contenido diferente conserva prioridad. Esta compatibilidad no escribe en Firestore: el editor muestra un aviso para que revises y guardes la versión cargada.
+
+El editor carga el borrador de Firestore. Para cargar la versión de los archivos del proyecto, usa **Importar del proyecto**. Esta acción reemplaza el texto visible, pide confirmación y puede deshacerse con Ctrl + Z. No guarda ni publica automáticamente: revisa la vista previa y luego guarda el borrador o publica cuando corresponda. Una sección sin archivo local mostrará un aviso y conservará su contenido actual.
+
+Para citar una ecuación numerada, escribe `[ecuación (8.3.2)](#eq-8.3.2)`. Al pulsar el enlace, se muestra y destaca la ecuación correspondiente. Si prefieres un identificador que no cambie al renumerar, agrega `id="eq-esfuerzo-normal"` a `<Formula>` y enlaza a `#eq-esfuerzo-normal`.
+
+Las figuras también admiten números y enlaces:
+
+```mdx
+Como se muestra en la [Figura 8.3.3](#fig-8.3.3), la barra está sometida a tracción.
+
+<Image src="barra.png" alt="Barra sometida a una carga axial"
+  number="8.3.3" caption="Carga y sección transversal de la barra" />
+```
+
+Con `number="8.3.3"` se genera el destino `#fig-8.3.3` y el pie comienza por “Figura 8.3.3”. No repitas ese número en `caption`. Puedes agregar un `id` propio como `id="fig-barra"` y usar `[figura de la barra](#fig-barra)`.
+
+Para enlazar a otra sección, usa `[resistencia y seguridad](/curso/01-esfuerzos-falla/resistencia-y-seguridad)`. Para citar una ecuación o figura de esa sección, añade su destino al final de la ruta, por ejemplo `#eq-1.2.1`. Copia la ruta real del tema; los números del texto del enlace no generan destinos por sí solos.
+
+Un término con explicación breve se escribe dentro de un párrafo:
+
+```mdx
+El <Term definition="Fuerza interna perpendicular a una sección, por unidad de área.">esfuerzo normal</Term> se representa por $\sigma$.
+```
+
+El subrayado punteado indica que hay una explicación. Se abre con el cursor, con el foco del teclado o tocando el término; Escape o un toque fuera la cierra. `definition` admite notación matemática entre dólares. Usa una explicación breve y evita poner componentes o enlaces dentro del nombre del término.
+
+El menú **Insertar componente** incluye **Término con explicación**, **Referencia a ecuación** y **Figura numerada**. Reemplaza los números de ejemplo por los de tu tema. Los números de ecuaciones y figuras se asignan manualmente y sus destinos deben ser únicos en cada página.
+
 ### 3. `<Example>`
 Bloque para presentar un ejercicio resuelto completo.
 ```markdown
@@ -270,7 +303,15 @@ Escribe aquí la solución paso a paso.
 </Problem>
 ```
 
-`imagePosition` acepta `right` o `left`. `imageWidth` acepta un porcentaje o un ancho como `240px`; se limita al 60% del bloque para conservar espacio para el enunciado. En móviles la imagen pasa debajo del texto. La solución queda debajo de ambos y ocupa el ancho completo. Usa una URL completa o una imagen de la carpeta del tema, igual que en `<Image>`. El menú de componentes incluye **Problema con imagen al costado**.
+`imagePosition` acepta `right` o `left`. `imageWidth` acepta un porcentaje o un ancho como `240px`.
+
+Si quieres numerar la figura incluida en el problema, agrega `imageNumber="1.4.1"`; su destino será `#fig-1.4.1`.
+
+La distribución es automática: las imágenes que piden un 50% o más del ancho se colocan debajo del enunciado, centradas. Las más pequeñas pueden ir al costado cuando el bloque tiene suficiente espacio; el texto recupera el ancho completo al superar la imagen. En bloques estrechos, incluso en un monitor grande, la imagen pasa debajo. Al costado se reserva espacio suficiente para leer el texto y la imagen no supera el 45% del bloque.
+
+Puedes elegir `imageLayout="stacked"` para colocar siempre el diagrama debajo o `imageLayout="wrap"` para permitirlo al costado cuando haya espacio. Si no escribes `imageLayout`, se usa `auto`. En todos los casos la solución queda debajo del enunciado y la imagen, a ancho completo. No hace falta modificar los problemas existentes para que reciban estos ajustes.
+
+Usa una URL completa o una imagen de la carpeta del tema, igual que en `<Image>`. El menú de componentes incluye **Problema con imagen al costado**.
 
 ### 5. `<Solution>`
 **Aclaración clave:** Se utiliza **dentro** de `<Example>` o `<Problem>` para mostrar el desarrollo de la solución. Genera un botón interactivo desplegable (*"Mostrar Solución"*) para que el estudiante piense el problema antes de ver la respuesta.

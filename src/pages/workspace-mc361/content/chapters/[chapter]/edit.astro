@@ -15,5 +15,11 @@ if (!chapter || !slug) {
 
 <Layout title="Editor de contenido | Resistencia de Materiales" description="Editor y vista previa de páginas del curso">
   <WorkspaceHeader session={sessionData} />
-  <ContentEditor session={sessionData} initialChapter={chapter} initialSlug={slug} client:only="react" />
+  <ContentEditor session={sessionData} initialChapter={chapter} initialSlug={slug} client:only="react">
+    <div slot="fallback" role="status" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-5 text-center text-sm text-[#765e5e]">
+      <p class="font-semibold text-[#7f0303]">Cargando editor…</p>
+      <p>Si no aparece, vuelve a cargar esta página.</p>
+      <a href={Astro.url.pathname + Astro.url.search} data-astro-reload class="rounded-md border border-[#d5baba] px-4 py-2 font-semibold text-[#7f0303]">Reintentar carga</a>
+    </div>
+  </ContentEditor>
 </Layout>

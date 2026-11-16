@@ -33,7 +33,7 @@ try {
     ["'@/components/interactive-tools'", "'./tools.mjs'"],
     ["'@/lib/remark-number-headings'", "'./numbering.mjs'"],
     ["'@/lib/course-markdown'", "'./markdown.mjs'"],
-    [/import \{ Image,.*from '@\/components\/mdx-components'/, 'const Table = ({children}) => <div>{children}</div>; const Image = Table, ImageGrid = Table, Definition = Table, Formula = Table, Example = Table, Problem = Table, Solution = Table, Summary = Table;'],
+    [/import \{ Image,.*from '@\/components\/mdx-components'/, 'const Table = ({children}) => <div>{children}</div>; const Image = Table, ImageGrid = Table, Definition = Table, Formula = Table, Example = Table, Problem = Table, Solution = Table, Summary = Table, Term = Table;'],
   ])
   const { ContentRenderer } = await import(pathToFileURL(path.join(temporary, 'renderer.mjs')).href)
   const { getCourseHeadings } = await import(pathToFileURL(path.join(temporary, 'headings.mjs')).href)

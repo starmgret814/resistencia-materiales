@@ -2,12 +2,19 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-.problem-illustrated { display: grid; gap: 1.5rem; align-items: start; }
-@media (min-width: 640px) {
-  .problem-illustrated { grid-template-columns: minmax(0, 1fr) minmax(0, min(60%, var(--problem-image-width, 38%))); }
-  .problem-image-left { grid-template-columns: minmax(0, min(60%, var(--problem-image-width, 38%))) minmax(0, 1fr); }
-  .problem-image-left > .problem-figure { grid-column: 1; grid-row: 1; }
-  .problem-image-left > :first-child { grid-column: 2; grid-row: 1; }
+.problem-content { container: problem / inline-size; }
+.problem-illustrated { display: flex; flex-direction: column; gap: 1.25rem; }
+.problem-statement { order: 1; }
+.problem-statement > :first-child { margin-top: 0; }
+.problem-statement > :last-child { margin-bottom: 0; }
+.problem-figure { order: 2; align-self: center; width: min(100%, max(16rem, var(--problem-image-width, 38%))); }
+.problem-figure > figure { margin: 0; }
+/* Side placement depends on the actual problem width, not the browser viewport. */
+@container problem (min-width: 42rem) {
+  .problem-layout-wrap { display: flow-root; }
+  .problem-layout-wrap > .problem-figure { float: right; width: min(var(--problem-image-width, 38%), 45%, calc(100% - 23rem)); margin: 0 0 1rem 1.5rem; }
+  .problem-layout-wrap.problem-image-left > .problem-figure { float: left; margin: 0 1.5rem 1rem 0; }
+  .problem-statement > :is(.formula-block, .katex-display) { clear: both; }
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -284,6 +291,23 @@
   font-weight: 700;
   color: #4b1719;
 }
+
+.mdx-content :is(p, li, figcaption) a:not(.course-tool a), .course-reference, .course-term-tooltip a {
+  color: #8f2525;
+  text-decoration-line: underline;
+  text-underline-offset: .18em;
+  text-decoration-thickness: 1px;
+}
+.mdx-content :is(p, li, figcaption) a:hover { color: #5f1515; }
+.course-figure { scroll-margin-top: 6rem; }
+.formula-block:target, .course-figure:target { outline: 2px solid #b36a62; outline-offset: .45rem; border-radius: .3rem; }
+.mdx-content .course-term-trigger { display: inline; padding: 0; border: 0; border-radius: 0; background: none; color: #8f2525; font: inherit; text-decoration: underline dotted; text-underline-offset: .2em; cursor: help; }
+.course-term-tooltip { position: fixed; z-index: 60; display: block; width: min(20rem, calc(100vw - 2rem)); max-height: 50dvh; overflow-y: auto; padding: .85rem 1rem; border: 1px solid #dcc3c3; border-radius: .5rem; background: #fffaf8; box-shadow: 0 5px 24px #3a171822; color: #4d3838; font-family: var(--font-sans); font-size: .85rem; font-weight: 400; font-style: normal; line-height: 1.65; text-align: left; white-space: normal; }
+.dark .mdx-content :is(p, li, figcaption) a:not(.course-tool a), .dark .course-reference, .dark .mdx-content .course-term-trigger { color: #fca5a5; }
+.dark .course-term-tooltip { background: #281719; border-color: #543336; color: #ead4d2; }
+.course-term-tooltip a:focus-visible { outline: 2px solid #9e3434; outline-offset: 3px; }
+.dark .course-term-tooltip a { color: #fca5a5; }
+.dark .formula-block:target, .dark .course-figure:target { outline-color: #fca5a5; }
 
 .mdx-content hr {
   margin-top: 2.5rem;

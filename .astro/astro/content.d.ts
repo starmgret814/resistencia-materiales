@@ -278,6 +278,20 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"05-recipientes-presion/problemas/index.mdx": {
+	id: "05-recipientes-presion/problemas/index.mdx";
+  slug: "05-recipientes-presion/problemas";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"05-recipientes-presion/recipientes-cilindricos/index.mdx": {
+	id: "05-recipientes-presion/recipientes-cilindricos/index.mdx";
+  slug: "05-recipientes-presion/recipientes-cilindricos";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "05-recipientes-presion/subtema-inicial/index.mdx": {
 	id: "05-recipientes-presion/subtema-inicial/index.mdx";
   slug: "05-recipientes-presion/subtema-inicial";
@@ -306,6 +320,13 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"06-torsion/problemas-resueltos/index.mdx": {
+	id: "06-torsion/problemas-resueltos/index.mdx";
+  slug: "06-torsion/problemas-resueltos";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "06-torsion/subtema-inicial/index.mdx": {
 	id: "06-torsion/subtema-inicial/index.mdx";
   slug: "06-torsion/subtema-inicial";
@@ -320,6 +341,34 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"07-flexion-cortante/distribucion-de-esfuerzos--ecuacion-de-la-flexion-y-momento-de-inercia/index.mdx": {
+	id: "07-flexion-cortante/distribucion-de-esfuerzos--ecuacion-de-la-flexion-y-momento-de-inercia/index.mdx";
+  slug: "07-flexion-cortante/distribucion-de-esfuerzos--ecuacion-de-la-flexion-y-momento-de-inercia";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"07-flexion-cortante/flexion-pura-y-cinematica-de-la-deformacion/index.mdx": {
+	id: "07-flexion-cortante/flexion-pura-y-cinematica-de-la-deformacion/index.mdx";
+  slug: "07-flexion-cortante/flexion-pura-y-cinematica-de-la-deformacion";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"07-flexion-cortante/fuerzas-internas-en-vigas---diagramas-de-fuerza-cortante-y-momento-flector/index.mdx": {
+	id: "07-flexion-cortante/fuerzas-internas-en-vigas---diagramas-de-fuerza-cortante-y-momento-flector/index.mdx";
+  slug: "07-flexion-cortante/fuerzas-internas-en-vigas---diagramas-de-fuerza-cortante-y-momento-flector";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"07-flexion-cortante/problemas-resueltos/index.mdx": {
+	id: "07-flexion-cortante/problemas-resueltos/index.mdx";
+  slug: "07-flexion-cortante/problemas-resueltos";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "07-flexion-cortante/subtema-inicial/index.mdx": {
 	id: "07-flexion-cortante/subtema-inicial/index.mdx";
   slug: "07-flexion-cortante/subtema-inicial";
@@ -330,6 +379,13 @@ declare module 'astro:content' {
 "08-flexion-asimetrica/8-2-ejes-principales/index.mdx": {
 	id: "08-flexion-asimetrica/8-2-ejes-principales/index.mdx";
   slug: "08-flexion-asimetrica/8-2-ejes-principales";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"08-flexion-asimetrica/8-3-circulo-de-mohr/index.mdx": {
+	id: "08-flexion-asimetrica/8-3-circulo-de-mohr/index.mdx";
+  slug: "08-flexion-asimetrica/8-3-circulo-de-mohr";
   body: string;
   collection: "resistencia";
   data: any
@@ -376,6 +432,13 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"09-deflexion-integracion/formulario/index.mdx": {
+	id: "09-deflexion-integracion/formulario/index.mdx";
+  slug: "09-deflexion-integracion/formulario";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-/index.mdx": {
 	id: "09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-/index.mdx";
   slug: "09-deflexion-integracion/funciones-de-discontinuidad-y-singularidad--metodo-de-macaulay-";
@@ -390,9 +453,23 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"09-deflexion-integracion/resolucion-de-problemas/index.mdx": {
+	id: "09-deflexion-integracion/resolucion-de-problemas/index.mdx";
+  slug: "09-deflexion-integracion/resolucion-de-problemas";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "09-deflexion-integracion/subtema-inicial/index.mdx": {
 	id: "09-deflexion-integracion/subtema-inicial/index.mdx";
   slug: "09-deflexion-integracion/subtema-inicial";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
+"09-deflexion-integracion/vigas-hiperestaticas-y-principio-de-superposicion/index.mdx": {
+	id: "09-deflexion-integracion/vigas-hiperestaticas-y-principio-de-superposicion/index.mdx";
+  slug: "09-deflexion-integracion/vigas-hiperestaticas-y-principio-de-superposicion";
   body: string;
   collection: "resistencia";
   data: any

@@ -1,7 +1,6 @@
 function attribute(source: string, name: string): string {
-  return source.match(new RegExp(`${name}=["']([^"']*)["']`))?.[1]
-    || source.match(new RegExp(`${name}=\\{([^}]*)\\}`))?.[1]
-    || ''
+  const match = source.match(new RegExp(`(?:^|\\s)${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|\\{([^}]*)\\})`))
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? ''
 }
 
 export function normalizeLegacyMdx(markdown: string): string {
@@ -35,6 +34,11 @@ export function normalizeLegacyMdx(markdown: string): string {
 
   normalized = normalized.replace(/<(Solution)\s*>\s*([\s\S]*?)\s*<\/\1>/gi, (_match, _tag, body) => `:::solution\n${body.trim()}\n:::`)
 
+  normalized = normalized.replace(/<Term\b((?:"[^"]*"|'[^']*'|[^'">])*)>([\s\S]*?)<\/Term>/gi, (_match, attrs, body) => {
+    const definition = attribute(attrs, 'definition').replace(/"/g, '&quot;')
+    return `:term[${body.trim()}]{definition="${definition}"}`
+  })
+
   normalized = normalized.replace(/<Image\b([\s\S]*?)\/>/gi, (_match, attrs) => {
     const src = attribute(attrs, 'src')
     const alt = attribute(attrs, 'alt') || 'Imagen del curso'
@@ -43,14 +47,18 @@ export function normalizeLegacyMdx(markdown: string): string {
     const height = attribute(attrs, 'height')
     const size = attribute(attrs, 'size')
     const align = attribute(attrs, 'align')
+    const number = attribute(attrs, 'number')
+    const id = attribute(attrs, 'id')
 
-    if (width || height || size || align) {
+    if (width || height || size || align || number || id) {
       let props = `src="${src}" alt="${alt}"`
       if (caption) props += ` caption="${caption}"`
       if (width) props += ` width="${width}"`
       if (height) props += ` height="${height}"`
       if (size) props += ` size="${size}"`
       if (align) props += ` align="${align}"`
+      if (number) props += ` number="${number}"`
+      if (id) props += ` id="${id}"`
       return `:::image{${props}}\n:::`
     }
 
@@ -85,7 +93,7 @@ export function normalizeLegacyMdx(markdown: string): string {
       const kind = tag.toLowerCase()
       const title = attribute(attrs, 'title')
       const number = attribute(attrs, 'number')
-      const options = { title, number, image: attribute(attrs, 'image'), imageAlt: attribute(attrs, 'imageAlt'), imageCaption: attribute(attrs, 'imageCaption'), imageWidth: attribute(attrs, 'imageWidth'), imagePosition: attribute(attrs, 'imagePosition') }
+      const options = { title, number, image: attribute(attrs, 'image'), imageAlt: attribute(attrs, 'imageAlt'), imageCaption: attribute(attrs, 'imageCaption'), imageWidth: attribute(attrs, 'imageWidth'), imagePosition: attribute(attrs, 'imagePosition'), imageLayout: attribute(attrs, 'imageLayout'), imageNumber: attribute(attrs, 'imageNumber') }
       const properties = Object.entries(options).filter(([, value]) => value).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(' ')
       return `\n\n::::${kind}${properties ? `{${properties}}` : ''}\n\n${body.trim()}\n\n::::\n\n`
     })
@@ -96,8 +104,9 @@ export function normalizeLegacyMdx(markdown: string): string {
     const number = attribute(attrs, 'number')
     const boxed = attribute(attrs, 'boxed')
     const bold = attribute(attrs, 'bold')
+    const id = attribute(attrs, 'id')
     const latex = body.trim().replace(/^\$\$\s*/, '').replace(/\s*\$\$$/, '')
-    const options = [label && `title="${label}"`, number && `number="${number}"`, boxed && `boxed="${boxed}"`, bold && `bold="${bold}"`].filter(Boolean).join(' ')
+    const options = [label && `title="${label}"`, number && `number="${number}"`, id && `id="${id}"`, boxed && `boxed="${boxed}"`, bold && `bold="${bold}"`].filter(Boolean).join(' ')
     return `:::formula${options ? `{${options}}` : ''}\n$$\n${latex}\n$$\n:::`
   })
 

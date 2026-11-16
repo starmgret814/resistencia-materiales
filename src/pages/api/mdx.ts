@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import fs from 'fs/promises';
-import path from 'path';
+import { chapters } from '@/lib/course-data';
+import { loadProjectMarkdown } from '@/lib/project-markdown';
+
 
 export const GET: APIRoute = async ({ request }) => {
   try {
@@ -11,10 +12,6 @@ export const GET: APIRoute = async ({ request }) => {
     if (!chapterNumber || !docSlug) {
       return new Response(JSON.stringify({ error: 'Faltan parámetros' }), { status: 400 });
     }
-
-    const chaptersPath = path.join(process.cwd(), 'lib', 'chapters.json');
-    const chaptersContent = await fs.readFile(chaptersPath, 'utf-8');
-    const chapters = JSON.parse(chaptersContent);
 
     const chData = chapters.find((c: any) => c.number === chapterNumber);
     if (!chData) {
@@ -32,24 +29,9 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Subtema no encontrado' }), { status: 404 });
     }
 
-    const chapterFolder = chData.sections.find((s: any) => s.slug?.includes('/'))?.slug?.split('/')[0] 
-      || `${chData.number.padStart(2, '0')}-capitulo`;
-
-    const fullSectionSlug = section.slug.includes('/')
-      ? section.slug
-      : `${chapterFolder}/${section.slug}`;
-
-    const filePath = path.join(process.cwd(), 'src', 'content', 'resistencia', fullSectionSlug, 'index.mdx');
-
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      return new Response(JSON.stringify({ content: fileContent }), { status: 200 });
-    } catch (e: any) {
-      if (e.code === 'ENOENT') {
-        return new Response(JSON.stringify({ error: 'Archivo MDX no existe' }), { status: 404 });
-      }
-      throw e;
-    }
+    const content = await loadProjectMarkdown(chapterNumber, docSlug);
+    if (!content) return Response.json({ error: 'Archivo MDX no existe' }, { status: 404 });
+    return Response.json({ content }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error: any) {
     console.error('Error leyendo archivo MDX:', error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
