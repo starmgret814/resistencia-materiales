@@ -186,6 +186,12 @@
 .mohr-workspace { display: grid; gap: 0.75rem; align-items: start; }
 .mohr-diagrams, .mohr-controls-grid { display: grid; gap: 0.75rem; align-items: center; }
 .mohr-controls-grid { align-items: start; }
+.mohr-control-row { display:grid; grid-template-columns:5.1rem minmax(3rem,1fr) 5rem; align-items:center; gap:.5rem; }
+@container (max-width:24rem) {
+  .mohr-control-row { grid-template-columns:minmax(0,1fr) 6rem; }
+  .mohr-control-row > input[type="text"] { grid-column:2; grid-row:1; min-height:2.75rem; }
+  .mohr-control-row > input[type="range"] { grid-column:1 / -1; grid-row:2; min-height:2.75rem; }
+}
 .mohr-visual { border: 1px solid #eadada; border-radius: 0.5rem; padding: 0.5rem; }
 .mohr-element-square { fill: #eaf2f7; stroke: var(--mohr-original); }
 .mohr-element svg { max-height: 280px; }
@@ -212,6 +218,8 @@
 .dark .mohr-circle-line { stroke: #d4a5a2; }
 
 .mdx-content {
+  min-width: 0;
+  max-width: 100%;
   font-family: var(--font-serif);
   --course-font-size: 1.125rem;
   color: #403333;
@@ -221,6 +229,8 @@
   font-variant-numeric: lining-nums;
   overflow-wrap: break-word;
 }
+
+.mdx-content pre { max-width:100%; overflow-x:auto; }
 
 /* Reading stays serif; embedded controls and interactive tools use the interface font. */
 .mdx-content :is(button, input, select, textarea, summary),
@@ -463,6 +473,8 @@
 }
 @media (max-width: 640px) {
   .mdx-content { --course-font-size: 1.0625rem; }
+  .mdx-content :is(th, td) { padding:.65rem .75rem; }
+  .course-tool input:not([type="range"]), .course-tool button { min-height:2.75rem; }
   .formula-number { font-size: .8em; }
 }
 

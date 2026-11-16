@@ -35,6 +35,9 @@ import { workspaceFetch } from '@/lib/workspace-api'
 import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
 import Editor from '@monaco-editor/react'
 import PreviewErrorBoundary from '@/components/preview-error-boundary'
+import { LocalDraftNotice, LocalDraftStatus } from '@/components/local-draft-notice'
+import { localDraftKey } from '@/lib/local-draft'
+import { useLocalDraft } from '@/lib/use-local-draft'
 import { chapters, type Chapter } from '@/lib/course-data'
 import { findSubtopicNumber, findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
 import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision'
@@ -52,6 +55,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [document, setDocument] = useState<CourseDocument>(() => ({ ...structuredClone(starterDocument), chapterId: initialChapter, slug: initialSlug }))
   const deferredDocument = useDeferredValue(document)
   const [previewExpanded, setPreviewExpanded] = useState(false)
+  const [mobilePane, setMobilePane] = useState<'edit' | 'preview'>('edit')
   const [previewAttempt, setPreviewAttempt] = useState(0)
   const ContentRenderer = useMemo(() => lazy(() => import('@/components/content-renderer')), [previewAttempt])
   const validation = useMemo(() => validateCourseDocument(document), [document])
@@ -107,6 +111,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [isCreatingSub, setIsCreatingSub] = useState(false)
   
   const [isLoaded, setIsLoaded] = useState(false)
+  const localBackup = useLocalDraft(
+    session?.email ? localDraftKey(session.email, 'chapter', `${initialChapter}/${initialSlug}`) : null,
+    { contentMarkdown: document.contentMarkdown },
+    isLoaded && document.chapterId === initialChapter && document.slug === initialSlug,
+  )
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -163,6 +172,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const loadDraft = async (chapterId: string, slug: string) => {
     if (!session?.email) return;
+    setIsLoaded(false);
     setProjectRevisionLoaded(false);
     try {
       const draftId = `${chapterId}_${slug}`;
@@ -283,6 +293,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   }
 
   const saveDraft = async (status: 'draft' | 'pending_approval', silent = false) => {
+    if (localBackup.pending) return;
     if (!session?.email) return showToast('No tienes sesión activa.', 'error');
     try {
       setIsSaving(true);
@@ -310,6 +321,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       }, { merge: true });
 
       setDocument(currentDocument);
+      localBackup.acknowledge({ contentMarkdown: currentDocument.contentMarkdown });
       if (!silent) showToast(status === 'draft' ? 'Borrador guardado exitosamente.' : 'Enviado para revisión del administrador.', 'success');
     } catch (e: any) {
       console.error(e);
@@ -320,6 +332,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   }
 
   const publishDraft = async () => {
+    if (localBackup.pending) return;
     if (!session?.email || session.role !== 'admin') return showToast('No tienes permisos.', 'error');
     try {
       setIsSaving(true);
@@ -344,6 +357,8 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         publishedBy: session.email,
         updatedAt: nowIso
       }, { merge: true });
+
+      localBackup.acknowledge({ contentMarkdown: currentDocument.contentMarkdown });
 
       // 2. Sincronización secundaria en segundo plano con GitHub (respaldo en el repositorio)
       workspaceFetch('/api/publish', {
@@ -541,6 +556,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   }
 
   return <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
+    {localBackup.pending && <div className="shrink-0 px-4 pt-3 sm:px-6"><LocalDraftNotice savedAt={localBackup.pending.savedAt} content={localBackup.pending.values.contentMarkdown} onRecover={() => { const recovered = localBackup.recover(); if (recovered) updateMarkdown(recovered.contentMarkdown) }} onDiscard={localBackup.discard} /></div>}
     {projectRevisionLoaded && <p role="status" className="shrink-0 border-b border-[#e3caca] bg-[#fbf2f0] px-5 py-2.5 text-xs leading-relaxed text-[#6a2022]">Se cargó el Markdown actualizado del capítulo 1 con sus referencias y términos. Revisa la vista previa y guarda o publica para conservar esta versión en la plataforma.</p>}
     {toast && (
       <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
@@ -550,8 +566,13 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     )}
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
-    <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 gap-5 p-4 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
-      {!previewExpanded && <section className="flex min-w-0 flex-col space-y-4 min-h-0">
+    <div className="flex shrink-0 gap-2 border-b border-[#ddcaca] bg-white px-4 py-2 xl:hidden" role="group" aria-label="Vista del editor">
+      <button type="button" aria-pressed={mobilePane === 'edit' && !previewExpanded} onClick={() => { setMobilePane('edit'); setPreviewExpanded(false) }} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold ${mobilePane === 'edit' && !previewExpanded ? 'bg-[#f1dddd] text-[#7f0303]' : 'text-[#765e5e]'}`}><Pencil className="size-4" aria-hidden="true" />Editar</button>
+      <button type="button" aria-pressed={mobilePane === 'preview' || previewExpanded} onClick={() => setMobilePane('preview')} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold ${mobilePane === 'preview' || previewExpanded ? 'bg-[#f1dddd] text-[#7f0303]' : 'text-[#765e5e]'}`}><Eye className="size-4" aria-hidden="true" />Vista previa</button>
+    </div>
+
+    <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 grid-rows-[minmax(0,1fr)] gap-5 p-3 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
+      {!previewExpanded && <section className={`min-w-0 flex-col space-y-4 min-h-0 ${mobilePane === 'edit' ? 'flex' : 'hidden xl:flex'}`}>
         {/* Document Header Info */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3 rounded-xl border border-[#ddcaca] shadow-sm">
           <div className="min-w-0 flex-1 basis-64">
@@ -636,7 +657,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             </a>
              <button
               onClick={() => saveDraft('draft')}
-              disabled={isSaving || isImporting || isEditingTitle}
+              disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#d8c1c1] hover:bg-[#f1dddd] text-[#3b2022] text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
               title="Guardar progreso en la nube (borrador)"
             >
@@ -646,7 +667,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             {session?.role === 'admin' ? (
               <button
                 onClick={publishDraft}
-                disabled={isSaving || isImporting || isEditingTitle}
+                disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#1c663b] hover:bg-[#15502e] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Publicar directamente en la web"
               >
@@ -661,7 +682,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   }
                   saveDraft('pending_approval');
                 }}
-                disabled={isSaving || isImporting || isEditingTitle}
+                disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
                 title="Enviar a revisión del administrador"
               >
@@ -673,7 +694,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         </div>
 
         <div className="flex flex-1 min-h-0 flex-col rounded-xl border border-[#ddcaca] bg-white shadow-sm">
-          <div onMouseDown={(event) => { if ((event.target as HTMLElement).closest('button')) event.preventDefault() }} className="shrink-0 flex flex-wrap items-center gap-1 border-b border-[#eadada] bg-[#fbf7f4] p-2 rounded-t-xl">
+          <fieldset disabled={isSaving || Boolean(localBackup.pending)} onMouseDown={(event) => { if ((event.target as HTMLElement).closest('button')) event.preventDefault() }} className="min-w-0 shrink-0 flex flex-wrap items-center gap-1 border-b border-[#eadada] bg-[#fbf7f4] p-2 rounded-t-xl">
             <button type="button" className={toolClass} title="Deshacer" aria-label="Deshacer" onClick={() => execCommand('undo')}><Undo2 className="size-4" /></button>
             <button type="button" className={toolClass} title="Rehacer" aria-label="Rehacer" onClick={() => execCommand('redo')}><Redo2 className="size-4" /></button>
             <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
@@ -705,7 +726,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             </button>
             <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
             <ToolbarSelect onChange={insertEducationalBlock} />
-          </div>
+          </fieldset>
           <div className="relative flex-1 min-h-0">
             <Editor
               key={`${document.chapterId}_${document.slug}`}
@@ -780,6 +801,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                 }, 50)
               }}
               options={{
+                readOnly: isSaving || Boolean(localBackup.pending),
                 automaticLayout: true,
                 lineNumbers: 'on',
                 wordWrap: 'on',
@@ -798,11 +820,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
               className="absolute inset-0 w-full bg-[#fffdfc] outline-none"
             />
           </div>
-          <div className="shrink-0 rounded-b-xl border-t border-[#eadada] bg-[#fbf7f4] px-4 py-2 text-[10px] text-[#967070]">Markdown · GFM · LaTeX · {document.contentMarkdown.length.toLocaleString('es')} caracteres</div>
+          <div className="shrink-0 rounded-b-xl border-t border-[#eadada] bg-[#fbf7f4] px-4 py-2 text-[10px] text-[#967070]"><p>Markdown · GFM · LaTeX · {document.contentMarkdown.length.toLocaleString('es')} caracteres</p><p className="mt-1"><LocalDraftStatus failed={localBackup.failed} savedAt={localBackup.savedAt} /></p></div>
         </div>
       </section>}
 
-      <aside className={`flex min-w-0 flex-col min-h-0 ${previewExpanded ? '' : ''}`}>
+      <aside className={`min-w-0 flex-col min-h-0 ${mobilePane === 'preview' || previewExpanded ? 'flex' : 'hidden xl:flex'}`}>
         <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#d8c2c2] bg-white shadow-lg shadow-[#4b1719]/5">
           <div className="flex flex-wrap shrink-0 items-center justify-between gap-2 border-b border-[#eadada] bg-[#fbf7f4] px-4 py-3">
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.13em] text-[#765e5e]">

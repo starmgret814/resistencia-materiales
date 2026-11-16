@@ -7,6 +7,10 @@ import { auth, db } from '@/lib/firebase'
 import { examTypes, validExam, type PastExam } from '@/lib/exam-data'
 import { examSnippets, validateExamImport } from '@/lib/exam-authoring'
 import PreviewErrorBoundary from '@/components/preview-error-boundary'
+import { LocalDraftNotice, LocalDraftStatus } from '@/components/local-draft-notice'
+import { localDraftKey } from '@/lib/local-draft'
+import { useLocalDraft } from '@/lib/use-local-draft'
+import { examFailure, type ExamFailure } from '@/lib/exam-errors'
 
 const Editor = lazy(() => import('@monaco-editor/react'))
 const input = 'w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022]'
@@ -19,11 +23,14 @@ export default function ExamManagement() {
   const [exams, setExams] = useState<PastExam[]>([])
   const [current, setCurrent] = useState<PastExam>(starter)
   const [ready, setReady] = useState(false)
+  const [owner, setOwner] = useState('')
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [dirty, setDirty] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [loadError, setLoadError] = useState<ExamFailure | null>(null)
+  const loadAttempt = useRef(0)
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [importing, setImporting] = useState(false)
   const [editorReady, setEditorReady] = useState(false)
@@ -31,21 +38,29 @@ export default function ExamManagement() {
   const ContentRenderer = useMemo(() => lazy(() => import('@/components/content-renderer')), [previewAttempt])
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
-  const blocked = busy || importing
+  const backupValues = { period: current.period, type: current.type, title: current.title, contentMarkdown: current.contentMarkdown }
+  const localBackup = useLocalDraft(owner ? localDraftKey(owner, 'exam', current.id || 'new') : null, backupValues, ready)
+  const blocked = busy || importing || Boolean(localBackup.pending)
 
   async function load() {
+    const attempt = ++loadAttempt.current
     setLoading(true)
+    setLoadError(null)
     try {
       const snapshot = await getDocs(collection(db, 'exams'))
-      setExams(snapshot.docs.flatMap(item => validExam(item.data()) ? [{ ...item.data(), id: item.id } as PastExam] : []).sort((a, b) => b.period.localeCompare(a.period) || a.title.localeCompare(b.title, 'es', { numeric: true })))
-    } catch { setError('No se pudieron cargar los exámenes. Comprueba la conexión y que las reglas de Firestore estén actualizadas.') }
-    finally { setLoading(false) }
+      if (attempt === loadAttempt.current) setExams(snapshot.docs.flatMap(item => validExam(item.data()) ? [{ ...item.data(), id: item.id } as PastExam] : []).sort((a, b) => b.period.localeCompare(a.period) || a.title.localeCompare(b.title, 'es', { numeric: true })))
+    } catch (cause) { if (attempt === loadAttempt.current) setLoadError(examFailure(cause, 'load')) }
+    finally { if (attempt === loadAttempt.current) setLoading(false) }
   }
-  useEffect(() => onAuthStateChanged(auth, user => {
-    setReady(Boolean(user))
-    if (user) void load()
-    else { setLoading(false); setError('Inicia sesión nuevamente para administrar los exámenes.') }
-  }), [])
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setReady(Boolean(user))
+      setOwner(user?.email || '')
+      if (user) { setError(''); void load() }
+      else { loadAttempt.current++; setExams([]); setLoadError(null); setLoading(false); setError('Inicia sesión nuevamente para administrar los exámenes.') }
+    })
+    return () => { loadAttempt.current++; unsubscribe() }
+  }, [])
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = '' } }
     window.addEventListener('beforeunload', warn)
@@ -93,17 +108,18 @@ export default function ExamManagement() {
   }
   async function save(event: React.FormEvent) {
     event.preventDefault()
-    if (blocked || !ready || loading) return
+    if (blocked || !ready || loading || loadError) return
     const { id, ...data } = { ...current, title: current.title.trim(), contentMarkdown: current.contentMarkdown.trim() }
     if (!validExam(data)) { setError('Completa el título, un periodo como 2026-1 y el contenido (máximo 200 000 caracteres).'); return }
     setBusy(true); setError(''); setMessage('')
     try {
       const reference = id ? doc(db, 'exams', id) : doc(collection(db, 'exams'))
       await setDoc(reference, data)
+      localBackup.acknowledge({ period: data.period, type: data.type, title: data.title, contentMarkdown: data.contentMarkdown })
       setCurrent({ ...data, id: reference.id }); setDirty(false)
       setMessage('Evaluación publicada. Ya está disponible en Exámenes pasados.')
       await load()
-    } catch { setError('No se pudo publicar la evaluación. Comprueba tu sesión, conexión y permisos. Tu contenido sigue en el editor.') }
+    } catch (cause) { setError(examFailure(cause, 'save').message) }
     finally { setBusy(false) }
   }
   async function remove(exam: PastExam) {
@@ -113,7 +129,7 @@ export default function ExamManagement() {
       await deleteDoc(doc(db, 'exams', exam.id))
       if (current.id === exam.id) { setCurrent(starter()); setDirty(false) }
       await load(); setMessage('Evaluación eliminada.')
-    } catch { setError('No se pudo eliminar la evaluación.') }
+    } catch (cause) { setError(examFailure(cause, 'remove').message) }
     finally { setBusy(false) }
   }
 
@@ -121,11 +137,14 @@ export default function ExamManagement() {
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><h1 className="font-sans text-3xl font-bold text-[#4b1719]">Exámenes pasados</h1><p className="mt-2 text-sm">Publica evaluaciones como páginas web, con fórmulas, imágenes y soluciones.</p></div><a href="/examenes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7f0303]">Ver archivo público <ExternalLink className="size-3.5" aria-hidden="true" /></a></div>
     {message && <p role="status" className="mb-5 rounded-lg bg-green-50 p-4 text-sm text-green-800">{message}</p>}
     {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-800">{error}</p>}
+    {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#e3caca] bg-red-50 p-4 text-sm text-red-800"><p>{loadError.message}</p><p className="mt-2 text-xs">Código: <code>{loadError.code}</code>. Puedes seguir preparando el contenido; la publicación estará disponible cuando se pueda consultar el archivo.</p><div className="mt-3 flex flex-wrap items-center gap-4"><button type="button" disabled={blocked || !ready || loading} onClick={() => void load()} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-red-200 px-3 py-2 text-xs font-semibold disabled:opacity-50"><RotateCw className="size-3.5" aria-hidden="true" />Reintentar carga</button>{loadError.code === 'permission-denied' && <a href="/guia-colaboradores#guia-examenes-permisos" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold underline underline-offset-4">Cómo revisar los permisos</a>}</div></div>}
+    {localBackup.pending && <div className="mb-5"><LocalDraftNotice savedAt={localBackup.pending.savedAt} content={localBackup.pending.values.contentMarkdown} onRecover={() => { const recovered = localBackup.recover(); if (recovered) change({ ...recovered, type: examTypes.some(type => type.id === recovered.type) ? recovered.type as PastExam['type'] : current.type }) }} onDiscard={localBackup.discard} /></div>}
+    <p className="mb-5 text-xs text-[#765e5e]"><LocalDraftStatus failed={localBackup.failed} savedAt={localBackup.savedAt} /></p>
     <div className="grid items-start gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
       <aside className="rounded-xl border border-[#e3caca] bg-white p-4">
         <button disabled={blocked} onClick={() => select(starter())} className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#7f0303] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Plus className="size-4" aria-hidden="true" />Nueva evaluación</button>
         <div className="mb-3 flex items-center justify-between"><h2 className="text-xs font-semibold">Evaluaciones publicadas</h2><button type="button" disabled={blocked || loading || !ready} onClick={() => void load()} aria-label="Actualizar lista de evaluaciones" className="rounded p-2 hover:bg-[#f8eaea] disabled:opacity-50"><RotateCw className="size-3.5" aria-hidden="true" /></button></div>
-        {loading ? <p role="status" className="text-sm">Cargando…</p> : !exams.length ? <p className="text-sm">Aún no hay evaluaciones.</p> : <ul className="max-h-[65vh] space-y-3 overflow-y-auto">{exams.map(exam => <li key={exam.id} className={`rounded-lg border p-3 ${current.id === exam.id ? 'border-[#a35a5a] bg-[#faf0ee]' : 'border-[#eadada]'}`}><button disabled={blocked} onClick={() => select(exam)} aria-pressed={current.id === exam.id} className="w-full text-left text-sm"><span className="block text-xs text-[#967070]">{exam.period} · {examTypes.find(type => type.id === exam.type)?.label}</span><span className="mt-1 block font-semibold">{exam.title}</span></button><button disabled={blocked || !ready} onClick={() => remove(exam)} className="mt-2 text-xs text-red-700 disabled:opacity-50">Eliminar</button></li>)}</ul>}
+        {loading ? <p role="status" className="text-sm">Cargando…</p> : loadError ? <p className="text-sm">La lista no está disponible. Reintenta la carga para consultar las evaluaciones.</p> : !exams.length ? <p className="text-sm">Aún no hay evaluaciones.</p> : <ul className="max-h-[65vh] space-y-3 overflow-y-auto">{exams.map(exam => <li key={exam.id} className={`rounded-lg border p-3 ${current.id === exam.id ? 'border-[#a35a5a] bg-[#faf0ee]' : 'border-[#eadada]'}`}><button disabled={blocked} onClick={() => select(exam)} aria-pressed={current.id === exam.id} className="w-full text-left text-sm"><span className="block text-xs text-[#967070]">{exam.period} · {examTypes.find(type => type.id === exam.type)?.label}</span><span className="mt-1 block font-semibold">{exam.title}</span></button><button disabled={blocked || !ready} onClick={() => remove(exam)} className="mt-2 text-xs text-red-700 disabled:opacity-50">Eliminar</button></li>)}</ul>}
       </aside>
       <form onSubmit={save} className="min-w-0 rounded-xl border border-[#e3caca] bg-white p-5">
         <h2 className="mb-5 font-sans text-xl font-bold">{current.id ? 'Editar evaluación' : 'Nueva evaluación'}</h2>
@@ -154,7 +173,7 @@ export default function ExamManagement() {
         <div id="exam-preview" hidden={mode !== 'preview'} className="min-w-0 rounded-lg bg-[#faf5f3] p-4 sm:p-6">
           {mode === 'preview' && <><p className="mb-2 text-xs text-[#967070]">{current.period} · {examTypes.find(type => type.id === current.type)?.label}</p><h2 className="font-sans text-2xl font-bold">{current.title || 'Título de la evaluación'}</h2><PreviewErrorBoundary key={previewAttempt} resetKey={current.contentMarkdown} onRetry={() => setPreviewAttempt(value => value + 1)}><Suspense fallback={<p role="status" className="py-8 text-sm">Cargando vista previa…</p>}><ContentRenderer document={{ schemaVersion: 2, chapterId: current.period, slug: current.id || 'nueva-evaluacion', title: current.title, contentMarkdown: current.contentMarkdown }} /></Suspense></PreviewErrorBoundary></>}
         </div>
-        <div className="mt-5 border-t border-[#eadada] pt-5"><p className="mb-3 text-xs text-[#765e5e]">{dirty ? 'Tienes cambios sin publicar.' : current.id ? 'Estás editando una evaluación publicada.' : 'La evaluación aún no se ha publicado.'} Al publicar, estará visible para todos en el periodo seleccionado.</p><div className="flex flex-wrap items-center gap-4"><button disabled={blocked || !ready || loading} className="rounded-lg bg-[#7f0303] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy ? 'Guardando…' : current.id ? 'Publicar cambios' : 'Publicar evaluación'}</button>{current.id && <a href={`/examenes/${encodeURIComponent(current.id)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#7f0303]">Ver página publicada <ExternalLink className="size-3.5" aria-hidden="true" /></a>}</div></div>
+        <div className="mt-5 border-t border-[#eadada] pt-5"><p className="mb-3 text-xs text-[#765e5e]">{dirty ? 'Tienes cambios sin publicar.' : current.id ? 'Estás editando una evaluación publicada.' : 'La evaluación aún no se ha publicado.'} Al publicar, estará visible para todos en el periodo seleccionado.</p><div className="flex flex-wrap items-center gap-4"><button disabled={blocked || !ready || loading || Boolean(loadError)} className="rounded-lg bg-[#7f0303] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy ? 'Guardando…' : current.id ? 'Publicar cambios' : 'Publicar evaluación'}</button>{current.id && <a href={`/examenes/${encodeURIComponent(current.id)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-[#7f0303]">Ver página publicada <ExternalLink className="size-3.5" aria-hidden="true" /></a>}</div></div>
       </form>
     </div>
   </div>

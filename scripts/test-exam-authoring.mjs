@@ -14,6 +14,9 @@ function load(path, dependencies = {}, globals = {}) {
 }
 const authoring = load('../lib/exam-authoring.ts')
 const data = load('../lib/exam-data.ts')
+const errors = load('../lib/exam-errors.ts')
+assert.equal(errors.examFailure({ code: 'firestore/permission-denied' }, 'load').code, 'permission-denied')
+assert.match(errors.examFailure({ code: 'unavailable' }, 'load').message, /conectar/)
 assert.equal(authoring.validateExamImport('examen.MDX', 100, '\uFEFF## Enunciado\r\n\r\n$\\sigma$\r\n'), '## Enunciado\n\n$\\sigma$')
 for (const [name, bytes, content] of [['exam.pdf', 100, 'contenido'], ['exam.md', 1, ' '], ['exam.md', 5, '\0texto'], ['exam.md', 800001, 'texto'], ['exam.md', 200001, 'x'.repeat(200001)]]) {
   assert.throws(() => authoring.validateExamImport(name, bytes, content))
@@ -23,7 +26,7 @@ assert.equal(authoring.validateExamImport('exam.md', 200000, 'x'.repeat(200000))
 // Exercise the actual form handlers with a Monaco model and isolated Firebase calls.
 // No requests are sent to the live database.
 const hooks = [], effects = []
-let index = 0, authChanged, allowConfirm = true, undoStops = 0
+let index = 0, authChanged, allowConfirm = true, undoStops = 0, queryFailure = null
 const writes = []
 const react = {
   useState(initial) {
@@ -39,10 +42,14 @@ const react = {
 const { default: Management } = load('../components/exam-management.tsx', {
   react, 'react/jsx-runtime': jsx, 'lucide-react': icons, '@/lib/firebase': { db: {}, auth: {} },
   '@/lib/exam-data': data, '@/lib/exam-authoring': authoring, '@/components/preview-error-boundary': { default: 'boundary' },
+  '@/lib/exam-errors': errors,
+  '@/lib/local-draft': { localDraftKey: () => 'isolated-exam-test' },
+  '@/lib/use-local-draft': { useLocalDraft: () => ({ pending: null, failed: false, savedAt: null, acknowledge() {} }) },
+  '@/components/local-draft-notice': { LocalDraftStatus: 'local-status', LocalDraftNotice: 'local-notice' },
   'firebase/auth': { onAuthStateChanged: (_auth, callback) => { authChanged = callback; return () => {} } },
   'firebase/firestore': {
     collection: () => ({}), doc: (_collection, ...parts) => ({ id: parts.at(-1) || 'new-exam' }),
-    getDocs: async () => ({ docs: [] }), setDoc: async (reference, value) => writes.push({ reference, value }),
+    getDocs: async () => { if (queryFailure) throw queryFailure; return { docs: [] } }, setDoc: async (reference, value) => writes.push({ reference, value }),
   },
 }, { window: { addEventListener() {}, removeEventListener() {}, confirm: () => allowConfirm }, console })
 function render() { index = 0; return Management() }
@@ -93,4 +100,22 @@ assert.equal(writes.length, 1, 'Only explicit publication writes to Firestore')
 assert.equal(writes[0].value.contentMarkdown, markdown)
 assert.equal(writes[0].value.title, 'Práctica calificada 1')
 assert.ok(data.validExam(writes[0].value))
-console.log('OK: import validation, cancellation, undo, preservation of content and explicit publication.')
+tree = render()
+queryFailure = { code: 'permission-denied' }
+find(tree, node => node.props?.['aria-label'] === 'Actualizar lista de evaluaciones').props.onClick()
+await settle(); tree = render()
+const loadAlert = find(tree, node => node.props?.role === 'alert')
+assert.ok(loadAlert, 'The loader must report Firestore failures')
+const textContent = node => typeof node === 'string' ? node : [node?.props?.children].flat(Infinity).filter(Boolean).map(textContent).join(' ')
+assert.match(textContent(loadAlert), /permission-denied/)
+assert.match(textContent(loadAlert), /reglas publicadas/)
+assert.doesNotMatch(textContent(tree), /Aún no hay evaluaciones/, 'Permission errors must not look like an empty archive')
+assert.equal(find(tree, node => node.props?.language === 'markdown').props.value, markdown, 'Loading errors must preserve the editor text')
+await find(tree, node => node.type === 'form').props.onSubmit({ preventDefault() {} })
+assert.equal(writes.length, 1, 'Publication stays disabled until the archive is reachable')
+queryFailure = null
+find(tree, node => node.props?.['aria-label'] === 'Actualizar lista de evaluaciones').props.onClick()
+await settle(); tree = render()
+assert.equal(find(tree, node => node.props?.role === 'alert'), undefined, 'A successful retry must clear the previous error')
+assert.equal(find(tree, node => node.props?.language === 'markdown').props.value, markdown)
+console.log('OK: import, explicit publication, permission errors, preserved text and successful retry.')

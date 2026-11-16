@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import Layout from '@/src/layouts/Layout.astro';
+import { ArrowRight, Copy, Eye, History } from 'lucide-react';
 ---
 
 <Layout title="Guía para Colaboradores | Resistencia de Materiales — UNI" description="Manual práctico para redactores y colaboradores del espacio digital de estudio de Resistencia de Materiales">
@@ -31,7 +32,32 @@ import Layout from '@/src/layouts/Layout.astro';
 
     <!-- Contenido principal -->
     <main class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:py-14">
-      
+      <!-- Añadir las próximas actualizaciones arriba, con fecha y enlaces a las instrucciones. Conservar las entradas anteriores. -->
+      <section id="novedades" aria-labelledby="novedades-titulo" class="mb-8 scroll-mt-24 rounded-xl border border-[#d5baba] bg-white p-5 sm:p-7 dark:border-[#4d282b] dark:bg-[#1a0f10]">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 id="novedades-titulo" class="flex items-center gap-2.5 font-sans text-xl font-bold text-[#4a1719] sm:text-2xl dark:text-[#f7dfdd]"><History size={22} className="shrink-0 text-[#8B0000] dark:text-[#fca5a5]" aria-hidden="true" />Novedades para colaboradores</h1>
+            <p class="mt-2 max-w-xl text-sm leading-relaxed text-[#765e5e] dark:text-[#cbb0ae]">¿Ya conoces la guía? Revisa aquí los cambios recientes y abre solo las instrucciones que necesites.</p>
+          </div>
+          <a href="#guia-completa" class="inline-flex items-center gap-1.5 rounded-md py-1 text-xs font-semibold text-[#7f0303] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-[#fca5a5]">Ir a la guía completa <ArrowRight size={15} aria-hidden="true" /></a>
+        </div>
+        <details open class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-15">15 de noviembre de 2026</time> · Puesta al día del editor y los contenidos</summary>
+          <ul class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+            <li><strong>Respaldo local del trabajo.</strong> Los editores conservan una copia mientras escribes, sin servicios adicionales. Al volver puedes revisar y recuperar el texto pendiente. <a href="#guia-respaldo" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Cómo funciona la recuperación</a>.</li>
+            <li><strong>Ejemplos para copiar y probar.</strong> Cada bloque de código de esta guía tiene <strong>Copiar</strong> y <strong>Ver resultado</strong>. <a href="#guia-ejemplos" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Probar los ejemplos</a>.</li>
+            <li><strong>Edición en pantallas pequeñas.</strong> Alterna entre <strong>Editar</strong> y <strong>Vista previa</strong> para aprovechar el espacio. Los simuladores tienen controles más cómodos de tocar.</li>
+            <li><strong>Ecuaciones y referencias.</strong> Usa <code>Formula</code> con <code>number</code>, <code>boxed="true"</code> y <code>bold="true"</code>. Puedes enlazar ecuaciones y figuras desde el texto. <a href="#guia-formulas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver formato de ecuaciones</a>.</li>
+            <li><strong>Términos con explicación.</strong> Añade <code>Term definition="..."</code> para mostrar una definición al pasar el cursor, enfocar o tocar el término. <a href="#guia-referencias" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Copiar ejemplos de términos y referencias</a>.</li>
+            <li><strong>Problemas con imágenes.</strong> La numeración es automática por capítulo. Usa <code>imageLayout="auto"</code>, <code>"wrap"</code> o <code>"stacked"</code> para acomodar la figura sin estrechar demasiado el enunciado. <a href="#guia-problemas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver opciones de problemas</a>.</li>
+            <li><strong>Tablas personalizables.</strong> Puedes definir alineación, ancho y tamaños de columna, o usar <code>TableGrid</code> para colocar varias tablas en una fila. <a href="#guia-tablas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver ejemplos de tablas</a>.</li>
+            <li><strong>Herramientas interactivas.</strong> Inserta los simuladores de Mohr, esfuerzo normal o deformación axial desde <strong>Insertar componente</strong>. <a href="#guia-herramientas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver herramientas disponibles</a>.</li>
+            <li><strong>Exámenes como páginas web · solo administradores.</strong> El editor permite importar Markdown, insertar componentes, revisar la vista previa y publicar por periodo. <a href="#guia-examenes" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver cómo publicar evaluaciones</a>.</li>
+          </ul>
+          <p class="mt-4 rounded-lg bg-[#fbf2f0] px-3 py-2 text-xs leading-6 text-[#765e5e] dark:bg-[#241215] dark:text-[#cbb0ae]">Puedes incorporar estas opciones al adaptar tu capítulo; no necesitas reescribir todo el material. La autoría de las presentaciones originales corresponde al <strong>Ing. Eden Angel Molina Capcha</strong>.</p>
+        </details>
+      </section>
+
       <!-- Aviso inicial destacado -->
       <div class="mb-10 rounded-2xl border-2 border-[#8B0000]/25 dark:border-[#f87171]/30 bg-[#fbf2f0] dark:bg-[#241215] p-5 sm:p-6 shadow-sm">
         <div class="flex items-start gap-3 sm:gap-4">
@@ -49,7 +75,7 @@ import Layout from '@/src/layouts/Layout.astro';
         </div>
       </div>
 
-      <div class="max-w-none space-y-12">
+      <div id="guia-completa" class="max-w-none scroll-mt-24 space-y-12">
 
         <!-- 1. Bienvenida -->
         <section class="rounded-xl border border-[#ead5d4] dark:border-[#382022] bg-white dark:bg-[#1a0f10] p-6 sm:p-8 shadow-sm">
@@ -104,6 +130,16 @@ import Layout from '@/src/layouts/Layout.astro';
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">6. Enviar a revisión</p>
               <p class="mt-1">Al finalizar, pulsa <strong>Solicitar Revisión</strong> para que el administrador revise y publique tu contenido.</p>
             </div>
+          </div>
+        </section>
+
+        <section id="guia-respaldo" aria-labelledby="guia-respaldo-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
+          <h2 id="guia-respaldo-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Respaldo local y recuperación</h2>
+          <div class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+            <p>Los editores de capítulos y exámenes guardan una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento; este respaldo no envía el texto a Firestore ni publica cambios.</p>
+            <p>Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar <strong>Recuperar copia</strong>. Después, usa <strong>Guardar Avance</strong>, solicita revisión o publica según tus permisos.</p>
+            <p>La copia está solo en <strong>ese navegador y dispositivo</strong>. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa <strong>Descargar Markdown</strong> en capítulos o <strong>Descargar copia</strong> en exámenes.</p>
+            <p>Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.</p>
           </div>
         </section>
 
@@ -228,7 +264,7 @@ import Layout from '@/src/layouts/Layout.astro';
             <span class="flex size-7 items-center justify-center rounded-full bg-[#f6e5e5] dark:bg-[#341619] font-mono text-xs font-bold">5</span>
             <h2 class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd] m-0">Componentes disponibles</h2>
           </div>
-          <p class="mt-2 text-sm text-[#7a5c5c] dark:text-[#af9795]">Escribe siempre la primera letra en mayúscula:</p>
+          <p id="guia-ejemplos" class="mt-2 scroll-mt-24 text-sm leading-6 text-[#7a5c5c] dark:text-[#af9795]">Cada bloque de código tiene <strong>Copiar</strong> y <strong>Ver resultado</strong>. La vista se abre debajo del código y usa los mismos componentes de los capítulos. Escribe siempre la primera letra de los componentes en mayúscula.</p>
 
           <div class="mt-5 space-y-6 text-sm">
             
@@ -242,9 +278,9 @@ Fuerza interna perpendicular al plano de corte por unidad de área.
             </div>
 
             <!-- Formula -->
-            <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
+            <div id="guia-formulas" class="scroll-mt-24 rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Formula label="..."&gt;</p>
-              <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">Ecuación centrada; usa <code>number</code> para numerarla y <code>boxed="true"</code> para destacar un resultado.</p>
+              <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">Ecuación centrada; usa <code>number</code> para numerarla, <code>boxed="true"</code> para destacar un resultado y <code>bold="true"</code> para escribirla en negrita. Puedes combinar estas opciones.</p>
               <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Formula number="8.3.1"&gt;
 $$
 N(x) = \int_{A(x)} \sigma\,dA
@@ -252,7 +288,7 @@ $$
 &lt;/Formula&gt;</code></pre>
             </div>
 
-            <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
+            <div id="guia-referencias" class="scroll-mt-24 rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] text-xs">Referencias y términos con explicación</p>
               <p class="mt-2 text-xs leading-6">Las ecuaciones numeradas tienen destinos como <code>#eq-8.3.2</code>. Las figuras aceptan <code>number</code> y crean destinos como <code>#fig-8.3.3</code>. También puedes asignar un <code>id</code> propio a Formula o Image. Usa números e identificadores únicos en cada página.</p>
               <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs overflow-x-auto"><code>Consulta la [ecuación (8.3.2)](#eq-8.3.2).
@@ -281,10 +317,11 @@ Una barra de $20\text{ mm}$ soporta $40\text{ kN}$. Calcule el esfuerzo.
             </div>
 
             <!-- Problem -->
-            <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
+            <div id="guia-problemas" class="scroll-mt-24 rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Problem&gt;</p>
               <p class="mt-1 text-xs text-[#6e5051] dark:text-[#c4aba9]">Problema propuesto con borde punteado para práctica del alumno.</p>
               <p class="mt-2 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">La numeración es automática y continua por capítulo: 5.1, 5.2, 5.3, aunque los problemas estén en secciones diferentes. No necesitas escribir <code>number</code>. Para una imagen junto al enunciado, agrega <code>image="figura.png" imageAlt="Descripción" imageWidth="38%" imagePosition="right"</code>. También acepta <code>left</code>; en móviles se apila y la solución queda debajo a ancho completo.</p>
+              <p class="mt-2 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]"><code>imageLayout="auto"</code> es el valor predeterminado: las imágenes grandes se colocan debajo y las pequeñas pueden ir al costado cuando hay espacio. Con <code>imageLayout="wrap"</code>, el texto continúa por debajo de la imagen; con <code>imageLayout="stacked"</code>, la figura siempre va debajo del enunciado. La solución conserva todo el ancho.</p>
               <pre is:raw class="mt-2 p-3 rounded bg-white dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] text-xs font-mono text-[#8B0000] dark:text-[#fca5a5] overflow-x-auto"><code>&lt;Problem title="Diseño por cortante"&gt;
 Determine el diámetro mínimo para un perno sometido a $V = 30\text{ kN}$ si $\tau_{adm} = 90\text{ MPa}$.
 
@@ -305,7 +342,7 @@ $A \ge V / \tau_{adm} \implies d \ge 20.6\text{ mm}$.
             </div>
 
             <!-- Interactive tools -->
-            <div class="rounded-lg border border-[#ebd0cf] bg-[#fcf8f7] p-4 dark:border-[#3a1f22] dark:bg-[#1e1012]">
+            <div id="guia-herramientas" class="scroll-mt-24 rounded-lg border border-[#ebd0cf] bg-[#fcf8f7] p-4 dark:border-[#3a1f22] dark:bg-[#1e1012]">
               <p class="font-mono text-xs font-bold text-[#7f0303] dark:text-[#fca5a5]">&lt;Tool id="..." /&gt;</p>
               <p class="mt-2 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">Inserta simuladores dentro del tema, respetando su ancho. El cuadrado rota y sus flechas cambian con las componentes giradas. Los campos aceptan valores libres; los deslizadores amplían su rango al llegar a un extremo y también tienen controles ×2 y ÷2. Se conservan las variables, el radio, el promedio, los valores principales y sus dos direcciones. Cada herramienta es independiente y funciona en la vista previa.</p>
               <pre is:raw class="mt-3 overflow-x-auto rounded border border-[#ead0ce] bg-white p-3 font-mono text-xs text-[#8B0000] dark:border-[#3b1e21] dark:bg-[#281315] dark:text-[#fca5a5]"><code>&lt;Tool id="mohr-esfuerzos" /&gt;
@@ -324,7 +361,7 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
             </div>
 
             <!-- Table -->
-            <div class="rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
+            <div id="guia-tablas" class="scroll-mt-24 rounded-lg border border-[#ebd0cf] dark:border-[#3a1f22] p-4 bg-[#fcf8f7] dark:bg-[#1e1012]">
               <div class="flex items-center justify-between">
                 <p class="font-bold text-[#7f0303] dark:text-[#fca5a5] font-mono text-xs">&lt;Table title="..."&gt; y Tablas Markdown</p>
                 <span class="rounded bg-[#8B0000]/10 px-2 py-0.5 text-[10px] font-bold text-[#8B0000] dark:text-[#fca5a5]">Nuevo</span>
@@ -410,16 +447,10 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
               <span class="flex size-7 items-center justify-center rounded-full bg-[#f6e5e5] dark:bg-[#341619] font-mono text-xs font-bold">7</span>
               <h2 class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd] m-0">Plantilla para crear un tema</h2>
             </div>
-            <button id="copy-template-btn" type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-[#8B0000]/30 bg-[#fbf2f0] dark:bg-[#2a1417] px-3 py-1.5 text-xs font-bold text-[#8B0000] dark:text-[#fca5a5] hover:bg-[#f3dedc] transition-colors shadow-sm">
-              <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-              </svg>
-              <span>Copiar plantilla</span>
-            </button>
           </div>
           <p class="mt-2 text-sm text-[#7a5c5c] dark:text-[#af9795]">Copia este bloque base y pégalo directamente en el editor para comenzar a rellenar:</p>
 
-          <pre id="template-code" is:raw class="mt-4 p-4 rounded-xl bg-[#201012] text-[#f7e8e7] text-xs font-mono leading-relaxed overflow-x-auto border border-[#3e1e22]"><code># 1.1 Título del Subtema
+          <pre id="template-code" is:raw class="mt-4 p-4 rounded-xl bg-[#201012] text-[#f7e8e7] text-xs font-mono leading-relaxed overflow-x-auto border border-[#3e1e22]"><code># Título del Subtema
 
 Escribe aquí una breve introducción conceptual del tema y su importancia en la ingeniería.
 
@@ -548,6 +579,26 @@ Explicación concisa de la respuesta correcta.
           </ul>
         </section>
 
+        <section id="guia-examenes" aria-labelledby="guia-examenes-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
+          <p class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8B0000] dark:text-[#fca5a5]">Solo administradores autorizados</p>
+          <h2 id="guia-examenes-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Editor de exámenes</h2>
+          <ol class="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+            <li>En el panel administrativo, abre <strong>Exámenes</strong> y pulsa <strong>Nueva evaluación</strong>. Completa el periodo, el tipo y el título.</li>
+            <li>Escribe el contenido o usa <strong>Importar Markdown</strong> con un archivo <code>.md</code>, <code>.mdx</code> o <code>.markdown</code>. La importación reemplaza el texto tras confirmarlo y se puede deshacer con Ctrl + Z. El título, periodo y tipo se conservan.</li>
+            <li>Usa <strong>Insertar</strong> para añadir problemas, fórmulas, imágenes o tablas y revisa <strong>Vista previa</strong>. El límite es de 200 000 caracteres.</li>
+            <li>Pulsa <strong>Publicar evaluación</strong> para hacerla visible en el archivo público bajo su periodo. Importar un archivo o abrir la vista previa no lo publica.</li>
+          </ol>
+          <p class="mt-4 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]"><strong>Descargar copia</strong> guarda el Markdown como archivo independiente. El respaldo automático solo permanece en el mismo navegador; descargarlo permite conservarlo aunque borres sus datos. Para editar una evaluación existente, selecciónala en la lista de publicadas.</p>
+          <div id="guia-examenes-permisos" class="mt-5 scroll-mt-24 rounded-lg border border-[#ead5d4] p-4 text-sm leading-6 dark:border-[#382022]">
+            <h3 class="font-semibold text-[#7f0303] dark:text-[#fca5a5]">Si Firestore rechaza el acceso a los exámenes</h3>
+            <p class="mt-2">El código <code>permission-denied</code> indica un rechazo de permisos. Tener el archivo <code>firestore.rules</code> en el proyecto no publica sus reglas en Firebase. Un administrador del proyecto Firebase debe revisar la colección <code>exams</code> en <strong>Firestore Database → Reglas</strong>.</p>
+            <p class="mt-2">Para publicar las reglas del proyecto desde la terminal, inicia sesión con una cuenta que tenga permisos en Firebase y ejecuta:</p>
+            <pre class="mt-3 overflow-x-auto rounded bg-[#fbf2f0] p-3 text-xs dark:bg-[#281315]"><code>npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules --project resistencia-materiales</code></pre>
+            <p class="mt-2">Este despliegue reemplaza las reglas publicadas por el archivo local: revisa sus diferencias si también se editaron desde la consola. No es necesario habilitar escrituras públicas. El archivo del proyecto permite consultar los exámenes y reserva su publicación y eliminación a administradores registrados. Después, vuelve al editor y pulsa <strong>Reintentar carga</strong>.</p>
+          </div>
+        </section>
+
         <!-- Checklist de 5 cosas -->
         <section class="rounded-2xl border-2 border-[#1c663b]/30 bg-[#f3f9f5] dark:bg-[#0f1f15] p-6 sm:p-8 shadow-sm">
           <div class="flex items-center gap-2.5 text-[#1c663b] dark:text-[#86efac]">
@@ -598,21 +649,54 @@ Explicación concisa de la respuesta correcta.
     </main>
   </div>
 
-  <script is:inline>
-    const btn = document.getElementById('copy-template-btn');
-    if (btn) {
-      btn.addEventListener('click', () => {
-        const code = document.getElementById('template-code')?.innerText || '';
-        navigator.clipboard.writeText(code).then(() => {
-          const original = btn.innerHTML;
-          btn.textContent = '¡Copiado!';
-          btn.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
-          setTimeout(() => {
-            btn.innerHTML = original;
-            btn.classList.remove('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
-          }, 2000);
-        });
+  <template id="guide-example-actions">
+    <div class="guide-example-actions">
+      <button type="button" data-example-copy><Copy size={15} aria-hidden="true" /><span>Copiar</span></button>
+      <button type="button" data-example-preview><Eye size={15} aria-hidden="true" /><span>Ver resultado</span></button>
+      <span data-example-status role="status" aria-live="polite"></span>
+    </div>
+  </template>
+  <script>
+    import { bindGuideExamples } from '@/lib/guide-examples';
+    let cleanup: (() => void) | undefined;
+    function bindExamples() {
+      if (cleanup) return;
+      const root = document.querySelector<HTMLElement>('main');
+      const template = document.querySelector<HTMLTemplateElement>('#guide-example-actions');
+      if (!root || !template) return;
+      cleanup = bindGuideExamples(root, template, {
+        copy: text => navigator.clipboard.writeText(text),
+        render: async (target, markdown, id) => {
+          const [{ createElement }, { createRoot }, { default: ContentRenderer }, { default: Boundary }] = await Promise.all([
+            import('react'), import('react-dom/client'), import('@/components/content-renderer'), import('@/components/preview-error-boundary'),
+          ]);
+          if (!target.isConnected) return () => {};
+          const reactRoot = createRoot(target);
+          let attempt = 0;
+          const render = () => reactRoot.render(createElement(Boundary, { key: attempt++, resetKey: markdown, onRetry: render, children: createElement(ContentRenderer, { document: { schemaVersion: 2, chapterId: 'guia', slug: id, title: 'Ejemplo de la guía', contentMarkdown: markdown } }) }));
+          render();
+          return () => reactRoot.unmount();
+        },
       });
     }
+    bindExamples();
+    document.addEventListener('astro:page-load', bindExamples);
+    document.addEventListener('astro:before-swap', () => { cleanup?.(); cleanup = undefined; });
   </script>
 </Layout>
+
+<style is:global>
+  .guide-example { min-width:0; margin-top:.75rem; }
+  .guide-example-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin-bottom:.5rem; font-family:var(--font-sans); }
+  .guide-example-actions button { display:inline-flex; min-height:2.75rem; align-items:center; gap:.4rem; padding:.5rem .75rem; border:1px solid #d5baba; border-radius:.4rem; color:#7f0303; background:#fffaf8; font-size:.75rem; font-weight:600; cursor:pointer; }
+  .guide-example-actions button:hover { background:#f8eaea; }
+  .guide-example-actions button:focus-visible { outline:2px solid #7f0303; outline-offset:3px; }
+  .guide-example-actions button:disabled { opacity:.6; cursor:wait; }
+  .guide-example-actions [role="status"] { font-size:.75rem; color:#765e5e; }
+  .guide-example > pre { margin-top:0; max-height:28rem; overflow:auto; }
+  .guide-example-preview { min-width:0; margin-top:.75rem; border:1px solid #e3caca; border-radius:.5rem; padding:1rem; background:#fbf7f4; }
+  .dark .guide-example-actions button { color:#fca5a5; border-color:#4d282b; background:#281315; }
+  .dark .guide-example-actions button:hover { background:#381b1e; }
+  .dark .guide-example-actions [role="status"] { color:#cbb0ae; }
+  .dark .guide-example-preview { border-color:#422527; background:#1a0f10; }
+</style>

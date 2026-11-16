@@ -6,7 +6,29 @@
 
 Esta guía rápida contiene todo lo necesario para redactar, estructurar y enviar temas teóricos, fórmulas y problemas resueltos en la plataforma.
 
+## Novedades para colaboradores
+
+¿Ya conoces la guía? Revisa los cambios recientes y abre solo las instrucciones que necesites. [Ir a la guía completa](#guia-completa).
+
+<!-- Añadir las próximas actualizaciones arriba, con fecha y enlaces a las instrucciones. Conservar las entradas anteriores y actualizar también la guía web. -->
+
+### 15 de noviembre de 2026 · Puesta al día del editor y los contenidos
+
+- **Respaldo local del trabajo:** los editores conservan una copia mientras escribes, sin servicios adicionales. Al volver puedes revisar y recuperar el texto pendiente. [Cómo funciona la recuperación](#guia-respaldo).
+- **Ejemplos para copiar y probar:** cada bloque de código de la guía web tiene **Copiar** y **Ver resultado**, usando los mismos componentes de los capítulos. [Abrir los ejemplos de la guía web](/guia-colaboradores#guia-ejemplos).
+- **Edición en pantallas pequeñas:** alterna entre **Editar** y **Vista previa** para aprovechar el espacio. Los simuladores tienen controles más cómodos de tocar.
+- **Ecuaciones y referencias:** usa `Formula` con `number`, `boxed="true"` y `bold="true"`. Puedes enlazar ecuaciones y figuras desde el texto. [Ver formato de ecuaciones](#guia-formulas).
+- **Términos con explicación:** usa `Term definition="..."` para mostrar una definición al pasar el cursor, enfocar o tocar el término. [Copiar ejemplos de términos y referencias](#guia-referencias).
+- **Problemas con imágenes:** la numeración es automática por capítulo. Usa `imageLayout="auto"`, `"wrap"` o `"stacked"` para acomodar la figura sin estrechar demasiado el enunciado. [Ver opciones de problemas](#guia-problemas).
+- **Tablas personalizables:** define alineación, ancho y tamaños de columna. Usa `TableGrid` para colocar varias tablas en una fila. [Ver ejemplos de tablas](#guia-tablas).
+- **Herramientas interactivas:** inserta los simuladores de Mohr, esfuerzo normal o deformación axial desde **Insertar componente**. [Ver herramientas disponibles](#guia-herramientas).
+- **Exámenes como páginas web · solo administradores:** importa Markdown, inserta componentes, revisa la vista previa y publica por periodo. [Ver cómo publicar evaluaciones](#guia-examenes).
+
+Puedes incorporar estas opciones al adaptar tu capítulo; no necesitas reescribir todo el material. La autoría de las presentaciones originales corresponde al **Ing. Eden Angel Molina Capcha**.
+
 ---
+
+<a id="guia-completa"></a>
 
 ## 1. Bienvenida
 
@@ -39,6 +61,16 @@ Es un libro digital interactivo diseñado para los estudiantes de Resistencia de
    - Cuando hayas concluido el tema y verificado que todo se ve correctamente en la vista previa, pulsa **"Enviar a revisión"**. El equipo docente o administrador revisará tu contenido para publicarlo en la web del curso.
 
 ---
+
+<a id="guia-respaldo"></a>
+
+### Respaldo local y recuperación
+
+Los editores de capítulos y exámenes guardan una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento. Este respaldo no envía el texto a Firestore ni publica cambios.
+
+Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar **Recuperar copia**. Después, usa **Guardar Avance**, solicita revisión o publica según tus permisos.
+
+La copia está solo en **ese navegador y dispositivo**. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa **Descargar Markdown** en capítulos o **Descargar copia** en exámenes. Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.
 
 ## 3. Markdown básico
 
@@ -141,6 +173,8 @@ Escribe funciones como `\sin\theta` y `\cos\theta`, y palabras o unidades con `\
 
 ## 5. Componentes del contenido
 
+<a id="guia-herramientas"></a>
+
 ### Herramientas interactivas
 
 Puedes insertar un simulador en cualquier parte del tema, dejando una línea en blanco antes y después. No necesitas escribir código JavaScript ni adjuntar archivos HTML.
@@ -190,6 +224,8 @@ El esfuerzo normal $\sigma$ representa la intensidad de las fuerzas internas que
 </Definition>
 ```
 
+<a id="guia-formulas"></a>
+
 ### 2. `<Formula>`
 Bloque central para ecuaciones. Usa `number` para alinear el número a la derecha, `boxed="true"` para destacar un resultado y `bold="true"` para una ecuación en negrita.
 ```markdown
@@ -205,6 +241,8 @@ $$
 $$
 </Formula>
 ```
+
+<a id="guia-referencias"></a>
 
 ### Referencias y términos explicados
 
@@ -263,6 +301,8 @@ Una varilla de acero de $20\text{ mm}$ de diámetro y $2\text{ m}$ de longitud s
 </Solution>
 </Example>
 ```
+
+<a id="guia-problemas"></a>
 
 ### 4. `<Problem>`
 Recuadro con borde punteado para proponer problemas de práctica al estudiante.
@@ -424,7 +464,7 @@ Muestra tablas ordenadas con tipografía clara y barras de desplazamiento respon
 Puedes copiar este bloque y comenzar a rellenarlo en el editor:
 
 ```markdown
-# 1.1 Título del Subtema
+# Título del Subtema
 
 Escribe aquí una breve introducción conceptual del tema y su importancia en la ingeniería.
 
@@ -540,6 +580,8 @@ Antes de pulsar el botón de envío, verifica estos 5 puntos:
 ### ¿Terminaste? Guarda el contenido y envíalo a revisión.
 
 
+<a id="guia-tablas"></a>
+
 ### Personalizar la alineación y el ancho de las tablas
 
 ```mdx
@@ -596,6 +638,8 @@ El menú de componentes del editor incluye **Tablas en una fila** para insertar 
 
 Las fórmulas con `number` tienen un enlace directo. Por ejemplo, para citar una fórmula con `number="8.3.1"`, escribe `[ecuación (8.3.1)](#eq-8.3.1)` en el mismo tema. También puedes enlazarla desde otro tema usando `/curso/ruta-del-tema#eq-8.3.1`. Usa un número único para cada fórmula dentro de una página.
 
+<a id="guia-examenes"></a>
+
 ## Publicar exámenes como páginas web
 
 El editor está en `/workspace-mc361/management/exams`, en la pestaña **Exámenes** del panel administrativo. Si tienes una sesión de administrador activa, también aparece **Editor de exámenes** en `/examenes`. La gestión y publicación están reservadas a administradores.
@@ -605,7 +649,22 @@ El editor está en `/workspace-mc361/management/exams`, en la pestaña **Exámen
 3. Usa **Insertar** para añadir problemas con soluciones, fórmulas, imágenes o tablas. Son los mismos componentes de los capítulos. Las imágenes necesitan una URL o una ruta de `public/`, por ejemplo `/imagenes/figura.png`.
 4. Revisa **Vista previa** y pulsa **Publicar evaluación**. Aparecerá en el archivo público bajo su periodo y tipo. Para modificarla, selecciónala en la lista de evaluaciones publicadas.
 
-**Descargar copia** guarda el contenido como Markdown en tu equipo, incluso antes de publicarlo. Los cambios sin publicar solo permanecen en la pestaña abierta: descarga una copia si vas a salir. El límite es de 200 000 caracteres por evaluación.
+**Descargar copia** guarda el contenido como Markdown en un archivo independiente, incluso antes de publicarlo. El respaldo automático solo permanece en el mismo navegador; descargarlo permite conservarlo aunque borres sus datos. El límite es de 200 000 caracteres por evaluación.
+
+<a id="guia-examenes-permisos"></a>
+
+### Si Firestore rechaza el acceso a los exámenes
+
+El código `permission-denied` indica un rechazo de permisos. Tener `firestore.rules` en el proyecto no publica sus reglas en Firebase. Un administrador del proyecto Firebase debe revisar la colección `exams` en **Firestore Database → Reglas**.
+
+Para publicar las reglas del proyecto desde la terminal, usa una cuenta con permisos en Firebase:
+
+```powershell
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules --project resistencia-materiales
+```
+
+Este despliegue reemplaza las reglas publicadas por el archivo local: revisa sus diferencias si también se editaron desde la consola. No habilites escrituras públicas. El archivo del proyecto permite consultar los exámenes y reserva su publicación y eliminación a administradores registrados. Vuelve al editor y pulsa **Reintentar carga** tras aplicar las reglas.
 
 ## Presentación del proyecto y su equipo
 
