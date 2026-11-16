@@ -80,6 +80,14 @@ for (const path of ['/api/users', '/api/publish', '/api/subchapters', '/api/user
 const downgraded = await request('/api/users', token);
 assert.equal(downgraded.result.status, 403);
 assert.equal(downgraded.proceeded, false);
+for (const path of ['/workspace-mc361/management/exams', '/workspace-mc361/management/exams/']) {
+  const anonymous = await request(path);
+  assert.equal(anonymous.proceeded, false, 'Anonymous visitors cannot open the exam editor.');
+  assert.equal(anonymous.result.headers.get('location'), '/workspace-mc361/login');
+  const contentEditor = await request(path, token);
+  assert.equal(contentEditor.proceeded, false, 'Chapter editing access must not grant exam administration.');
+  assert.equal(contentEditor.result.headers.get('location'), '/workspace-mc361/content/chapters');
+}
 const editor = await request('/workspace-mc361/content/chapters/01/edit', token);
 assert.equal(editor.result.status, 302);
 assert.equal(editor.proceeded, false);
@@ -102,5 +110,6 @@ assert.equal(unavailable.proceeded, false, 'Permission checks must fail closed w
 dbStatus = 200;
 role = 'admin';
 assert.equal((await request('/api/users', token)).proceeded, true);
+assert.equal((await request('/workspace-mc361/management/exams', token)).proceeded, true, 'Registered admins can open the exam editor.');
 assert(databaseReads >= 8, 'Current permissions must be read for each authenticated operation.');
 console.log('PASS: live role/chapter revocation, deleted users, invalid/expired/forged tokens, protected mutations and fail-closed behavior.');

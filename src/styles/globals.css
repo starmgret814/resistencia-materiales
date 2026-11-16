@@ -366,6 +366,7 @@
 }
 
 .formula-block {
+  container: formula / inline-size;
   font-family: inherit;
   font-size: inherit;
   font-style: normal;
@@ -392,20 +393,32 @@
 .formula-row-numbered { grid-template-columns: 3.5rem minmax(0, 1fr) 3.5rem; }
 
 .formula-equation {
+  display: flex;
   min-width: 0;
   width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: .25rem;
   text-align: center;
   font-size: inherit;
 }
 
-.formula-equation .katex-display {
+.formula-surface {
+  flex: 0 0 auto;
+  width: max-content;
+  margin-inline: auto;
+}
+
+/* Measure the natural equation plus its frame. Scroll only the outer wrapper,
+   rather than shrinking a fit-content frame around an inner scroll container. */
+.formula-block .formula-equation .katex-display {
+  max-width: none;
+  overflow: visible;
   margin: 0;
+  padding-block: .25rem;
 }
 
 .formula-equation-boxed {
-  width: fit-content;
-  max-width: 100%;
-  justify-self: center;
   border: 1.5px solid #7f0303;
   border-radius: 0.25rem;
   background: #fbf2f0;
@@ -443,9 +456,13 @@
 .tool-equation { font-size: 1.0625rem; line-height: 1.7; }
 .tool-equation .katex-display { margin-block: .5rem; }
 .dark .formula-block .formula-label { color: #cbb0ae; }
+@container formula (max-width: 32rem) {
+  .formula-row-numbered { grid-template-columns: minmax(0, 1fr); row-gap: .25rem; }
+  .formula-row-numbered > span[aria-hidden="true"] { display: none; }
+  .formula-number { justify-self: end; }
+}
 @media (max-width: 640px) {
   .mdx-content { --course-font-size: 1.0625rem; }
-  .formula-row-numbered { grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem; gap: .3rem; }
   .formula-number { font-size: .8em; }
 }
 

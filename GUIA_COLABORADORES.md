@@ -596,3 +596,29 @@ El menú de componentes del editor incluye **Tablas en una fila** para insertar 
 
 Las fórmulas con `number` tienen un enlace directo. Por ejemplo, para citar una fórmula con `number="8.3.1"`, escribe `[ecuación (8.3.1)](#eq-8.3.1)` en el mismo tema. También puedes enlazarla desde otro tema usando `/curso/ruta-del-tema#eq-8.3.1`. Usa un número único para cada fórmula dentro de una página.
 
+## Publicar exámenes como páginas web
+
+El editor está en `/workspace-mc361/management/exams`, en la pestaña **Exámenes** del panel administrativo. Si tienes una sesión de administrador activa, también aparece **Editor de exámenes** en `/examenes`. La gestión y publicación están reservadas a administradores.
+
+1. Pulsa **Nueva evaluación** y completa el periodo (`2026-1`, `2026-2`, etc.), tipo y título.
+2. Escribe el contenido o usa **Importar Markdown** para cargar un archivo `.md`, `.mdx` o `.markdown`. La importación reemplaza únicamente el contenido, pide confirmación y se puede deshacer con Ctrl + Z. No publica el archivo automáticamente.
+3. Usa **Insertar** para añadir problemas con soluciones, fórmulas, imágenes o tablas. Son los mismos componentes de los capítulos. Las imágenes necesitan una URL o una ruta de `public/`, por ejemplo `/imagenes/figura.png`.
+4. Revisa **Vista previa** y pulsa **Publicar evaluación**. Aparecerá en el archivo público bajo su periodo y tipo. Para modificarla, selecciónala en la lista de evaluaciones publicadas.
+
+**Descargar copia** guarda el contenido como Markdown en tu equipo, incluso antes de publicarlo. Los cambios sin publicar solo permanecen en la pestaña abierta: descarga una copia si vas a salir. El límite es de 200 000 caracteres por evaluación.
+
+## Presentación del proyecto y su equipo
+
+La página pública es `/acerca-de`. Sus textos y el equipo se configuran en `lib/project-info.ts`. Los créditos distinguen la **Autoría del material académico**, el **Desarrollo de la plataforma** y la **Adaptación de contenidos a la web**. Las presentaciones originales son del **Ing. Eden Angel Molina Capcha**; el equipo adapta ese material al formato web. Esta presentación no concede acceso al editor: los permisos se administran en el panel privado. El proyecto no se presenta como código abierto ni se enlaza su repositorio desde la página pública. Añade un objeto a `projectMembers` por persona:
+
+```ts
+{
+  name: 'Nombre completo',
+  role: 'Desarrollo frontend',
+  area: 'development',
+  description: 'Contribuciones de esta persona.',
+}
+```
+
+`area` acepta `development` (desarrollo), `content` (adaptación a la web) o `academic` (autoría del material académico). `description` y `url` son opcionales. Una persona puede aparecer en más de un área si tiene varias contribuciones. Añade solo nombres y enlaces que deban mostrarse públicamente; no se exponen las cuentas ni los correos del panel de colaboradores.
+

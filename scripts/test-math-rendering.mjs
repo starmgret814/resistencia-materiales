@@ -49,6 +49,15 @@ $$`,
     String.raw`<Quiz question="¿Cambia $I_z + I_y$?">
 No, $J_O = I_z + I_y$.
 </Quiz>`,
+    String.raw`<Formula number="3.2.6" id="eq-carga-lineal-limitada" boxed="true">
+$$
+\begin{aligned}
+q(x)={}&k\langle x-a\rangle^1\\
+&-k\langle x-b\rangle^1\\
+&-k(b-a)\langle x-b\rangle^0.
+\end{aligned}
+$$
+</Formula>`,
   ]
   for (const fixture of fixtures) {
     const html = render(fixture)
@@ -60,6 +69,9 @@ No, $J_O = I_z + I_y$.
   assert(render(fixtures[2]).includes('large-op'), 'Display integrals use the large LaTeX operator')
   assert(render(fixtures[3]).includes('katex-display'), 'Standalone same-line dollars produce display math')
   assert(render(fixtures[5]).includes('id="eq-8.3.1"'))
+  const alignedBox = render(fixtures.at(-1))
+  assert(alignedBox.includes('id="eq-carga-lineal-limitada"'))
+  assert.match(alignedBox, /class="formula-equation"><div class="formula-surface formula-equation-boxed">/, 'The framed equation must sit inside the outer overflow wrapper')
   const references = render(String.raw`Consulta la [ecuación (8.3.2)](#eq-axial) y la [Figura 8.3.3](#fig-8.3.3).
 
 <Formula id="eq-axial" number="8.3.2" boxed="true">

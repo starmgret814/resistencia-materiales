@@ -15,7 +15,7 @@ export function Formula({ children, label, number, id, boxed = false, bold = fal
   return <figure id={anchor} className="formula-block my-5 px-4 py-0">
     <div className={cn('formula-row', number && 'formula-row-numbered')}>
       {number && <span aria-hidden="true" />}
-      <div className={cn('formula-equation', boxed && 'formula-equation-boxed', bold && 'formula-equation-bold')}>{children}</div>
+      <div className="formula-equation"><div className={cn('formula-surface', boxed && 'formula-equation-boxed', bold && 'formula-equation-bold')}>{children}</div></div>
       {number && <span className="formula-number"><a href={`#${anchor}`} aria-label={`Enlace a la ecuación ${number}`}>({number})</a></span>}
     </div>
     {label && <figcaption className="formula-label mt-3">{label}</figcaption>}

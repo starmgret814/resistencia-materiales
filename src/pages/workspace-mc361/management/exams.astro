@@ -7,5 +7,5 @@ if (!session || session.role !== 'admin') return Astro.redirect('/workspace-mc36
 ---
 <Layout title="Administrar exámenes | Resistencia de Materiales">
   <WorkspaceHeader session={session} />
-  <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6"><ExamManagement client:only="react" /></main>
+  <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6"><ExamManagement client:only="react"><div slot="fallback" role="status" class="rounded-xl border border-[#e3caca] bg-white p-8 text-sm text-[#765e5e]">Cargando editor de exámenes…</div></ExamManagement></main>
 </Layout>

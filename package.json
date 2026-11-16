@@ -19,6 +19,7 @@
     "test:ux": "node scripts/test-course-ux.mjs",
     "test:math": "node scripts/test-math-rendering.mjs",
     "test:chapter-revision": "node scripts/test-chapter-one-revision.mjs",
+    "test:exams": "node scripts/test-exam-authoring.mjs",
     "test:problems": "node scripts/test-problem-numbering.mjs",
     "test:tools": "node scripts/test-interactive-tools.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-mc361-permissions \"node scripts/test-firestore.mjs\""

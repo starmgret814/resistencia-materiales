@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ArrowUp,
   Home,
+  Users,
   Command,
   ChevronDown,
   ChevronRight,
@@ -97,6 +98,7 @@ function Sidebar({
   onNavigate,
   examsActive,
   homeActive,
+  aboutActive,
 }: {
   open: boolean
   onClose: () => void
@@ -106,6 +108,7 @@ function Sidebar({
   onNavigate?: (slug: string) => void
   examsActive: boolean
   homeActive: boolean
+  aboutActive: boolean
 }) {
   const asideRef = useRef<HTMLElement>(null)
   const [mobile, setMobile] = useState(false)
@@ -156,6 +159,7 @@ function Sidebar({
             <a href="/examenes" onClick={onClose} aria-current={examsActive ? 'page' : undefined} className={cn('flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7f0303]', examsActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}>
               <FileText className="size-4 shrink-0" aria-hidden="true" /><span className="flex-1">Exámenes pasados</span><ChevronRight className="size-3.5 opacity-50" aria-hidden="true" />
             </a>
+            <a href="/acerca-de" onClick={onClose} aria-current={aboutActive ? 'page' : undefined} className={cn('flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors', aboutActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}><Users className="size-4 shrink-0" aria-hidden="true" />Acerca del proyecto</a>
           </div>
           {courseChapters.map((chapter) => {
             const isExpanded = expanded === chapter.number
@@ -303,7 +307,7 @@ export interface TextbookLayoutProps {
   previous?: { slug: string; title: string } | null
   next?: { slug: string; title: string } | null
   customChapters?: Chapter[]
-  variant?: 'course' | 'archive' | 'exam' | 'home'
+  variant?: 'course' | 'archive' | 'exam' | 'home' | 'about'
   children: React.ReactNode
 }
 
@@ -361,6 +365,7 @@ export default function TextbookLayout({
           onNavigate={setNavigatingSlug}
           examsActive={variant === 'archive' || variant === 'exam'}
           homeActive={variant === 'home'}
+          aboutActive={variant === 'about'}
         />
         <main id="main-content" tabIndex={-1} className="min-w-0 flex-1">
           <div className="flex justify-center">

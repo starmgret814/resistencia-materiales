@@ -1,0 +1,78 @@
+---
+import Layout from '@/src/layouts/Layout.astro';
+import TextbookLayout from '@/components/textbook-layout';
+import { BookOpen, FileText, FlaskConical, Users, ArrowRight } from 'lucide-react';
+import { projectInfo, projectMembers, projectAreas } from '@/lib/project-info';
+const resources = [
+  { icon: BookOpen, title: 'Fundamentos que se conectan', text: 'Teoría, ecuaciones, figuras y problemas organizados por capítulos para consultar y estudiar a tu ritmo.' },
+  { icon: FlaskConical, title: 'Ideas que puedes explorar', text: 'Herramientas interactivas para observar cómo cambian las variables y relacionarlas con los modelos.' },
+  { icon: FileText, title: 'Práctica por periodo', text: 'Evaluaciones de periodos anteriores para aplicar los conceptos y preparar prácticas, parciales y finales.' },
+];
+---
+<Layout title="Acerca del proyecto | Resistencia de Materiales — UNI" description={projectInfo.description}>
+  <TextbookLayout activeSlug={null} variant="about" client:load>
+    <div class="about-project">
+      <header class="about-intro">
+        <p class="about-eyebrow">El proyecto · UNI / MC361</p>
+        <h1>Acerca del proyecto</h1>
+        <p class="about-lead">{projectInfo.title}</p>
+        <p>{projectInfo.description}</p>
+      </header>
+      <section aria-labelledby="about-resources" class="about-section">
+        <h2 id="about-resources">Qué encontrarás aquí</h2>
+        <div class="about-resources">{resources.map(({ icon: Icon, title, text }) => <div class="about-resource"><Icon size={22} aria-hidden="true" /><h3>{title}</h3><p>{text}</p></div>)}</div>
+      </section>
+      <section aria-labelledby="about-team" class="about-section">
+        <p class="about-eyebrow"><Users size={17} aria-hidden="true" />Las personas detrás</p>
+        <h2 id="about-team">Equipo del proyecto</h2>
+        <p>El material académico original pertenece al profesor. El equipo desarrolla la plataforma y adapta sus presentaciones al formato web.</p>
+        <div class="about-team-areas">{projectAreas.map(area => {
+          const members = projectMembers.filter(member => member.area === area.id);
+          return <section class="about-team-area" aria-labelledby={`team-${area.id}`}><h3 id={`team-${area.id}`}>{area.title}</h3><p>{area.description}</p>{members.length > 0 ? <ul class="about-members">{members.map(member => <li><p class="about-member-role">{member.role}</p><h4>{member.name}</h4>{member.description && <p>{member.description}</p>}{member.url && <a href={member.url} target="_blank" rel="noopener noreferrer">Ver perfil <ArrowRight size={15} aria-hidden="true" /></a>}</li>)}</ul> : <p class="about-team-pending">La presentación de sus integrantes se añadirá próximamente.</p>}</section>;
+        })}</div>
+      </section>
+      <section class="about-work" aria-labelledby="about-work">
+        <h2 id="about-work">Un esfuerzo compartido</h2>
+        <p>La plataforma reúne el material académico del profesor y el trabajo del equipo de desarrollo y adaptación a la web. El equipo continúa mejorando los recursos para acompañar el aprendizaje de Resistencia de Materiales.</p>
+      </section>
+    </div>
+  </TextbookLayout>
+</Layout>
+<style>
+  .about-project { --about-accent:#7f0303; --about-muted:#765e5e; --about-border:#e3caca; color:inherit; font-family:var(--font-sans); }
+  :global(.dark) .about-project { --about-accent:#fca5a5; --about-muted:#cbb0ae; --about-border:#422527; }
+  .about-intro { padding:0 0 2.5rem; }
+  .about-eyebrow { display:flex; align-items:center; gap:.6rem; margin:0 0 1rem; color:var(--about-accent); font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+  h1 { margin:0 0 1.5rem; font-size:clamp(2rem,4vw,2.8rem); line-height:1.15; letter-spacing:-.035em; font-weight:700; }
+  .about-lead { max-width:32rem; margin-bottom:1rem; font-size:1.4rem; line-height:1.5; font-weight:500; }
+  p { font-size:.95rem; line-height:1.8; }
+  .about-intro > p:last-child,.about-section > p:not(.about-eyebrow),.about-resource p,.about-members li > p:last-of-type,.about-work p { color:var(--about-muted); }
+  .about-section { border-top:1px solid var(--about-border); padding:2rem 0 2.5rem; }
+  h2 { margin:0 0 1rem; font-size:1.45rem; font-weight:650; letter-spacing:-.02em; }
+  h3 { font-size:1rem; line-height:1.5; font-weight:650; }
+  .about-resources { display:grid; gap:1.75rem; margin-top:1.5rem; }
+  .about-resource > :global(svg) { margin-bottom:.85rem; color:var(--about-accent); }
+  .about-resource h3 { margin-bottom:.5rem; }
+  .about-resource p { font-size:.85rem; }
+  .about-members { display:grid; gap:1rem; margin-top:1.5rem; list-style:none; padding:0; }
+  .about-members li { padding:1.5rem; border:1px solid var(--about-border); border-radius:.85rem; }
+  .about-member-role { margin-bottom:.4rem; font-size:.75rem; font-weight:600; color:var(--about-accent); }
+  .about-members h4 { margin-bottom:.5rem; font-size:1.2rem; font-weight:650; }
+  .about-members a { display:inline-flex; align-items:center; gap:.5rem; color:var(--about-accent); font-size:.85rem; font-weight:600; }
+  .about-members a { margin-top:.75rem; }
+  .about-team-areas { display:grid; gap:1rem; margin-top:1.5rem; }
+  .about-team-area { padding:1.5rem; border:1px solid var(--about-border); border-radius:.85rem; }
+  .about-team-area > h3 { margin-bottom:.4rem; color:var(--about-accent); }
+  .about-team-area > p { color:var(--about-muted); font-size:.85rem; }
+  .about-team-area .about-team-pending { margin-top:.75rem; font-size:.75rem; }
+  .about-work { padding:1.75rem; border:1px solid var(--about-border); border-radius:1rem; }
+  .about-work h2 { font-size:1.2rem; margin-bottom:.5rem; }
+  .about-work p { font-size:.85rem; }
+  a:hover { text-decoration:underline; }
+  a:focus-visible { outline:2px solid var(--about-accent); outline-offset:4px; }
+  @media(min-width:640px) {
+    .about-resources { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .about-members { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .about-members > li:last-child:nth-child(odd) { grid-column:1 / -1; }
+  }
+</style>
