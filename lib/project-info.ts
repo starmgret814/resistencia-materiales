@@ -2,6 +2,7 @@ export interface ProjectMember {
   name: string
   role: string
   area: 'development' | 'content' | 'academic'
+  chapterIds?: string[]
   description?: string
   url?: string
 }
@@ -13,19 +14,19 @@ export const projectMembers: ProjectMember[] = [
   { name: 'Ing. Eden Angel Molina Capcha', role: 'Profesor y autor del material original', area: 'academic', description: 'Autor de las presentaciones de clase que se adaptan a esta plataforma.' },
   { name: 'Neils Ilizarbe', role: 'Desarrollo de la plataforma', area: 'development' },
   { name: 'Joel Palacios', role: 'Desarrollo de la plataforma', area: 'development' },
-  { name: 'Neils Ilizarbe', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 1 · Esfuerzos, falla y factor de seguridad.' },
-  { name: 'Renzo Flores', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 2 · Deformaciones y ley de Hooke.' },
-  { name: 'Adrián Hildebrandt', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 3 · Cambio de temperatura y problemas hiperestáticos.' },
-  { name: 'Renzo Rengifo', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 4 · Transformación de esfuerzos y deformaciones.' },
-  { name: 'Joel Palacios', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 5 · Recipientes delgados sujetos a presión.' },
-  { name: 'Piero Alva', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 6 · Torsión en ejes circulares.' },
-  { name: 'Andrey Barrionuevo', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 7 · Flexión y cortante en vigas.' },
-  { name: 'Cristian Muñoz', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 8 · Flexión asimétrica.' },
-  { name: 'Anderson Escobar', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 9 · Deflexión por integración directa en vigas.' },
-  { name: 'Josué Cruz', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 10 · Funciones de discontinuidad y área momento.' },
-  { name: 'Kervin Surichaqui', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 11 · Vigas hiperestáticas.' },
-  { name: 'Emilia Rojas', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 12 · Columnas.' },
-  { name: 'Raúl Peralta', role: 'Adaptación a la web', area: 'content', description: 'Capítulo 13 · Fórmula de la secante y diseño de columnas.' },
+  { name: 'Neils Ilizarbe', role: 'Adaptación a la web', area: 'content', chapterIds: ['01'] },
+  { name: 'Renzo Flores', role: 'Adaptación a la web', area: 'content', chapterIds: ['02'] },
+  { name: 'Adrián Hildebrandt', role: 'Adaptación a la web', area: 'content', chapterIds: ['03'] },
+  { name: 'Renzo Rengifo', role: 'Adaptación a la web', area: 'content', chapterIds: ['04'] },
+  { name: 'Joel Palacios', role: 'Adaptación a la web', area: 'content', chapterIds: ['05'] },
+  { name: 'Piero Alva', role: 'Adaptación a la web', area: 'content', chapterIds: ['06'] },
+  { name: 'Andrey Barrionuevo', role: 'Adaptación a la web', area: 'content', chapterIds: ['07'] },
+  { name: 'Cristian Muñoz', role: 'Adaptación a la web', area: 'content', chapterIds: ['08'] },
+  { name: 'Anderson Escobar', role: 'Adaptación a la web', area: 'content', chapterIds: ['09'] },
+  { name: 'Josué Cruz', role: 'Adaptación a la web', area: 'content', chapterIds: ['10'] },
+  { name: 'Kervin Surichaqui', role: 'Adaptación a la web', area: 'content', chapterIds: ['11'] },
+  { name: 'Emilia Rojas', role: 'Adaptación a la web', area: 'content', chapterIds: ['12'] },
+  { name: 'Raúl Peralta', role: 'Adaptación a la web', area: 'content', chapterIds: ['13'] },
 ]
 
 export const projectAreas = [

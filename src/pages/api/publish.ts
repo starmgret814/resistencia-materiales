@@ -1,39 +1,8 @@
 import type { APIRoute } from 'astro';
 import fs from 'fs/promises';
 import path from 'path';
-import staticChapters from '@/lib/chapters.json';
+import { loadCourseCatalog } from '@/lib/course-structure-store';
 import { commitToGitHubWithRetry } from '@/lib/github-sync';
-
-/**
- * Load chapters from Firestore first (where dynamically-created and reordered subtemas live),
- * falling back to the static chapters.json bundled at build time.
- */
-async function loadChapters(): Promise<any[]> {
-  try {
-    const { initializeApp: initClientApp, getApps: getClientApps, getApp: getClientApp } = await import('firebase/app');
-    const { getFirestore, doc, getDoc } = await import('firebase/firestore');
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBuHiDaNFsryCyFDjqUtdymTYH93oqltg0",
-      authDomain: "resistencia-materiales.firebaseapp.com",
-      projectId: "resistencia-materiales",
-      storageBucket: "resistencia-materiales.firebasestorage.app",
-      messagingSenderId: "721587919055",
-      appId: "1:721587919055:web:c6bf064ea1a84ab8bc3fba",
-    };
-
-    const app = getClientApps().length > 0 ? getClientApp() : initClientApp(firebaseConfig);
-    const db = getFirestore(app);
-    const snapshot = await getDoc(doc(db, 'course', 'chapters'));
-
-    if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
-      return snapshot.data().list;
-    }
-  } catch (e) {
-    console.warn('Could not load chapters from Firestore, using static fallback:', e);
-  }
-  return structuredClone(staticChapters) as any[];
-}
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -51,7 +20,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Load chapters from Firestore (includes dynamically-created and reordered subtemas)
-    const chapters = await loadChapters();
+    const chapters = await loadCourseCatalog();
 
     const chData = chapters.find((c: any) => c.number === chapterId);
     if (!chData) {

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
-import { chapters, type Chapter } from '@/lib/course-data';
+import { auth, db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { loadCourseCatalog } from '@/lib/course-structure-store';
+import { shortSectionSlug } from '@/lib/course-structure';
 import { findSubtopicTitle } from '@/lib/course-titles';
 import { Loader2, FileText, ChevronRight, MessageSquare, CheckCircle2 } from 'lucide-react';
 
@@ -19,6 +20,7 @@ interface DraftRequest {
 export default function RequestsDashboard() {
   const [requests, setRequests] = useState<DraftRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     fetchRequests();
@@ -27,23 +29,21 @@ export default function RequestsDashboard() {
   const fetchRequests = async () => {
     try {
       setLoading(true);
+      setLoadError('');
+      await auth.authStateReady();
+      if (!auth.currentUser) throw new Error('Inicia sesión nuevamente para cargar las solicitudes.');
       const q = query(collection(db, 'drafts'), where("status", "==", "pending_approval"));
-      const [snap, structure] = await Promise.all([
+      const [snap, currentChapters] = await Promise.all([
         getDocs(q),
-        getDoc(doc(db, 'course', 'chapters')).catch(() => null),
+        loadCourseCatalog(),
       ]);
-      const currentChapters: Chapter[] = structure?.exists() && Array.isArray(structure.data().list)
-        ? structure.data().list
-        : chapters;
       const reqs: DraftRequest[] = [];
       snap.forEach(d => {
         const data = d.data() as Omit<DraftRequest, 'id'>;
         const ch = currentChapters.find(c => c.number === data.chapterId);
         const sec = ch?.sections.find(s => {
           if (!s.slug) return s.id === data.slug;
-          const parts = s.slug.split('/');
-          const shortSlug = parts.length > 1 ? parts[1] : parts[0];
-          return s.slug === data.slug || shortSlug === data.slug || s.id === data.slug;
+          return s.slug === data.slug || shortSectionSlug(s) === data.slug || s.id === data.slug;
         });
         reqs.push({
           id: d.id,
@@ -57,6 +57,7 @@ export default function RequestsDashboard() {
       setRequests(reqs);
     } catch (e) {
       console.error(e);
+      setLoadError(e instanceof Error ? e.message : 'No se pudieron cargar las solicitudes. Comprueba la conexión y reintenta.');
     } finally {
       setLoading(false);
     }
@@ -98,6 +99,7 @@ export default function RequestsDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 text-[#3b2022]">
+      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchRequests()} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-sans font-bold text-[#4b1719]">Solicitudes de Revisión</h1>
@@ -115,7 +117,7 @@ export default function RequestsDashboard() {
         </div>
         
         <div className="divide-y divide-[#E5D7D4]">
-          {requests.length === 0 ? (
+          {requests.length === 0 && loadError ? <p className="px-6 py-12 text-sm text-[#756565]">La lista estará disponible cuando se complete la carga.</p> : requests.length === 0 ? (
             <div className="px-6 py-16 text-center">
               <CheckCircle2 className="w-12 h-12 text-[#d1e8da] mx-auto mb-3" />
               <p className="text-[#5A4A4A] font-semibold">¡Todo al día!</p>

@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { workspaceFetch } from '@/lib/workspace-api';
 import { Trash2, Shield, User as UserIcon, BookOpen, Plus, Loader2, Edit2, CheckCircle2, X } from 'lucide-react';
-import { chapters } from '@/lib/course-data';
-
-// Capítulos disponibles en el curso
-const AVAILABLE_CHAPTERS = chapters.map(c => ({
-  id: c.number,
-  title: `${c.number}. ${c.title}`
-}));
+import { loadCourseCatalog } from '@/lib/course-structure-store';
+import type { Chapter } from '@/lib/course-data';
 
 interface Collaborator {
   email: string;
@@ -21,6 +16,9 @@ interface Collaborator {
 export default function UserManagement({ currentUserEmail }: { currentUserEmail?: string }) {
   const [users, setUsers] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [courseChapters, setCourseChapters] = useState<Chapter[]>([]);
+  const availableChapters = courseChapters.map(chapter => ({ id: chapter.number, title: `${chapter.number}. ${chapter.title}${chapter.archived ? ' (archivado)' : ''}` }));
   
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,7 +46,11 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'users'));
+      setLoadError('');
+      await auth.authStateReady();
+      if (!auth.currentUser || currentUserEmail && auth.currentUser.email !== currentUserEmail) throw new Error('Inicia sesión nuevamente para cargar los colaboradores y capítulos actuales.');
+      const [querySnapshot, catalog] = await Promise.all([getDocs(collection(db, 'users')), loadCourseCatalog()]);
+      setCourseChapters(catalog);
       let usersList: Collaborator[] = [];
       
       querySnapshot.forEach((doc) => {
@@ -73,6 +75,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
       setUsers(usersList);
     } catch (error) {
       console.error("Error obteniendo usuarios:", error);
+      setLoadError(error instanceof Error ? error.message : 'No se pudieron cargar los colaboradores y capítulos.');
     } finally {
       setLoading(false);
     }
@@ -160,6 +163,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         <h2 className="text-3xl font-sans font-bold text-[#4b1719]">Gestión de Colaboradores</h2>
         <button 
           onClick={handleOpenAddModal}
+          disabled={loading || Boolean(loadError)}
           className="flex items-center gap-2 px-4 py-2.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -167,6 +171,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         </button>
       </div>
 
+      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchUsers()} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
       <div className="">
         <div className="w-full">
           
@@ -223,7 +228,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                             <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-[#f8eaea] text-[#8B0000] border border-[#f2d8d8]">Acceso Total</span>
                           ) : (
                             user.assignedChapters?.map(ch => {
-                              const chapterData = AVAILABLE_CHAPTERS.find(c => c.id === ch);
+                              const chapterData = availableChapters.find(c => c.id === ch);
                               return (
                                 <span key={ch} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-[#f4ecea] text-[#5A4A4A] border border-[#e8dada]">
                                   <BookOpen className="w-3 h-3 shrink-0" />
@@ -313,7 +318,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                 <div>
                   <label className="block text-sm font-semibold text-[#3E3030] mb-2">Capítulos Asignados</label>
                   <div className="space-y-2 border border-[#d8c2c2] rounded-lg p-3 bg-[#fbf7f4]">
-                    {AVAILABLE_CHAPTERS.map(chapter => (
+                    {availableChapters.map(chapter => (
                       <label key={chapter.id} className="flex items-center gap-3 p-1 cursor-pointer group">
                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${newChapters.includes(chapter.id) ? 'bg-[#8B0000] border-[#8B0000]' : 'border-[#bca5a5] bg-white group-hover:border-[#8B0000]'}`}>
                           {newChapters.includes(chapter.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}

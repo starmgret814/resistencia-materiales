@@ -38,7 +38,7 @@ try {
     [/import \{ loadProjectMarkdown \} from '[^']+';/, 'const loadProjectMarkdown = async () => null;'],
     [/import \{ db \} from '[^']+';/, 'const db = {};'],
     [/import \{ doc, getDoc \} from 'firebase\/firestore';/, 'const doc = (_db, _collection, id) => id; const getDoc = async id => { const data = globalThis.testPublished[id]; if (data instanceof Error) throw data; return { exists: () => Boolean(data), data: () => data }; };'],
-    [/import \{ chapters as defaultChapters, type Chapter, type Section \} from '[^']+';/, 'const defaultChapters = [];'],
+    [/import \{ chapters as defaultChapters,[^}]+\} from '[^']+';/, 'const defaultChapters = []; const activeChapters = items => items.filter(item => !item.archived); const isChapterList = Array.isArray;'],
     ["'@/lib/course-headings'", "'./headings.mjs'"],
   ])
   const { ContentRenderer } = await import(pathToFileURL(path.join(temporary, 'renderer.mjs')).href)

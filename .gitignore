@@ -15,3 +15,7 @@ node_modules
 dist/
 out/
 .DS_Store
+
+# Local Firebase emulator diagnostics
+firebase-debug.log
+firestore-debug.log

@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { auth, db } from '@/lib/firebase'
-import { workspaceFetch } from '@/lib/workspace-api'
-import { doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { withSubtopicTitle } from '@/lib/course-titles'
-import type { CourseDocument } from '@/lib/content-schema'
-import { useRef } from 'react'
 import { Folder, FileText, Plus, Clock, CheckCircle2, MessageSquare, ChevronRight, ChevronUp, ChevronDown, Pencil, Trash2, X, Check } from 'lucide-react'
-import { chapters as initialChapters, isChapterList, type Chapter, type Section } from '@/lib/course-data'
+import { chapters as initialChapters, isChapterList, type Chapter } from '@/lib/course-data'
+import { changeCourseStructure } from '@/lib/course-structure-store'
+import { shortSectionSlug, type CourseStructureAction } from '@/lib/course-structure'
+import { CourseStructureControls, ChapterActions } from '@/components/course-structure-controls'
 
-const RESET_VERSION = '2026_10_05_clean_v4';
+const catalogCacheKey = 'mc361:course-catalog:v1';
 
 export default function Dashboard({ session }: { session: any }) {
   const expansionStorageKey = `mc361_expanded_chapters:${session?.email || 'guest'}`
@@ -20,10 +20,10 @@ export default function Dashboard({ session }: { session: any }) {
     try {
       const saved = JSON.parse(localStorage.getItem(expansionStorageKey) || '[]')
       setExpandedChapters(Array.isArray(saved) ? saved.filter((value): value is string => typeof value === 'string') : [])
-      const cached = localStorage.getItem('mc361_local_chapters')
-      if (localStorage.getItem('mc361_clean_version') === RESET_VERSION && cached) {
+      const cached = localStorage.getItem(catalogCacheKey)
+      if (cached) {
         const parsed = JSON.parse(cached)
-        if (isChapterList(parsed) && parsed.length) setLocalChapters(parsed)
+        if (isChapterList(parsed)) setLocalChapters(parsed)
       }
     } catch { /* Browser storage is optional. */ }
     setStorageReady(true)
@@ -56,12 +56,12 @@ export default function Dashboard({ session }: { session: any }) {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [retry, setRetry] = useState(0)
   const [localChapters, setLocalChapters] = useState<Chapter[]>(initialChapters)
+  const [showArchived, setShowArchived] = useState(false)
 
   useEffect(() => {
     if (!storageReady || !dataReady) return
     try {
-      localStorage.setItem('mc361_local_chapters', JSON.stringify(localChapters));
-      localStorage.setItem('mc361_clean_version', RESET_VERSION);
+      localStorage.setItem(catalogCacheKey, JSON.stringify(localChapters));
     } catch { /* Keep working without browser storage. */ }
   }, [localChapters, storageReady, dataReady]);
 
@@ -70,6 +70,7 @@ export default function Dashboard({ session }: { session: any }) {
   const [newTitle, setNewTitle] = useState('')
   const newSubtopicInputRef = useRef<HTMLInputElement>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const mutationInFlight = useRef(false)
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
   
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -164,239 +165,61 @@ export default function Dashboard({ session }: { session: any }) {
     return () => { active = false; window.clearTimeout(timeout); };
   }, [session, retry]);
 
-  const handleCreate = async (chapterNumber: string) => {
-    if (!dataReady) return showToast('Espera a que se confirmen los datos del curso.', 'error');
-    if (!newTitle.trim()) return showToast('Escribe el título', 'error')
+  const applyChange = async (action: CourseStructureAction, message: string): Promise<boolean> => {
+    if (!dataReady || mutationInFlight.current) return false
+    mutationInFlight.current = true
     setIsProcessing(true)
-    const chData = localChapters.find(c => c.number === chapterNumber)
-    if (!chData) return
-    
-    // Auto calcular ID buscando el número más alto existente + 1
-    const chapterNumInt = parseInt(chapterNumber, 10);
-    const existingNums = chData.sections
-      .map((s: Section) => {
-        const parts = s.id ? s.id.split('.') : [];
-        const num = parseInt(parts[1], 10);
-        return isNaN(num) ? 0 : num;
-      });
-    const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
-    const autoId = `${chapterNumInt}.${maxNum + 1}`;
-    
-    const safeTitle = newTitle.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]/g, '-')
-    const chapterFolder = chData.sections[0]?.slug?.split('/')[0] || `${chapterNumber}-capitulo`
-    const fullSlug = `${chapterFolder}/${safeTitle}`
-    const newSection = { id: autoId, title: newTitle, slug: fullSlug }
-
-    const updatedChapters = localChapters.map(c => {
-      if (c.number === chapterNumber) {
-        return { ...c, sections: [...c.sections, newSection] };
-      }
-      return c;
-    });
-
     try {
-      // 1. Guardar la estructura en Firestore
-      await setDoc(doc(db, 'course', 'chapters'), {
-        list: updatedChapters,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-
-      // 2. Crear borrador inicial en Firestore
-      const docSlug = safeTitle;
-      const draftId = `${chapterNumber}_${docSlug}`;
-      await setDoc(doc(db, 'drafts', draftId), {
-        chapterId: chapterNumber,
-        slug: docSlug,
-        title: newTitle,
-        contentMarkdown: `# ${newTitle}\n\nEscribe el contenido aquí...`,
-        authorEmail: session.email,
-        status: 'draft',
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-
-      // 3. Sincronizar en desarrollo local (opcional)
-      workspaceFetch('/api/subchapters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber, newSection })
-      }).catch(() => {});
-
-      setLocalChapters(updatedChapters);
-      setCreatingInChapter(null);
-      setNewTitle('');
-      showToast('Subtema creado exitosamente', 'success');
-    } catch (e: any) {
-      console.error(e);
-      showToast('Error al crear subtema: ' + (e.message || ''), 'error');
-    } finally {
-      setIsProcessing(false);
-    }
+      const change = await changeCourseStructure({ email: session.email, role: session.role, assignedChapters }, action)
+      setLocalChapters(change.chapters)
+      setEditingSection(null)
+      if (action.type === 'archive-chapter') setCreatingInChapter(null)
+      if (change.section) {
+        const draftId = `${change.chapter.number}_${shortSectionSlug(change.section)}`
+        setDocumentsStatus(current => {
+          const next = { ...current }
+          if (action.type === 'remove-section') delete next[draftId]
+          else if (action.type === 'create-section') next[draftId] = { title: change.section!.title, status: 'draft', updatedAt: new Date().toISOString() }
+          else if (action.type === 'rename-section' && next[draftId]) next[draftId] = withSubtopicTitle(next[draftId], change.section!.title)
+          return next
+        })
+      }
+      if (action.type === 'create-chapter') setExpandedChapters(current => [...current, change.chapter.number])
+      showToast(message, 'success')
+      return true
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'No se pudo guardar el cambio. El contenido anterior se conserva.', 'error')
+      return false
+    } finally { mutationInFlight.current = false; setIsProcessing(false) }
   }
 
-  const handleReorder = async (chapterNumber: string, sectionIndex: number, direction: 'up' | 'down') => {
-    if (!dataReady) return;
-    if (isProcessing) return;
-    const chData = localChapters.find(c => c.number === chapterNumber);
-    if (!chData) return;
-    
-    const newSections = [...chData.sections];
-    if (direction === 'up' && sectionIndex > 0) {
-      [newSections[sectionIndex - 1], newSections[sectionIndex]] = [newSections[sectionIndex], newSections[sectionIndex - 1]];
-    } else if (direction === 'down' && sectionIndex < newSections.length - 1) {
-      [newSections[sectionIndex + 1], newSections[sectionIndex]] = [newSections[sectionIndex], newSections[sectionIndex + 1]];
-    } else {
-      return;
-    }
+  const handleChapterAction = (action: CourseStructureAction) => applyChange(action.type === 'move-chapter' ? { ...action, activeOnly: !showArchived } : action,
+    action.type === 'archive-chapter' ? 'Capítulo archivado. Sus contenidos se conservan.'
+      : action.type === 'restore-chapter' ? 'Capítulo restaurado.'
+      : action.type === 'create-chapter' ? 'Capítulo creado.'
+      : action.type === 'move-chapter' ? 'Orden de capítulos actualizado.' : 'Título del capítulo actualizado.')
 
-    // Recalcular IDs basados en el nuevo orden, sin ceros a la izquierda
-    const chapterNumInt = parseInt(chapterNumber, 10);
-    newSections.forEach((sec, idx) => {
-      sec.id = `${chapterNumInt}.${idx + 1}`;
-    });
-
-    setIsProcessing(true);
-    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
-    setLocalChapters(updatedChapters);
-
-    try {
-      await setDoc(doc(db, 'course', 'chapters'), {
-        list: updatedChapters,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-
-      workspaceFetch('/api/subchapters', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber, sections: newSections })
-      }).catch(() => {});
-
-      showToast('Orden actualizado', 'success');
-    } catch (e) {
-      showToast('Error reordenando', 'error');
-    } finally {
-      setIsProcessing(false);
+  const handleCreate = async (chapter: string) => {
+    if (await applyChange({ type: 'create-section', chapter, title: newTitle }, 'Subtema creado.')) {
+      setCreatingInChapter(null)
+      setNewTitle('')
     }
   }
-
-  const executeDelete = async (chapterNumber: string, sectionIndex: number) => {
-    if (!dataReady) return;
-    if (!canEditChapter(chapterNumber)) {
-      showToast('No tienes permisos para modificar este capítulo.', 'error');
-      setDeleteConfirm(null);
-      return;
-    }
-
-    setIsProcessing(true);
-    const chData = localChapters.find(c => c.number === chapterNumber);
-    if (!chData) return;
-    
-    const sectionToDelete = chData.sections[sectionIndex];
-    const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
-    const docId = `${chapterNumber}_${rawSlug}`;
-    const docStatus = documentsStatus[docId];
-    const isPublished = Boolean(docStatus?.publishedContent || docStatus?.status === 'approved');
-
-    if (isPublished && session?.role !== 'admin') {
-      showToast('Solo los administradores pueden eliminar subtemas ya publicados.', 'error');
-      setDeleteConfirm(null);
-      setIsProcessing(false);
-      return;
-    }
-    const newSections = [...chData.sections];
-    newSections.splice(sectionIndex, 1);
-    
-    const chapterNumInt = parseInt(chapterNumber, 10);
-    newSections.forEach((sec, idx) => {
-      sec.id = `${chapterNumInt}.${idx + 1}`;
-    });
-
-    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
-    setLocalChapters(updatedChapters);
-
-    try {
-      await setDoc(doc(db, 'course', 'chapters'), {
-        list: updatedChapters,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-
-      // Si existe borrador o publicación en Firestore, limpiarlo
-      const rawSlug = sectionToDelete?.slug ? sectionToDelete.slug.split('/').pop() : (sectionToDelete?.id || '');
-      if (rawSlug) {
-        await deleteDoc(doc(db, 'drafts', `${chapterNumber}_${rawSlug}`)).catch(() => null);
-      }
-
-      workspaceFetch('/api/subchapters', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber, sections: newSections })
-      }).catch(() => {});
-
-      showToast('Subtema eliminado exitosamente', 'success');
-    } catch (e: any) {
-      console.error(e);
-      showToast('Error eliminando subtema: ' + (e.message || ''), 'error');
-    } finally {
-      setIsProcessing(false);
-      setDeleteConfirm(null);
-    }
+  const handleReorder = async (chapter: string, index: number, direction: 'up' | 'down') => {
+    const section = localChapters.find(item => item.number === chapter)?.sections[index]
+    if (section) await applyChange({ type: 'move-section', chapter, slug: shortSectionSlug(section), direction }, 'Orden actualizado.')
   }
-
-  const handleSaveEdit = async (chapterNumber: string, sectionIndex: number) => {
-    if (!dataReady) return;
-    if (!editTitle.trim()) {
-      setEditingSection(null);
-      return;
-    }
-    setIsProcessing(true);
-    const chData = localChapters.find(c => c.number === chapterNumber);
-    if (!chData) return;
-    
-    const newSections = chData.sections.map((section, index) => index === sectionIndex ? { ...section, title: editTitle.trim() } : section);
-
-    const updatedChapters = localChapters.map(c => c.number === chapterNumber ? { ...c, sections: newSections } : c);
-
-    try {
-      const section = newSections[sectionIndex];
-      const slug = section.slug?.split('/').slice(1).join('/') || section.id;
-      const draftRef = doc(db, 'drafts', `${chapterNumber}_${slug}`);
-      const draft = await getDoc(draftRef);
-      const batch = writeBatch(db);
-      batch.set(doc(db, 'course', 'chapters'), {
-        list: updatedChapters,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-      if (draft.exists()) {
-        const renamed = withSubtopicTitle(draft.data() as CourseDocument, section.title);
-        const updateData: any = { title: renamed.title, contentMarkdown: renamed.contentMarkdown };
-        if (draft.data()?.publishedContent) {
-          updateData.publishedTitle = section.title;
-        }
-        batch.update(draftRef, updateData);
-      }
-      await batch.commit();
-      setLocalChapters(updatedChapters);
-      setDocumentsStatus((current) => current[draftRef.id] ? {
-        ...current,
-        [draftRef.id]: withSubtopicTitle(current[draftRef.id], section.title),
-      } : current);
-
-      workspaceFetch('/api/subchapters', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber, sections: newSections })
-      }).catch(() => {});
-
-      setEditingSection(null);
-      showToast('Subtema editado', 'success');
-    } catch (e) {
-      showToast('Error editando', 'error');
-    } finally {
-      setIsProcessing(false);
-    }
+  const executeDelete = async (chapter: string, index: number) => {
+    const section = localChapters.find(item => item.number === chapter)?.sections[index]
+    if (section && await applyChange({ type: 'remove-section', chapter, slug: shortSectionSlug(section) }, 'Subtema eliminado.')) setDeleteConfirm(null)
+  }
+  const handleSaveEdit = async (chapter: string, index: number) => {
+    const section = localChapters.find(item => item.number === chapter)?.sections[index]
+    if (section && await applyChange({ type: 'rename-section', chapter, slug: shortSectionSlug(section), title: editTitle }, 'Título del subtema actualizado.')) setEditingSection(null)
   }
 
   // Filtrar capítulos que el usuario puede ver
-  const visibleChapters = localChapters.filter(c => session.role === 'admin' || assignedChapters.includes(c.number))
+  const visibleChapters = localChapters.filter(c => (session.role === 'admin' || assignedChapters.includes(c.number)) && (!c.archived || showArchived && session.role === 'admin'))
   const allChaptersExpanded = visibleChapters.length > 0 && visibleChapters.every((chapter) => expandedChapters.includes(chapter.number))
 
   return (
@@ -425,20 +248,22 @@ export default function Dashboard({ session }: { session: any }) {
         </div>
       </div>
 
+      {session.role === 'admin' && <CourseStructureControls busy={isProcessing || !dataReady} archived={showArchived} onToggleArchived={() => setShowArchived(value => !value)} onApply={handleChapterAction} />}
+
       {isLoading && <p role="status" className="mb-5 flex items-center gap-2 text-sm text-[#8b6d6d]"><Clock className="size-4 animate-pulse" aria-hidden="true" />Actualizando capítulos y estados de publicación…</p>}
       {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => setRetry(value => value + 1)} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
       {!visibleChapters.length && <p className="rounded-lg border border-dashed border-[#d5baba] p-6 text-sm">{session.role === 'admin' ? 'El curso todavía no tiene capítulos.' : 'Tu cuenta no tiene capítulos asignados. Un administrador debe asignarte los capítulos que puedes editar.'}</p>}
       <div className="space-y-3">
         {visibleChapters.map(chapter => (
           <div key={chapter.number} className="bg-white rounded-xl border border-[#eadada] overflow-hidden shadow-sm">
-            <div className={`bg-[#fbf7f4] flex flex-wrap items-center gap-2 pr-3 ${expandedChapters.includes(chapter.number) ? 'border-b border-[#eadada]' : ''}`}>
+            <div className={`bg-[#fbf7f4] flex flex-wrap items-center gap-2 pr-3 transition-colors hover:bg-[#f5ecec] focus-within:bg-[#f5ecec] ${expandedChapters.includes(chapter.number) ? 'border-b border-[#eadada]' : ''}`}>
               <h2 className="min-w-0 flex-1">
                 <button
                   type="button"
                   onClick={() => toggleChapter(chapter.number)}
                   aria-expanded={expandedChapters.includes(chapter.number)}
                   aria-controls={`chapter-sections-${chapter.number}`}
-                  className="flex w-full items-center gap-3 rounded-lg px-5 py-4 text-left hover:bg-[#f5ecec] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8B0000]"
+                  className="flex w-full items-center gap-3 rounded-lg px-5 py-4 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8B0000]"
                 >
                   <ChevronRight aria-hidden="true" className={`size-4 shrink-0 text-[#8b6d6d] transition-transform ${expandedChapters.includes(chapter.number) ? 'rotate-90' : ''}`} />
                   <Folder aria-hidden="true" className="size-5 shrink-0 text-[#8b6d6d]" />
@@ -446,8 +271,10 @@ export default function Dashboard({ session }: { session: any }) {
                   <span className="hidden shrink-0 text-xs font-normal text-[#8b6d6d] sm:inline">{chapter.sections.length} {chapter.sections.length === 1 ? 'subtema' : 'subtemas'}</span>
                 </button>
               </h2>
+              {chapter.archived && <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Archivado</span>}
+              {session.role === 'admin' && <ChapterActions chapter={chapter} first={visibleChapters[0]?.number === chapter.number} last={visibleChapters.at(-1)?.number === chapter.number} busy={isProcessing || !dataReady} onApply={handleChapterAction} />}
               <button 
-                disabled={!dataReady || isProcessing}
+                disabled={!dataReady || isProcessing || Boolean(chapter.archived)}
                 onClick={() => {
                   setExpandedChapters((current) => current.includes(chapter.number) ? current : [...current, chapter.number]);
                   setCreatingInChapter(chapter.number);
@@ -470,7 +297,7 @@ export default function Dashboard({ session }: { session: any }) {
                 <p className="p-5 text-sm text-[#8b6d6d] italic">No hay subtemas aún.</p>
               ) : (
                 chapter.sections.map((section, idx) => {
-                  const docSlug = section.slug ? section.slug.split('/')[1] : section.id;
+                  const docSlug = shortSectionSlug(section);
                   const draftId = `${chapter.number}_${docSlug}`;
                   const docStatus = documentsStatus[draftId];
                   
@@ -499,7 +326,7 @@ export default function Dashboard({ session }: { session: any }) {
                               }}
                               className="flex-1 rounded border border-[#dcc3c3] px-2 py-1 text-[15px] font-semibold outline-none focus:border-[#9c4d4d]"
                             />
-                            <button onClick={() => handleSaveEdit(chapter.number, idx)} disabled={isProcessing || !dataReady} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
+                            <button onClick={() => handleSaveEdit(chapter.number, idx)} disabled={isProcessing || !dataReady || Boolean(chapter.archived)} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
                               <Check className="w-4 h-4" />
                             </button>
                             <button onClick={() => setEditingSection(null)} className="p-1 text-[#8b6d6d] hover:bg-[#f1dddd] rounded">
@@ -515,8 +342,8 @@ export default function Dashboard({ session }: { session: any }) {
                       </div>
                       <div className="flex items-center gap-3">
                         {statusBadge}
-                        <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing || !dataReady} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
+                        <div className="flex items-center gap-1 mr-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100">
+                           <button onClick={() => { setEditingSection({chapter: chapter.number, index: idx}); setEditTitle(section.title); }} disabled={isProcessing || !dataReady || Boolean(chapter.archived)} className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" title="Editar Título">
                              <Pencil className="w-4 h-4" />
                            </button>
                            {canEditChapter(chapter.number) && (
@@ -525,7 +352,7 @@ export default function Dashboard({ session }: { session: any }) {
                                  const isPublished = Boolean(docStatus?.publishedContent || docStatus?.status === 'approved');
                                  setDeleteConfirm({ chapter: chapter.number, index: idx, title: section.title, isPublished });
                                }} 
-                               disabled={isProcessing || !dataReady}
+                               disabled={isProcessing || !dataReady || Boolean(chapter.archived)}
                                className="p-1.5 text-[#8b6d6d] hover:bg-[#f1dddd] hover:text-[#8B0000] rounded" 
                                title="Eliminar"
                              >
@@ -563,7 +390,7 @@ export default function Dashboard({ session }: { session: any }) {
                       className="flex-1 rounded border border-[#dcc3c3] px-3 py-2 text-sm outline-none focus:border-[#9c4d4d]"
                     />
                     <button onClick={() => setCreatingInChapter(null)} className="text-sm font-semibold text-[#8b6d6d] hover:underline px-2 py-1">Cancelar</button>
-                    <button onClick={() => handleCreate(chapter.number)} disabled={isProcessing || !dataReady} className="bg-[#8B0000] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-[#6a0000] disabled:opacity-50">
+                    <button onClick={() => handleCreate(chapter.number)} disabled={isProcessing || !dataReady || Boolean(chapter.archived)} className="bg-[#8B0000] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-[#6a0000] disabled:opacity-50">
                       {isProcessing ? 'Guardando...' : 'Guardar'}
                     </button>
                   </div>
@@ -618,70 +445,6 @@ export default function Dashboard({ session }: { session: any }) {
               </>
             )}
           </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function CustomSelect({
-  value,
-  onChange,
-  options,
-  placeholder = 'Seleccionar...',
-  className = "w-full"
-}: {
-  value: string,
-  onChange: (value: string) => void,
-  options: { value: string, label: string }[],
-  placeholder?: string,
-  className?: string
-}) {
-  const [open, setOpen] = useState(false)
-  const selected = options.find(o => o.value === value)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false)
-      }
-    }
-    if (open) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [open])
-
-  return (
-    <div className="relative" ref={containerRef}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`flex ${className} items-center justify-between rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition hover:border-[#9c4d4d] focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15`}
-      >
-        <span className={selected ? "truncate" : "truncate text-[#8b6d6d]"}>
-          {selected ? selected.label : placeholder}
-        </span>
-        <svg className="ml-2 h-4 w-4 shrink-0 text-[#8b6d6d]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10 [scrollbar-width:thin]">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => { onChange(option.value); setOpen(false) }}
-              className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors ${
-                value === option.value 
-                  ? 'bg-[#f8eaea] text-[#8B0000] font-medium' 
-                  : 'text-[#3b2022] hover:bg-[#FCF9F7] hover:text-[#8B0000]'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
         </div>
       )}
     </div>

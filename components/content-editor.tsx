@@ -3,9 +3,7 @@
 import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bold,
-  ArrowLeft,
   Pencil,
-  Code2,
   Download,
   FileInput,
   Eye,
@@ -32,13 +30,15 @@ import {
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
 import { workspaceFetch } from '@/lib/workspace-api'
-import { doc, getDoc, setDoc, writeBatch } from 'firebase/firestore'
-import Editor from '@monaco-editor/react'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import Editor from '@/components/markdown-editor'
+import { insertEditorText, replaceEditorText } from '@/lib/editor-history'
 import PreviewErrorBoundary from '@/components/preview-error-boundary'
 import { LocalDraftNotice, LocalDraftStatus } from '@/components/local-draft-notice'
 import { localDraftKey } from '@/lib/local-draft'
 import { useLocalDraft } from '@/lib/use-local-draft'
 import { chapters, type Chapter } from '@/lib/course-data'
+import { changeCourseStructure, loadCourseCatalog } from '@/lib/course-structure-store'
 import { findSubtopicNumber, findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
 import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision'
 import {
@@ -47,9 +47,6 @@ import {
   type CourseDocument,
 } from '@/lib/content-schema'
 
-const inputClass = 'w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15'
-const selectClass = 'appearance-none w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition hover:border-[#9c4d4d] focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15 bg-[url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%238b6d6d\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")] bg-[length:1.25rem_1.25rem] bg-[position:right_0.5rem_center] bg-no-repeat pr-10 cursor-pointer'
-const labelClass = 'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-[#7d6060]'
 
 export default function ContentEditor({ session, initialChapter, initialSlug }: { session?: any, initialChapter: string, initialSlug: string }) {
   const [document, setDocument] = useState<CourseDocument>(() => ({ ...structuredClone(starterDocument), chapterId: initialChapter, slug: initialSlug }))
@@ -60,14 +57,12 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const ContentRenderer = useMemo(() => lazy(() => import('@/components/content-renderer')), [previewAttempt])
   const validation = useMemo(() => validateCourseDocument(document), [document])
 
-  const [assignedChapters, setAssignedChapters] = useState<string[]>([])
   const [courseChapters, setCourseChapters] = useState<Chapter[]>(chapters)
   const [problemOffset, setProblemOffset] = useState<number | null>(null)
   const [problemNumberError, setProblemNumberError] = useState(false)
   const [numberingRetry, setNumberingRetry] = useState(0)
   const [isSaving, setIsSaving] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
-  const [projectRevisionLoaded, setProjectRevisionLoaded] = useState(false)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const [isRenaming, setIsRenaming] = useState(false)
@@ -104,17 +99,12 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     })
   }, [currentChapter, document.slug])
   
-  // CRUD de subtemas
-  const [isCreatingNewSection, setIsCreatingNewSection] = useState(false)
-  const [newSectionId, setNewSectionId] = useState('')
-  const [newSectionTitle, setNewSectionTitle] = useState('')
-  const [isCreatingSub, setIsCreatingSub] = useState(false)
-  
   const [isLoaded, setIsLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const localBackup = useLocalDraft(
     session?.email ? localDraftKey(session.email, 'chapter', `${initialChapter}/${initialSlug}`) : null,
     { contentMarkdown: document.contentMarkdown },
-    isLoaded && document.chapterId === initialChapter && document.slug === initialSlug,
+    isLoaded && !loadError && document.chapterId === initialChapter && document.slug === initialSlug,
   )
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
 
@@ -123,46 +113,6 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     setTimeout(() => setToast(null), 3000)
   }
 
-  const handleCreateSubchapter = async () => {
-    if (!newSectionId || !newSectionTitle) return showToast('Debes llenar el número y el título del subtema', 'error');
-    
-    // Generar slug
-    const safeTitle = newSectionTitle.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]/g, '-');
-    const chapterData = chapters.find(c => c.number === document.chapterId);
-    if (!chapterData) return;
-    
-    // El slug del curso completo sigue el formato: carpeta-del-capitulo/nombre-del-subtema
-    // Necesitamos saber la carpeta del capítulo. Podemos extraerla del primer subtema existente.
-    let chapterFolder = `${document.chapterId}-capitulo`; // Fallback
-    if (chapterData.sections.length > 0 && chapterData.sections[0].slug) {
-      chapterFolder = chapterData.sections[0].slug.split('/')[0];
-    }
-    
-    const fullSlug = `${chapterFolder}/${safeTitle}`;
-
-    const newSection = { id: newSectionId, title: newSectionTitle, slug: fullSlug };
-
-    try {
-      setIsCreatingSub(true);
-      const res = await workspaceFetch('/api/subchapters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber: document.chapterId, newSection })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showToast('Subtema creado exitosamente.', 'success');
-        setTimeout(() => window.location.reload(), 1500);
-      } else {
-        showToast('Error: ' + data.error, 'error');
-      }
-    } catch (e) {
-      showToast('Error de conexión', 'error');
-    } finally {
-      setIsCreatingSub(false);
-    }
-  }
-  
   useEffect(() => {
     if (session?.email && initialChapter && initialSlug) {
       loadDraft(initialChapter, initialSlug);
@@ -173,19 +123,13 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const loadDraft = async (chapterId: string, slug: string) => {
     if (!session?.email) return;
     setIsLoaded(false);
-    setProjectRevisionLoaded(false);
+    setLoadError(null);
     try {
       const draftId = `${chapterId}_${slug}`;
-      const [structureSnap, snap] = await Promise.all([
-        getDoc(doc(db, 'course', 'chapters')).catch(() => null),
-        getDoc(doc(db, 'drafts', draftId)).catch(err => {
-          console.warn('No se pudo leer el borrador directo de Firestore:', err);
-          return null;
-        }),
+      const [list, snap] = await Promise.all([
+        loadCourseCatalog().catch(() => chapters),
+        getDoc(doc(db, 'drafts', draftId)),
       ]);
-      const list: Chapter[] = structureSnap?.exists() && Array.isArray(structureSnap.data().list)
-        ? structureSnap.data().list as Chapter[]
-        : chapters;
       setCourseChapters(list);
       const currentTitle = findSubtopicTitle(list, chapterId, slug);
       if (snap && snap.exists()) {
@@ -198,7 +142,6 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             const source = await response.json();
             if (response.ok && typeof source.content === 'string' && source.content.trim()) {
               loaded = { ...loaded, contentMarkdown: source.content };
-              setProjectRevisionLoaded(true);
             }
           } catch { /* Preserve the original draft when the source cannot load. */ }
         }
@@ -216,80 +159,30 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       }
     } catch (error) {
       console.error('Error cargando borrador', error);
-      const initialTitle = findSubtopicTitle(chapters, chapterId, slug) || 'Subtema';
-      setDocument({
-        schemaVersion: 2,
-        title: initialTitle,
-        chapterId,
-        slug,
-        contentMarkdown: `# ${initialTitle}\n\nEscribe el contenido del subtema aquí...`,
-      });
+      setLoadError('No se pudo cargar el documento. Reintenta la conexión antes de editar; el contenido guardado no se ha modificado.');
     } finally {
       setIsLoaded(true);
     }
   }
 
-  const loadSubtopicTitle = async (chapterId: string, slug: string) => {
-    const structure = await getDoc(doc(db, 'course', 'chapters'));
-    const list = structure.exists() && Array.isArray(structure.data().list)
-      ? structure.data().list as Chapter[]
-      : chapters;
-    return findSubtopicTitle(list, chapterId, slug);
-  }
+  const loadSubtopicTitle = async (chapterId: string, slug: string) =>
+    findSubtopicTitle(await loadCourseCatalog(), chapterId, slug);
 
   const renameSubtopic = async () => {
-    if (titleEditCancelled.current || titleSaveInFlight.current) return;
-    const title = titleInput.trim();
-    if (!title || title === document.title) {
-      setIsEditingTitle(false);
-      return;
-    }
-    titleSaveInFlight.current = true;
+    if (titleEditCancelled.current || titleSaveInFlight.current) return
+    const title = titleInput.trim()
+    if (!title || title === document.title) { setIsEditingTitle(false); return }
+    titleSaveInFlight.current = true
+    setIsRenaming(true)
     try {
-      setIsRenaming(true);
-      const structureRef = doc(db, 'course', 'chapters');
-      const structure = await getDoc(structureRef);
-      const list: Chapter[] = structure.exists() && Array.isArray(structure.data().list)
-        ? structure.data().list : chapters;
-      if (!findSubtopicTitle(list, document.chapterId, document.slug)) {
-        throw new Error('No se encontró el subtema en el listado de capítulos.');
-      }
-      const updatedChapters = list.map(chapter => chapter.number === document.chapterId ? {
-        ...chapter,
-        sections: chapter.sections.map(section =>
-          (section.slug?.split('/').slice(1).join('/') || section.id) === document.slug
-            ? { ...section, title } : section),
-      } : chapter);
-      const draftRef = doc(db, 'drafts', `${document.chapterId}_${document.slug}`);
-      const draft = await getDoc(draftRef);
-      const batch = writeBatch(db);
-      batch.set(structureRef, { list: updatedChapters, updatedAt: new Date().toISOString() }, { merge: true });
-      if (draft.exists()) {
-        const renamed = withSubtopicTitle(draft.data() as CourseDocument, title);
-        const updateData: any = { title: renamed.title, contentMarkdown: renamed.contentMarkdown };
-        if (draft.data()?.publishedContent) {
-          updateData.publishedTitle = title;
-        }
-        batch.update(draftRef, updateData);
-      }
-      await batch.commit();
-      // Preserve the content being edited; renaming does not save other unsaved changes.
-      setDocument(current => withSubtopicTitle(current, title));
-      setCourseChapters(updatedChapters);
-      setIsEditingTitle(false);
-      showToast('Nombre del subtema actualizado.', 'success');
-      void workspaceFetch('/api/subchapters', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chapterNumber: document.chapterId,
-          sections: updatedChapters.find(chapter => chapter.number === document.chapterId)!.sections }),
-      }).catch(error => console.error('No se pudo sincronizar el listado local.', error));
+      const change = await changeCourseStructure(session, { type: 'rename-section', chapter: document.chapterId, slug: document.slug, title })
+      setDocument(current => withSubtopicTitle(current, title))
+      setCourseChapters(change.chapters)
+      setIsEditingTitle(false)
+      showToast('Nombre del subtema actualizado.', 'success')
     } catch (error) {
-      console.error(error);
-      showToast('No se pudo cambiar el nombre del subtema.', 'error');
-    } finally {
-      titleSaveInFlight.current = false;
-      setIsRenaming(false);
-    }
+      showToast(error instanceof Error ? error.message : 'No se pudo cambiar el nombre del subtema.', 'error')
+    } finally { titleSaveInFlight.current = false; setIsRenaming(false) }
   }
 
   const saveDraft = async (status: 'draft' | 'pending_approval', silent = false) => {
@@ -431,12 +324,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
     const insertText = `${before}${selectedText}${after}`
 
-    editor.executeEdits('toolbar', [{
-      range: selection,
-      text: insertText,
-      forceMoveMarkers: true
-    }])
-    editor.focus()
+    insertEditorText(editor, insertText)
   }
 
   function downloadMarkdown() {
@@ -465,9 +353,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       const current = model.getValue()
       if (data.content === current) return showToast('Ya tienes esta versión en el editor.', 'success')
       if (!window.confirm('¿Cargar el Markdown del proyecto en este editor? Reemplazará el texto que estás viendo. No se guardará ni publicará automáticamente. Puedes deshacer la importación con Ctrl + Z.')) return
-      editor.pushUndoStop()
-      editor.executeEdits('import-project-markdown', [{ range: model.getFullModelRange(), text: data.content, forceMoveMarkers: true }])
-      editor.pushUndoStop()
+      replaceEditorText(editor, data.content, 'import-project-markdown', false)
       editor.focus()
       showToast('Markdown importado. Revisa la vista previa antes de guardar o publicar.', 'success')
     } catch (error) {
@@ -544,12 +430,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   const toolClass = 'inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[#6f5050] hover:bg-[#f1dddd] hover:text-[#7f0303]'
 
-  if (!isLoaded) {
+  if (!isLoaded || loadError) {
     return (
       <div className="flex h-[calc(100dvh-4rem)] items-center justify-center bg-[#f8f5f4]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" />
-          <p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p>
+          {loadError ? <div role="alert" className="max-w-md space-y-4 p-5 text-center text-sm"><p>{loadError}</p><button onClick={() => void loadDraft(initialChapter, initialSlug)} className="rounded-lg border border-[#d5baba] px-4 py-2 font-semibold text-[#7f0303]">Reintentar carga</button></div> : <><Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" /><p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p></>}
         </div>
       </div>
     );
@@ -557,7 +442,6 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
   return <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
     {localBackup.pending && <div className="shrink-0 px-4 pt-3 sm:px-6"><LocalDraftNotice savedAt={localBackup.pending.savedAt} content={localBackup.pending.values.contentMarkdown} onRecover={() => { const recovered = localBackup.recover(); if (recovered) updateMarkdown(recovered.contentMarkdown) }} onDiscard={localBackup.discard} /></div>}
-    {projectRevisionLoaded && <p role="status" className="shrink-0 border-b border-[#e3caca] bg-[#fbf2f0] px-5 py-2.5 text-xs leading-relaxed text-[#6a2022]">Se cargó el Markdown actualizado del capítulo 1 con sus referencias y términos. Revisa la vista previa y guarda o publica para conservar esta versión en la plataforma.</p>}
     {toast && (
       <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
         {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />}
@@ -572,7 +456,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     </div>
 
     <div className={`mx-auto grid w-full max-w-[1800px] flex-1 min-h-0 grid-rows-[minmax(0,1fr)] gap-5 p-3 sm:p-6 ${previewExpanded ? 'grid-cols-1' : 'xl:grid-cols-2'}`}>
-      {!previewExpanded && <section className={`min-w-0 flex-col space-y-4 min-h-0 ${mobilePane === 'edit' ? 'flex' : 'hidden xl:flex'}`}>
+      <section className={`min-w-0 flex-col space-y-4 min-h-0 ${previewExpanded ? 'hidden' : mobilePane === 'edit' ? 'flex' : 'hidden xl:flex'}`}>
         {/* Document Header Info */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3 rounded-xl border border-[#ddcaca] shadow-sm">
           <div className="min-w-0 flex-1 basis-64">
@@ -729,7 +613,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           </fieldset>
           <div className="relative flex-1 min-h-0">
             <Editor
-              key={`${document.chapterId}_${document.slug}`}
+              documentId={`${document.chapterId}_${document.slug}`}
               height="100%"
               defaultLanguage="markdown"
               value={document.contentMarkdown}
@@ -822,7 +706,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
           </div>
           <div className="shrink-0 rounded-b-xl border-t border-[#eadada] bg-[#fbf7f4] px-4 py-2 text-[10px] text-[#967070]"><p>Markdown · GFM · LaTeX · {document.contentMarkdown.length.toLocaleString('es')} caracteres</p><p className="mt-1"><LocalDraftStatus failed={localBackup.failed} savedAt={localBackup.savedAt} /></p></div>
         </div>
-      </section>}
+      </section>
 
       <aside className={`min-w-0 flex-col min-h-0 ${mobilePane === 'preview' || previewExpanded ? 'flex' : 'hidden xl:flex'}`}>
         <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#d8c2c2] bg-white shadow-lg shadow-[#4b1719]/5">
@@ -862,67 +746,6 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       </aside>
     </div>
   </div>
-}
-
-function CustomSelect({
-  value,
-  onChange,
-  options,
-  className = "w-full"
-}: {
-  value: string,
-  onChange: (value: string) => void,
-  options: { value: string, label: string }[],
-  className?: string
-}) {
-  const [open, setOpen] = useState(false)
-  const selected = options.find(o => o.value === value)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false)
-      }
-    }
-    if (open) document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [open])
-
-  return (
-    <div className="relative" ref={containerRef}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`flex ${className} items-center justify-between rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022] outline-none transition hover:border-[#9c4d4d] focus:border-[#9c4d4d] focus:ring-2 focus:ring-[#9c4d4d]/15`}
-      >
-        <span className="truncate">{selected ? selected.label : 'Seleccionar...'}</span>
-        <svg className="ml-2 h-4 w-4 shrink-0 text-[#8b6d6d]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10 [scrollbar-width:thin]">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => { onChange(option.value); setOpen(false) }}
-              className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-[#fbf7f4] ${value === option.value ? 'bg-[#f8eaea] text-[#7f0303] font-medium' : 'text-[#4d3838]'}`}
-            >
-              <span className="truncate pr-4">{option.label}</span>
-              {value === option.value && (
-                <svg className="ml-auto h-4 w-4 shrink-0 text-[#7f0303]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
 }
 
 function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {

@@ -59,27 +59,26 @@ service cloud.firestore {
     }
 
     match /course/chapters {
-      // The course has up to 13 chapters. Editors may change only sections of assigned chapters,
-      // preserving chapter identity/order; admins can add/restructure chapters.
-      function assignedOrUnchanged(index) {
-        return index >= resource.data.list.size()
-          || request.resource.data.list[index] == resource.data.list[index]
-          || (request.resource.data.list[index].number == resource.data.list[index].number
-            && request.resource.data.list[index].diff(resource.data.list[index]).affectedKeys().hasOnly(['sections'])
-            && canEditChapter(resource.data.list[index].number));
+      // A single assigned chapter may change; all other entries and their order
+      // must remain identical, regardless of how many chapters the course has.
+      function assignedChapterOnly() {
+        let index = request.resource.data.editedChapterIndex;
+        let previous = resource.data.list[index];
+        let next = request.resource.data.list[index];
+        return index is int && index >= 0 && index < resource.data.list.size()
+          && canEditChapter(previous.number)
+          && previous.get('archived', false) == false
+          && next.diff(previous).affectedKeys().hasOnly(['sections'])
+          && next.sections is list
+          && resource.data.list.removeAll([previous]) == request.resource.data.list.removeAll([next]);
       }
       allow read: if true;
       allow create, delete: if admin();
       allow update: if admin() || (registered()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['list', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['list', 'updatedAt', 'editedChapterIndex'])
         && request.resource.data.list is list
         && request.resource.data.list.size() == resource.data.list.size()
-        && resource.data.list.size() <= 13
-        && assignedOrUnchanged(0) && assignedOrUnchanged(1) && assignedOrUnchanged(2)
-        && assignedOrUnchanged(3) && assignedOrUnchanged(4) && assignedOrUnchanged(5)
-        && assignedOrUnchanged(6) && assignedOrUnchanged(7) && assignedOrUnchanged(8)
-        && assignedOrUnchanged(9) && assignedOrUnchanged(10) && assignedOrUnchanged(11)
-        && assignedOrUnchanged(12));
+        && assignedChapterOnly());
     }
 
     match /exams/{examId} {

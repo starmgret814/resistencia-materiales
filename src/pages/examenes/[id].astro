@@ -6,6 +6,8 @@ import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
 import ContentRenderer from '@/components/content-renderer';
 import { ArrowLeft } from 'lucide-react';
+import { getLiveChapters } from '@/lib/course-service';
+const liveChapters = await getLiveChapters();
 
 let exam: PastExam | null = null;
 let unavailable = false;
@@ -18,7 +20,7 @@ const category = examTypes.find(type => type.id === exam?.type)?.label;
 ---
 
 <Layout title={`${exam?.title || 'Evaluación no disponible'} | Resistencia de Materiales — UNI`}>
-  <TextbookLayout activeSlug={null} variant="exam" client:load>
+  <TextbookLayout activeSlug={null} variant="exam" customChapters={liveChapters} client:load>
     <div class="not-prose">
       <a href="/examenes" class="inline-flex items-center gap-2 text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><ArrowLeft size={16} aria-hidden="true" />Volver a exámenes pasados</a>
       {exam ? <>

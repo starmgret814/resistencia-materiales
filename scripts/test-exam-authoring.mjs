@@ -15,6 +15,7 @@ function load(path, dependencies = {}, globals = {}) {
 const authoring = load('../lib/exam-authoring.ts')
 const data = load('../lib/exam-data.ts')
 const errors = load('../lib/exam-errors.ts')
+const history = load('../lib/editor-history.ts')
 assert.equal(errors.examFailure({ code: 'firestore/permission-denied' }, 'load').code, 'permission-denied')
 assert.match(errors.examFailure({ code: 'unavailable' }, 'load').message, /conectar/)
 assert.equal(authoring.validateExamImport('examen.MDX', 100, '\uFEFF## Enunciado\r\n\r\n$\\sigma$\r\n'), '## Enunciado\n\n$\\sigma$')
@@ -43,6 +44,7 @@ const { default: Management } = load('../components/exam-management.tsx', {
   react, 'react/jsx-runtime': jsx, 'lucide-react': icons, '@/lib/firebase': { db: {}, auth: {} },
   '@/lib/exam-data': data, '@/lib/exam-authoring': authoring, '@/components/preview-error-boundary': { default: 'boundary' },
   '@/lib/exam-errors': errors,
+  '@/lib/editor-history': history,
   '@/lib/local-draft': { localDraftKey: () => 'isolated-exam-test' },
   '@/lib/use-local-draft': { useLocalDraft: () => ({ pending: null, failed: false, savedAt: null, acknowledge() {} }) },
   '@/components/local-draft-notice': { LocalDraftStatus: 'local-status', LocalDraftNotice: 'local-notice' },
@@ -66,7 +68,7 @@ await settle()
 tree = render()
 let editorNode = find(tree, node => node.props?.language === 'markdown')
 let text = editorNode.props.value
-const model = { getFullModelRange: () => 'all' }
+const model = { getFullModelRange: () => 'all', getValue: () => text }
 const editor = {
   getModel: () => model, getSelection: () => 'selection', focus() {},
   pushUndoStop() { undoStops++ },

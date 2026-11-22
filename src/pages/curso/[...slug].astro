@@ -2,7 +2,7 @@
 import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
 import ContentRenderer from '@/components/content-renderer';
-import { chapters, findSectionBySlug } from '@/lib/course-data';
+import { findSectionBySlug } from '@/lib/course-data';
 import { getLiveChapters, getApprovedSubtopic, getChapterProblemOffset } from '@/lib/course-service';
 import { findSubtopicNumber } from '@/lib/course-titles';
 import { getCourseHeadings } from '@/lib/course-headings';
@@ -12,25 +12,7 @@ const { slug } = Astro.params;
 
 // 1. Cargar el temario en vivo desde Firestore (con respaldo estático)
 const liveChapters = await getLiveChapters();
-const allLiveSections = liveChapters.flatMap((ch) =>
-  ch.sections.map((sec) => ({ ...sec, chapterNumber: ch.number, chapterTitle: ch.title }))
-);
-
-const sectionIndex = allLiveSections.findIndex((s) => {
-  if (!s.slug) return s.id === slug;
-  return s.slug === slug || s.slug.split('/').pop() === slug || s.id === slug;
-});
-
-let sectionData: any = null;
-if (sectionIndex !== -1) {
-  sectionData = {
-    section: allLiveSections[sectionIndex],
-    previous: allLiveSections.slice(0, sectionIndex).reverse().find(section => section.slug) || null,
-    next: allLiveSections.slice(sectionIndex + 1).find(section => section.slug) || null,
-  };
-} else {
-  sectionData = findSectionBySlug(slug!);
-}
+const sectionData = findSectionBySlug(slug!, liveChapters);
 
 if (!sectionData) {
   return Astro.redirect('/404');
@@ -42,13 +24,11 @@ const { section, previous, next } = sectionData;
 const rawSlug = section.slug?.includes('/') ? section.slug.split('/').pop()! : (section.slug || section.id);
 const approvedDoc = await getApprovedSubtopic(section.chapterNumber, rawSlug);
 
-const headingPrefix = findSubtopicNumber(liveChapters, section.chapterNumber, section.slug || section.id)
-  || findSubtopicNumber(chapters, section.chapterNumber, section.slug || section.id);
+const headingPrefix = findSubtopicNumber(liveChapters, section.chapterNumber, section.slug || section.id);
 const mappedHeadings = approvedDoc
   ? await getCourseHeadings(approvedDoc.contentMarkdown, headingPrefix)
   : [];
-const currentChapter = liveChapters.find(chapter => chapter.number === section.chapterNumber)
-  || chapters.find(chapter => chapter.number === section.chapterNumber);
+const currentChapter = liveChapters.find(chapter => chapter.number === section.chapterNumber);
 const problemOffset = currentChapter ? await getChapterProblemOffset(currentChapter, section.slug || section.id) : 0;
 
 ---

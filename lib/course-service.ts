@@ -1,6 +1,6 @@
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { chapters as defaultChapters, type Chapter, type Section } from '@/lib/course-data';
+import { chapters as defaultChapters, activeChapters, isChapterList, type Chapter } from '@/lib/course-data';
 import { countCourseProblems } from '@/lib/course-headings';
 import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision';
 import { loadProjectMarkdown } from '@/lib/project-markdown';
@@ -8,13 +8,13 @@ import { loadProjectMarkdown } from '@/lib/project-markdown';
 export async function getLiveChapters(): Promise<Chapter[]> {
   try {
     const snap = await getDoc(doc(db, 'course', 'chapters'));
-    if (snap.exists() && Array.isArray(snap.data().list)) {
-      return snap.data().list as Chapter[];
+    if (snap.exists() && isChapterList(snap.data().list)) {
+      return activeChapters(snap.data().list);
     }
   } catch (err) {
     console.warn('No se pudo cargar el temario desde Firestore, usando respaldo estático:', err);
   }
-  return defaultChapters;
+  return activeChapters(defaultChapters);
 }
 
 export interface ApprovedSubtopicContent {

@@ -120,14 +120,14 @@ function Sidebar({
     return () => media.removeEventListener('change', update)
   }, [])
   useModalFocus(open && mobile, asideRef, onClose)
-  const courseChapters = customChapters && customChapters.length > 0 ? customChapters : chapters
+  const courseChapters = customChapters ?? chapters
   const [expanded, setExpanded] = useState(() => {
     // Auto-expand the chapter that contains the active section
     if (!activeSlug) return ''
     for (const ch of courseChapters) {
       if (ch.sections.some((s) => s.slug === activeSlug)) return ch.number
     }
-    return '01'
+    return courseChapters[0]?.number || ''
   })
   useEffect(() => {
     const chapter = courseChapters.find(item => item.sections.some(section => section.slug === activeSlug))
@@ -342,7 +342,7 @@ export default function TextbookLayout({
     document.addEventListener('keydown', closeMenuForSearch)
     return () => document.removeEventListener('keydown', closeMenuForSearch)
   }, [])
-  const courseChapters = customChapters?.length ? customChapters : chapters
+  const courseChapters = customChapters ?? chapters
   const currentChapter = courseChapters.find(chapter => chapter.sections.some(section => section.slug === activeSlug))
   const available = currentChapter?.sections.filter(section => section.slug) ?? []
   const sectionIndex = available.findIndex(section => section.slug === activeSlug)

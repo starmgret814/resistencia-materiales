@@ -42,6 +42,14 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
           <a href="#guia-completa" class="inline-flex items-center gap-1.5 rounded-md py-1 text-xs font-semibold text-[#7f0303] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-[#fca5a5]">Ir a la guía completa <ArrowRight size={15} aria-hidden="true" /></a>
         </div>
         <details open class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-18">18 de noviembre de 2026</time> · Gestión de capítulos e historial del editor</summary>
+          <ul class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+            <li><strong>Capítulos administrables.</strong> Los administradores pueden crear, renombrar, ordenar, archivar y restaurar capítulos desde el panel. La estructura no está limitada a los 13 capítulos iniciales. <a href="#guia-gestion-capitulos" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver instrucciones</a>.</li>
+            <li><strong>Deshacer y rehacer.</strong> El editor conserva su historial al ampliar la vista previa. Las inserciones e importaciones son pasos deshacibles. Usa Ctrl + Z para deshacer y Ctrl + Y o Ctrl + Shift + Z para rehacer; en Mac, Command + Z y Command + Shift + Z.</li>
+            <li><strong>Ediciones simultáneas.</strong> Los cambios de estructura se guardan mediante transacciones sobre el catálogo actual, conservando las direcciones del contenido existente. Un error conserva el estado anterior.</li>
+          </ul>
+        </details>
+        <details class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
           <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-15">15 de noviembre de 2026</time> · Puesta al día del editor y los contenidos</summary>
           <ul class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
             <li><strong>Respaldo local del trabajo.</strong> Los editores conservan una copia mientras escribes, sin servicios adicionales. Al volver puedes revisar y recuperar el texto pendiente. <a href="#guia-respaldo" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Cómo funciona la recuperación</a>.</li>
@@ -141,6 +149,19 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
             <p>La copia está solo en <strong>ese navegador y dispositivo</strong>. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa <strong>Descargar Markdown</strong> en capítulos o <strong>Descargar copia</strong> en exámenes.</p>
             <p>Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.</p>
           </div>
+        </section>
+
+        <section id="guia-gestion-capitulos" aria-labelledby="guia-capitulos-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
+          <h2 id="guia-capitulos-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Gestionar los capítulos del curso</h2>
+          <ol class="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+            <li>Los administradores encuentran <strong>Nuevo capítulo</strong> en el panel de contenido. Escribe un título; el identificador se asigna automáticamente.</li>
+            <li>Junto a cada encabezado puedes <strong>renombrar</strong> el capítulo y cambiar su orden. Los identificadores, las asignaciones de los colaboradores y las direcciones existentes se conservan.</li>
+            <li><strong>Archivar</strong> retira el capítulo de la navegación pública y conserva sus secciones, borradores y publicaciones. Usa <strong>Ver archivados → Restaurar</strong> para recuperarlo.</li>
+            <li>Los editores gestionan las secciones de sus capítulos asignados. Pueden añadir, renombrar y ordenar secciones; la eliminación de una sección publicada requiere un administrador.</li>
+          </ol>
+          <p class="mt-4 text-sm leading-7 text-[#765e5e] dark:text-[#cbb0ae]">La lista se guarda en Firestore. No necesitas editar el archivo inicial ni volver a desplegar la web cada vez que cambias la estructura. Las opciones de asignación y los menús de las páginas consultan esa misma lista.</p>
+          <p class="mt-3 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]"><strong>Configuración inicial de esta actualización:</strong> un administrador del proyecto Firebase debe publicar el archivo <code>firestore.rules</code> actualizado para habilitar la validación de capítulos de tamaño variable. Los cambios en el código de la web no publican estas reglas automáticamente.</p>
+          <p class="mt-3 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]">Ctrl + Z revierte cambios de texto en el editor; las publicaciones y los cambios guardados en la estructura del curso se administran por separado. El historial se conserva mientras la instancia del editor permanezca abierta.</p>
         </section>
 
         <!-- 3. Markdown básico -->

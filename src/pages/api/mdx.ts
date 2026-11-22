@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { chapters } from '@/lib/course-data';
+import { getLiveChapters } from '@/lib/course-service';
 import { loadProjectMarkdown } from '@/lib/project-markdown';
 
 
@@ -13,7 +13,8 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Faltan parámetros' }), { status: 400 });
     }
 
-    const chData = chapters.find((c: any) => c.number === chapterNumber);
+    const chapters = await getLiveChapters();
+    const chData = chapters.find(c => c.number === chapterNumber);
     if (!chData) {
       return new Response(JSON.stringify({ error: 'Capítulo no encontrado' }), { status: 404 });
     }
@@ -29,7 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Subtema no encontrado' }), { status: 404 });
     }
 
-    const content = await loadProjectMarkdown(chapterNumber, docSlug);
+    const content = await loadProjectMarkdown(chapterNumber, docSlug, chapters);
     if (!content) return Response.json({ error: 'Archivo MDX no existe' }, { status: 404 });
     return Response.json({ content }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error: any) {

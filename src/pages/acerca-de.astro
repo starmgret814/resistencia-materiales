@@ -1,6 +1,7 @@
 ---
 import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
+import { getLiveChapters } from '@/lib/course-service';
 import { BookOpen, FileText, FlaskConical, Users, ArrowRight } from 'lucide-react';
 import { projectInfo, projectMembers, projectAreas } from '@/lib/project-info';
 const resources = [
@@ -8,9 +9,10 @@ const resources = [
   { icon: FlaskConical, title: 'Ideas que puedes explorar', text: 'Herramientas interactivas para observar cómo cambian las variables y relacionarlas con los modelos.' },
   { icon: FileText, title: 'Práctica por periodo', text: 'Evaluaciones de periodos anteriores para aplicar los conceptos y preparar prácticas, parciales y finales.' },
 ];
+const liveChapters = await getLiveChapters();
 ---
 <Layout title="Acerca del proyecto | Resistencia de Materiales — UNI" description={projectInfo.description}>
-  <TextbookLayout activeSlug={null} variant="about" client:load>
+  <TextbookLayout activeSlug={null} variant="about" customChapters={liveChapters} client:load>
     <div class="about-project">
       <header class="about-intro">
         <p class="about-eyebrow">El proyecto · UNI / MC361</p>
@@ -28,7 +30,7 @@ const resources = [
         <p>El material académico original pertenece al profesor. El equipo desarrolla la plataforma y adapta sus presentaciones al formato web.</p>
         <div class="about-team-areas">{projectAreas.map(area => {
           const members = projectMembers.filter(member => member.area === area.id);
-          return <section class="about-team-area" aria-labelledby={`team-${area.id}`}><h3 id={`team-${area.id}`}>{area.title}</h3><p>{area.description}</p>{members.length > 0 ? <ul class="about-members">{members.map(member => <li><p class="about-member-role">{member.role}</p><h4>{member.name}</h4>{member.description && <p>{member.description}</p>}{member.url && <a href={member.url} target="_blank" rel="noopener noreferrer">Ver perfil <ArrowRight size={15} aria-hidden="true" /></a>}</li>)}</ul> : <p class="about-team-pending">La presentación de sus integrantes se añadirá próximamente.</p>}</section>;
+          return <section class="about-team-area" aria-labelledby={`team-${area.id}`}><h3 id={`team-${area.id}`}>{area.title}</h3><p>{area.description}</p>{members.length > 0 ? <ul class="about-members">{members.map(member => <li><p class="about-member-role">{member.role}</p><h4>{member.name}</h4>{member.description && <p>{member.description}</p>}{member.chapterIds?.map(id => { const chapter = liveChapters.find(item => item.number === id); return <p>Capítulo {Number(id)}{chapter ? ` · ${chapter.title}.` : '.'}</p>; })}{member.url && <a href={member.url} target="_blank" rel="noopener noreferrer">Ver perfil <ArrowRight size={15} aria-hidden="true" /></a>}</li>)}</ul> : <p class="about-team-pending">La presentación de sus integrantes se añadirá próximamente.</p>}</section>;
         })}</div>
       </section>
       <section class="about-work" aria-labelledby="about-work">

@@ -1,0 +1,13 @@
+---
+import Layout from '@/src/layouts/Layout.astro'
+import DesignPreview from '@/components/design-preview'
+import '@/src/styles/interface.css'
+import '@/src/styles/design-preview.css'
+
+// Development-only proposal: no real course documents or permissions are changed.
+if (!import.meta.env.DEV) return new Response('No encontrado', { status: 404 })
+---
+
+<Layout title="Muestra de diseño | MC361" description="Propuesta visual de la etapa 1 para revisar los controles y la organización de la interfaz.">
+  <DesignPreview client:load />
+</Layout>

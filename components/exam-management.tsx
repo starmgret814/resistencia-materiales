@@ -11,8 +11,9 @@ import { LocalDraftNotice, LocalDraftStatus } from '@/components/local-draft-not
 import { localDraftKey } from '@/lib/local-draft'
 import { useLocalDraft } from '@/lib/use-local-draft'
 import { examFailure, type ExamFailure } from '@/lib/exam-errors'
+import { insertEditorText, replaceEditorText } from '@/lib/editor-history'
 
-const Editor = lazy(() => import('@monaco-editor/react'))
+const Editor = lazy(() => import('@/components/markdown-editor'))
 const input = 'w-full rounded-lg border border-[#dcc3c3] bg-white px-3 py-2.5 text-sm text-[#3b2022]'
 const starter = () => ({
   id: '', period: `${new Date().getFullYear()}-${new Date().getMonth() < 6 ? 1 : 2}`, type: 'practica' as PastExam['type'], title: '',
@@ -34,6 +35,7 @@ export default function ExamManagement() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [importing, setImporting] = useState(false)
   const [editorReady, setEditorReady] = useState(false)
+  const [editorVersion, setEditorVersion] = useState(0)
   const [previewAttempt, setPreviewAttempt] = useState(0)
   const ContentRenderer = useMemo(() => lazy(() => import('@/components/content-renderer')), [previewAttempt])
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null)
@@ -70,16 +72,13 @@ export default function ExamManagement() {
   function change(update: Partial<PastExam>) { setCurrent(value => ({ ...value, ...update })); setDirty(true); setMessage('') }
   function select(exam: PastExam) {
     if (dirty && !window.confirm('Tienes cambios sin guardar. ¿Descartarlos?')) return
-    setCurrent(exam); setDirty(false); setMessage(''); setError(''); setMode('edit')
+    setCurrent(exam); setDirty(false); setMessage(''); setError(''); setMode('edit'); setEditorVersion(value => value + 1)
   }
   function insert(content: string) {
     const editor = editorRef.current
     const selection = editor?.getSelection()
     if (!editor || !selection || blocked) return
-    editor.pushUndoStop()
-    editor.executeEdits('exam-template', [{ range: selection, text: content, forceMoveMarkers: true }])
-    editor.pushUndoStop()
-    editor.focus()
+    insertEditorText(editor, content, 'exam-template')
   }
   async function importMarkdown(file: File) {
     if (blocked) return
@@ -91,9 +90,7 @@ export default function ExamManagement() {
       const editor = editorRef.current
       const model = editor?.getModel()
       if (!editor || !model) throw new Error('Espera a que cargue el editor e inténtalo de nuevo.')
-      editor.pushUndoStop()
-      editor.executeEdits('exam-import', [{ range: model.getFullModelRange(), text: content, forceMoveMarkers: true }])
-      editor.pushUndoStop()
+      replaceEditorText(editor, content, 'exam-import', false)
       setMessage('Archivo importado. Revisa la vista previa antes de publicar. Puedes deshacer la importación con Ctrl + Z.')
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo leer el archivo. El contenido anterior se conserva.') }
     finally { setImporting(false) }
@@ -127,7 +124,7 @@ export default function ExamManagement() {
     setBusy(true); setError(''); setMessage('')
     try {
       await deleteDoc(doc(db, 'exams', exam.id))
-      if (current.id === exam.id) { setCurrent(starter()); setDirty(false) }
+      if (current.id === exam.id) { setCurrent(starter()); setDirty(false); setEditorVersion(value => value + 1) }
       await load(); setMessage('Evaluación eliminada.')
     } catch (cause) { setError(examFailure(cause, 'remove').message) }
     finally { setBusy(false) }
@@ -167,7 +164,7 @@ export default function ExamManagement() {
         <div id="exam-edit" hidden={mode !== 'edit'}>
           <div className="flex flex-wrap items-center gap-2 py-3" role="group" aria-label="Insertar contenido"><span className="mr-1 text-xs text-[#765e5e]">Insertar:</span>{examSnippets.map(snippet => <button key={snippet.id} type="button" disabled={blocked || !editorReady} onClick={() => insert(snippet.content)} className="inline-flex items-center gap-1 rounded-md border border-[#eadada] px-2.5 py-1.5 text-xs hover:bg-[#faf0ee] disabled:opacity-50"><Plus className="size-3" aria-hidden="true" />{snippet.label}</button>)}</div>
           <div className="overflow-hidden rounded-lg border border-[#dcc3c3]">
-            <Suspense fallback={<p className="p-5 text-sm">Cargando editor…</p>}><Editor key={current.id || 'new'} height="460px" language="markdown" value={current.contentMarkdown} onMount={editor => { editorRef.current = editor; setEditorReady(true) }} onChange={value => { if (value !== undefined && value !== current.contentMarkdown) change({ contentMarkdown: value }) }} options={{ minimap: { enabled: false }, wordWrap: 'on', fontSize: 14, readOnly: blocked, scrollBeyondLastLine: false, automaticLayout: true }} /></Suspense>
+            <Suspense fallback={<p className="p-5 text-sm">Cargando editor…</p>}><Editor documentId={`exam-${editorVersion}`} height="460px" language="markdown" value={current.contentMarkdown} onMount={editor => { editorRef.current = editor; setEditorReady(true) }} onChange={value => { if (value !== undefined && value !== current.contentMarkdown) change({ contentMarkdown: value }) }} options={{ minimap: { enabled: false }, wordWrap: 'on', fontSize: 14, readOnly: blocked, scrollBeyondLastLine: false, automaticLayout: true }} /></Suspense>
           </div>
         </div>
         <div id="exam-preview" hidden={mode !== 'preview'} className="min-w-0 rounded-lg bg-[#faf5f3] p-4 sm:p-6">

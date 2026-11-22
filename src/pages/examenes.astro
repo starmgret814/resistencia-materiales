@@ -3,10 +3,12 @@ import Layout from '@/src/layouts/Layout.astro';
 import TextbookLayout from '@/components/textbook-layout';
 import ExamArchive from '@/components/exam-archive';
 import ExamManagementLink from '@/components/exam-management-link';
+import { getLiveChapters } from '@/lib/course-service';
+const liveChapters = await getLiveChapters();
 ---
 
 <Layout title="Exámenes pasados | Resistencia de Materiales — UNI" description="Practica con evaluaciones de Resistencia de Materiales: prácticas calificadas, parciales, finales y sustitutorios organizados por periodo académico.">
-  <TextbookLayout activeSlug={null} variant="archive" client:load>
+  <TextbookLayout activeSlug={null} variant="archive" customChapters={liveChapters} client:load>
     <div>
       <div class="border-b border-[#e3caca] pb-7 dark:border-[#382022]">
         <p class="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[#967070] dark:text-[#ab8e8e]">Archivo académico · MC361</p>

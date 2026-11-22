@@ -12,6 +12,12 @@ Esta guía rápida contiene todo lo necesario para redactar, estructurar y envia
 
 <!-- Añadir las próximas actualizaciones arriba, con fecha y enlaces a las instrucciones. Conservar las entradas anteriores y actualizar también la guía web. -->
 
+### 18 de noviembre de 2026 · Gestión de capítulos e historial del editor
+
+- **Capítulos administrables:** los administradores pueden crear, renombrar, ordenar, archivar y restaurar capítulos. La estructura no está limitada a los 13 capítulos iniciales. [Ver instrucciones](#guia-gestion-capitulos).
+- **Deshacer y rehacer:** el editor conserva su historial al ampliar la vista previa. Las inserciones e importaciones son pasos deshacibles. Usa Ctrl + Z para deshacer y Ctrl + Y o Ctrl + Shift + Z para rehacer; en Mac, Command + Z y Command + Shift + Z.
+- **Ediciones simultáneas:** las operaciones usan transacciones sobre el catálogo actual y conservan las direcciones existentes. Un error conserva el estado anterior.
+
 ### 15 de noviembre de 2026 · Puesta al día del editor y los contenidos
 
 - **Respaldo local del trabajo:** los editores conservan una copia mientras escribes, sin servicios adicionales. Al volver puedes revisar y recuperar el texto pendiente. [Cómo funciona la recuperación](#guia-respaldo).
@@ -61,6 +67,20 @@ Es un libro digital interactivo diseñado para los estudiantes de Resistencia de
    - Cuando hayas concluido el tema y verificado que todo se ve correctamente en la vista previa, pulsa **"Enviar a revisión"**. El equipo docente o administrador revisará tu contenido para publicarlo en la web del curso.
 
 ---
+
+<a id="guia-gestion-capitulos"></a>
+
+### Gestionar los capítulos del curso
+
+Los administradores encuentran **Nuevo capítulo** en el panel de contenido. Al crear uno, escribe su título; el identificador se asigna automáticamente. Junto a cada encabezado puedes renombrar y ordenar los capítulos. Los identificadores, las asignaciones de los colaboradores y las direcciones existentes se conservan.
+
+**Archivar** retira el capítulo de la navegación pública y conserva sus secciones, borradores y publicaciones. Usa **Ver archivados → Restaurar** para recuperarlo. Los editores gestionan las secciones de sus capítulos asignados; eliminar una sección publicada requiere un administrador.
+
+La estructura se guarda en Firestore. No necesitas editar el catálogo inicial ni volver a desplegar la web cada vez que cambias los capítulos. Los menús y las opciones de asignación consultan esa misma lista.
+
+**Configuración inicial:** publica el archivo `firestore.rules` actualizado para habilitar la validación de estructuras de tamaño variable. El despliegue del código web no publica las reglas automáticamente.
+
+Ctrl + Z revierte texto en el editor. Las publicaciones y los cambios guardados en la estructura son operaciones independientes. El historial se conserva mientras la instancia del editor permanezca abierta.
 
 <a id="guia-respaldo"></a>
 
@@ -679,5 +699,5 @@ La página pública es `/acerca-de`. Sus textos y el equipo se configuran en `li
 }
 ```
 
-`area` acepta `development` (desarrollo), `content` (adaptación a la web) o `academic` (autoría del material académico). `description` y `url` son opcionales. Una persona puede aparecer en más de un área si tiene varias contribuciones. Añade solo nombres y enlaces que deban mostrarse públicamente; no se exponen las cuentas ni los correos del panel de colaboradores.
+`area` acepta `development` (desarrollo), `content` (adaptación a la web) o `academic` (autoría del material académico). `description` y `url` son opcionales. Para vincular contribuciones a capítulos, usa `chapterIds: ['01']`: el título se obtiene del catálogo actual y refleja sus cambios de nombre. Una persona puede aparecer en más de un área si tiene varias contribuciones. Añade solo nombres y enlaces que deban mostrarse públicamente; no se exponen las cuentas ni los correos del panel de colaboradores.
 

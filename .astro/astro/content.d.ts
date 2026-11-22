@@ -278,6 +278,13 @@ declare module 'astro:content' {
   collection: "resistencia";
   data: any
 } & { render(): Render[".mdx"] };
+"05-recipientes-presion/formulario/index.mdx": {
+	id: "05-recipientes-presion/formulario/index.mdx";
+  slug: "05-recipientes-presion/formulario";
+  body: string;
+  collection: "resistencia";
+  data: any
+} & { render(): Render[".mdx"] };
 "05-recipientes-presion/problemas/index.mdx": {
 	id: "05-recipientes-presion/problemas/index.mdx";
   slug: "05-recipientes-presion/problemas";
