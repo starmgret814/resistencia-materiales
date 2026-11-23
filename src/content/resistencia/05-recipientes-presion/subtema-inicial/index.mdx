@@ -9,10 +9,21 @@ Los recipientes esféricos son ampliamente utilizados para el almacenamiento de 
 <Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793598379/chv8pwqlwyjdrtk9dbhk.jpg" alt="Descripción de la imagen" />
 
 
-### Ecuaciones Fundamentales
+## Esfuerzo normal
 Al analizar un corte diametral del recipiente esférico, se establece el equilibrio entre la fuerza producida por la presión interna ($\rho$) y la fuerza de resistencia debida al esfuerzo ($\sigma$) en el material del recipiente:
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793597601/njswnv4kdm4aq07il9vz.svg" alt="Descripción de la imagen" />
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1795394593/d0vzqlycsjxg9kl85niz.svg"  />
+
+
+$$A_{\text{proy}} \cdot \rho = A \cdot \sigma$$
+
+$$\pi r^2 \cdot \rho = 2\pi r_m t \cdot \sigma$$
+
+$$\sigma = \frac{\pi r^2 \cdot \rho}{2\pi r_m t}$$
+
+$$r \approx r_m$$
 
 el esfuerzo en será:
 
@@ -21,7 +32,17 @@ $$
 \Large \fcolorbox{#7d2d2d}{#fcf2f2}{$\displaystyle \sigma_l = \frac{pr}{2t}$}
 $$
 
-<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1793599693/ook0lzaxhbiowdzdsda8.svg"  />
+## Esfuerzo cortante
+Como con solo un punto no se puede obtener el círculo de mohr, entonces buscamos otro punto de esfuerzos.
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1795395312/jjrnqhybdgtryuazjlgo.svg"  />
+
+tomando el esfuerzo tangencial a la superficie (el de color verde), trazamos el circulo de Mohr.
+
+
+<Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1795395407/euvxrjgvf3wtpzuethms.svg"  />
+
+finalmente podemos darnos cuenta que el valor de nuestro esfuerzo cortante es la mitad de nuestro esfuerzo normal
 
 $$
 \large \fcolorbox{#7d2d2d}{#fcf2f2}{$\displaystyle \tau_{max} = \frac{\sigma}{2}$}
