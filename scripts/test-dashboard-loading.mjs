@@ -35,6 +35,8 @@ function load(react) {
       '@/lib/workspace-api': { workspaceFetch: async () => { writes++ } },
       '@/lib/course-titles': { withSubtopicTitle: document => document },
       '@/lib/course-data': { chapters, isChapterList },
+      '@/lib/workspace-controls': { workspaceButtonClass: () => 'workspace-button', workspaceInputClass: () => 'workspace-input' },
+      '@/lib/use-modal-focus': { useModalFocus() {} },
       '@/lib/course-structure-store': { changeCourseStructure: async () => { writes++; throw new Error('Unexpected mutation') } },
       '@/lib/course-structure': { shortSectionSlug: section => section.slug?.split('/').pop() || section.id },
       '@/components/course-structure-controls': { CourseStructureControls: () => null, ChapterActions: () => null },

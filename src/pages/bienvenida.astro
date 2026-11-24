@@ -1,0 +1,85 @@
+---
+import Layout from '@/src/layouts/Layout.astro';
+import TextbookLayout from '@/components/textbook-layout';
+import { getLiveChapters } from '@/lib/course-service';
+import { ArrowRight, BookOpen, Compass, SquareFunction, GraduationCap, Wrench } from 'lucide-react';
+
+const liveChapters = await getLiveChapters();
+const firstLive = liveChapters.flatMap(chapter => chapter.sections).find(section => Boolean(section.slug));
+const goals = [
+  { icon: GraduationCap, title: 'Comprender', text: 'Reconocer las hipótesis, conceptos y principios que describen la respuesta de los elementos sometidos a cargas.' },
+  { icon: SquareFunction, title: 'Relacionar', text: 'Interpretar las ecuaciones junto con sus figuras, unidades y condiciones de aplicación.' },
+  { icon: Wrench, title: 'Aplicar', text: 'Resolver problemas con criterio y comprobar los resultados mediante ejemplos y recursos de práctica.' },
+];
+---
+
+<Layout title="Bienvenida al curso | Resistencia de Materiales — UNI" description="Presentación y orientación para estudiar Resistencia de Materiales en la plataforma MC361.">
+  <TextbookLayout activeSlug={null} variant="welcome" customChapters={liveChapters} client:load>
+    <div class="course-welcome">
+      <header class="welcome-intro">
+        <p class="welcome-eyebrow"><BookOpen size={17} aria-hidden="true" />Bienvenida al curso</p>
+        <h1>Resistencia de Materiales</h1>
+        <p class="welcome-lead">Curso obligatorio MC361 de la Facultad de Ingeniería Mecánica de la Universidad Nacional de Ingeniería. Es un espacio académico para comprender cómo las cargas producen esfuerzos y deformaciones, y cómo esos efectos orientan el análisis y el diseño de elementos estructurales y mecánicos.</p>
+      </header>
+
+      <section class="welcome-presentation" aria-labelledby="welcome-purpose">
+        <div>
+          <h2 id="welcome-purpose">Una plataforma para acompañar tu aprendizaje</h2>
+          <p>El curso pertenece al cuarto ciclo de la malla de Ingeniería Mecánica y es obligatorio. Se desarrolla con una carga académica de cinco créditos y sesiones intersemanales de teoría y práctica, como parte de la formación previa para analizar y diseñar componentes estructurales y elementos de máquinas.</p>
+          <p>El contenido reúne explicaciones, ecuaciones, figuras, ejemplos, problemas y herramientas que permiten estudiar de manera ordenada y volver a ellos cuando necesites repasar. Las clases combinan exposiciones conceptuales con resolución guiada de problemas y actividades prácticas que fomentan la participación.</p>
+          <p>El material académico se desarrolla a partir de las presentaciones de clase del <strong>Ing. Eden Angel Molina Capcha</strong>, adaptadas a una experiencia web por el equipo del proyecto.</p>
+        </div>
+        <aside class="welcome-orientation" aria-label="Orientación inicial">
+          <Compass size={22} aria-hidden="true" />
+          <div><h2>Cómo comenzar</h2><p>Si es tu primera vez en el curso, avanza por los capítulos en orden. Si buscas repasar, utiliza el menú lateral o el buscador para llegar directamente al concepto que necesitas.</p></div>
+        </aside>
+      </section>
+
+      <section class="welcome-goals" aria-labelledby="welcome-goals">
+        <p class="welcome-eyebrow">Durante el curso</p>
+        <h2 id="welcome-goals">De los fundamentos a la resolución de problemas</h2>
+        <div class="welcome-goal-grid">
+          {goals.map(({ icon: Icon, title, text }) => <article><Icon size={22} aria-hidden="true" /><h3>{title}</h3><p>{text}</p></article>)}
+        </div>
+      </section>
+
+      <section class="welcome-start" aria-labelledby="welcome-start">
+        <div><p class="welcome-eyebrow">Tu recorrido</p><h2 id="welcome-start">Empieza cuando estés listo</h2><p>Puedes seguir el orden del curso o consultar cualquier sección desde el mapa de contenidos.</p></div>
+        {firstLive?.slug && <a href={`/curso/${firstLive.slug}`}>Ir a la primera sección <ArrowRight size={18} aria-hidden="true" /></a>}
+      </section>
+    </div>
+  </TextbookLayout>
+</Layout>
+
+<style>
+  .course-welcome { --accent:#7f0303; --muted:#6b5150; --border:#e3caca; font-family:var(--font-sans); }
+  :global(.dark) .course-welcome { --accent:#fca5a5; --muted:#cbb0ae; --border:#422527; }
+  .welcome-intro { padding-bottom:2.5rem; }
+  .welcome-eyebrow { display:flex; align-items:center; gap:.55rem; margin-bottom:.85rem; color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+  h1 { max-width:38rem; margin:0 0 1.25rem; font-size:clamp(2.2rem,5vw,3.4rem); font-weight:700; line-height:1.08; letter-spacing:-.045em; }
+  h2 { margin:0 0 .75rem; font-size:1.35rem; font-weight:650; line-height:1.3; letter-spacing:-.02em; }
+  h3 { margin:.8rem 0 .45rem; font-size:1rem; font-weight:650; }
+  p { color:var(--muted); font-size:.92rem; line-height:1.8; }
+  .welcome-lead { max-width:45rem; font-size:1.15rem; line-height:1.75; }
+  .welcome-presentation { display:grid; gap:1.25rem; padding:2rem 0; border-top:1px solid var(--border); }
+  .welcome-presentation > div > p + p { margin-top:.85rem; }
+  .welcome-presentation strong { color:inherit; font-weight:650; }
+  .welcome-orientation { display:flex; align-items:flex-start; gap:.85rem; padding:1.25rem; border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:.55rem; background:#f8efed; }
+  :global(.dark) .welcome-orientation { background:#231416; }
+  .welcome-orientation > :global(svg) { flex-shrink:0; color:var(--accent); }
+  .welcome-orientation h2 { font-size:1rem; }
+  .welcome-orientation p { font-size:.82rem; }
+  .welcome-goals { padding:2rem 0 2.5rem; border-top:1px solid var(--border); }
+  .welcome-goal-grid { display:grid; gap:1rem; margin-top:1.5rem; }
+  .welcome-goal-grid article { padding:1.25rem; border:1px solid var(--border); border-radius:.6rem; }
+  .welcome-goal-grid article > :global(svg) { color:var(--accent); }
+  .welcome-goal-grid p { font-size:.82rem; }
+  .welcome-start { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1.25rem; padding:1.5rem; border:1px solid var(--border); border-radius:.65rem; background:#f8efed; }
+  :global(.dark) .welcome-start { background:#231416; }
+  .welcome-start .welcome-eyebrow { margin-bottom:.45rem; }
+  .welcome-start h2 { margin-bottom:.35rem; }
+  .welcome-start a { display:inline-flex; min-height:2.8rem; align-items:center; justify-content:center; gap:.6rem; padding:.7rem 1rem; border-radius:.4rem; background:#7f0303; color:#fff; font-size:.85rem; font-weight:650; }
+  .welcome-start a:hover { background:#a22020; }
+  .welcome-start a:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+  @media(min-width:680px) { .welcome-presentation { grid-template-columns:minmax(0,1.45fr) minmax(16rem,.75fr); } .welcome-goal-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+</style>

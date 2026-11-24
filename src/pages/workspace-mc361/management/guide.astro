@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+import Layout from '@/src/layouts/Layout.astro';
+import WorkspaceHeader from '@/src/components/WorkspaceHeader.astro';
+import { Content } from '@/GUIA_ADMINISTRADORES.md';
+import { COLLABORATOR_GUIDE } from '@/lib/workspace-guides';
+import { workspaceButtonClass } from '@/lib/workspace-controls';
+import { BookOpen, ArrowUpRight, LockKeyhole } from 'lucide-react';
+
+const session = Astro.locals.session;
+if (!session) return Astro.redirect('/workspace-mc361/login');
+if (session.role !== 'admin') return Astro.redirect('/workspace-mc361/content/chapters');
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+const sections = [
+  { id: 'novedades', label: 'Novedades' },
+  { id: 'guia-revision-cambios', label: 'Revisión y publicación' },
+  { id: 'guia-gestion-capitulos', label: 'Capítulos' },
+  { id: 'guia-colaboradores-acceso', label: 'Accesos' },
+  { id: 'guia-examenes', label: 'Exámenes' },
+  { id: 'guia-mantenimiento', label: 'Mantenimiento' },
+];
+---
+
+<Layout title="Guía de administración | Resistencia de Materiales">
+  <WorkspaceHeader session={session} />
+  <main class="mx-auto max-w-6xl px-4 py-8 font-sans sm:px-6 sm:py-10">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <p class="inline-flex items-center gap-2 text-sm font-semibold text-[#765e5e]">
+        <LockKeyhole size={17} aria-hidden="true" /> Solo administradores
+      </p>
+      <a href={COLLABORATOR_GUIDE} target="_blank" rel="noopener noreferrer" class={workspaceButtonClass()}>
+        <BookOpen size={17} aria-hidden="true" /> Formato de contenidos <ArrowUpRight size={16} aria-hidden="true" />
+      </a>
+    </div>
+    <nav aria-label="Apartados de la guía de administración" class="mb-6 flex flex-wrap gap-2">
+      {sections.map(({ id, label }) => (
+        <a href={`#${id}`} class="inline-flex min-h-11 items-center rounded-lg border border-[#e3caca] bg-white px-3 py-2 text-sm font-semibold text-[#6a2022] transition-colors hover:bg-[#f8eaea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B0000]">{label}</a>
+      ))}
+    </nav>
+    <article class="admin-guide-copy rounded-xl border border-[#e3caca] bg-white px-5 py-7 sm:px-9 sm:py-9">
+      <Content />
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .admin-guide-copy { color: #5f4445; line-height: 1.75; font-size: 1rem; overflow-wrap: anywhere; }
+  .admin-guide-copy :global(h1) { margin: 0 0 1rem; color: #3b2022; font-size: clamp(1.65rem, 4vw, 2.2rem); font-weight: 700; line-height: 1.25; }
+  .admin-guide-copy :global(h2) { margin: 2.5rem 0 1rem; border-top: 1px solid #eadada; padding-top: 1.5rem; color: #6a2022; font-size: 1.4rem; font-weight: 700; line-height: 1.35; }
+  .admin-guide-copy :global(h3) { margin: 1.75rem 0 .75rem; color: #6a2022; font-size: 1.1rem; font-weight: 600; }
+  .admin-guide-copy :global(p), .admin-guide-copy :global(ul), .admin-guide-copy :global(ol) { margin: .8rem 0; max-width: 85ch; }
+  .admin-guide-copy :global(ul) { list-style: disc; padding-left: 1.4rem; }
+  .admin-guide-copy :global(ol) { list-style: decimal; padding-left: 1.4rem; }
+  .admin-guide-copy :global(li) { margin: .55rem 0; padding-left: .2rem; }
+  .admin-guide-copy :global(a[href]) { color: #7f0303; text-decoration: underline; text-underline-offset: 3px; }
+  .admin-guide-copy :global(a[href]:focus-visible) { outline: 2px solid #8B0000; outline-offset: 3px; border-radius: 2px; }
+  .admin-guide-copy :global([id]) { scroll-margin-top: 9rem; }
+  .admin-guide-copy :global(pre) { max-width: 100%; overflow-x: auto; margin: 1rem 0; border: 1px solid #eadada; border-radius: .6rem; padding: 1rem; font-size: .875rem; }
+  .admin-guide-copy :global(:not(pre) > code) { border-radius: .25rem; background: #faf0ef; padding: .1rem .25rem; font-size: .9em; color: #6a2022; }
+  .admin-guide-copy :global(strong) { font-weight: 600; }
+</style>

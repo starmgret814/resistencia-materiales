@@ -26,6 +26,30 @@ export interface ApprovedSubtopicContent {
   authorEmail?: string;
 }
 
+/** Shared by public rendering and review, including the existing legacy-source bridge. */
+export async function effectiveCourseMarkdown(chapterNumber: string, cleanSlug: string, text: string): Promise<string> {
+  let contentMarkdown = text;
+  if (await matchesPreviousChapterOneRevision(chapterNumber, cleanSlug, text)) {
+    try { contentMarkdown = await loadProjectMarkdown(chapterNumber, cleanSlug) || text; }
+    catch { /* Keep the published content if the project source is unavailable. */ }
+  }
+  return contentMarkdown;
+}
+
+export async function approvedSubtopicFromData(data: Record<string, any>, chapterNumber: string, cleanSlug: string): Promise<ApprovedSubtopicContent | null> {
+  const publishedText = data.publishedContent || (data.status === 'approved' ? data.contentMarkdown : null);
+  if (!publishedText) return null;
+  const contentMarkdown = await effectiveCourseMarkdown(chapterNumber, cleanSlug, publishedText);
+  return {
+    title: data.publishedTitle || data.title,
+    chapterId: data.chapterId,
+    slug: data.slug,
+    contentMarkdown,
+    updatedAt: data.publishedAt || data.updatedAt,
+    authorEmail: data.publishedBy || data.authorEmail,
+  };
+}
+
 export async function getApprovedSubtopic(chapterNumber: string, slug: string, strict = false): Promise<ApprovedSubtopicContent | null> {
   try {
     const cleanSlug = slug.includes('/') ? slug.split('/').pop()! : slug;
@@ -34,25 +58,7 @@ export async function getApprovedSubtopic(chapterNumber: string, slug: string, s
     // 1. Consultar en drafts (donde reside el contenido aprobado / publicado con permisos ya otorgados)
     const snap = await getDoc(doc(db, 'drafts', docId));
     if (snap.exists()) {
-      const data = snap.data();
-      const publishedText = data.publishedContent || (data.status === 'approved' ? data.contentMarkdown : null);
-      if (publishedText) {
-        let contentMarkdown = publishedText;
-        // Bridge the old published chapter to its explicit, annotated MDX. A
-        // different published revision always keeps priority over the project.
-        if (await matchesPreviousChapterOneRevision(chapterNumber, cleanSlug, publishedText)) {
-          try { contentMarkdown = await loadProjectMarkdown(chapterNumber, cleanSlug) || publishedText; }
-          catch { /* Keep the published content if the project source is unavailable. */ }
-        }
-        return {
-          title: data.publishedTitle || data.title,
-          chapterId: data.chapterId,
-          slug: data.slug,
-          contentMarkdown,
-          updatedAt: data.publishedAt || data.updatedAt,
-          authorEmail: data.publishedBy || data.authorEmail,
-        };
-      }
+      return await approvedSubtopicFromData(snap.data(), chapterNumber, cleanSlug);
     }
   } catch (err) {
     if (strict) throw err;

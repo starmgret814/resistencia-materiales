@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { workspaceFetch } from '@/lib/workspace-api';
 import { Trash2, Shield, User as UserIcon, BookOpen, Plus, Loader2, Edit2, CheckCircle2, X } from 'lucide-react';
 import { loadCourseCatalog } from '@/lib/course-structure-store';
 import type { Chapter } from '@/lib/course-data';
+import { workspaceButtonClass, workspaceInputClass } from '@/lib/workspace-controls';
+import { useModalFocus } from '@/lib/use-modal-focus';
 
 interface Collaborator {
   email: string;
@@ -28,6 +30,10 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
   
   // Confirmar eliminación
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const userDialog = useRef<HTMLDivElement>(null);
+  const revokeDialog = useRef<HTMLDivElement>(null);
+  useModalFocus(isModalOpen, userDialog, () => { if (!saving) setIsModalOpen(false); });
+  useModalFocus(Boolean(userToDelete), revokeDialog, () => setUserToDelete(null));
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type })
@@ -164,14 +170,14 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
         <button 
           onClick={handleOpenAddModal}
           disabled={loading || Boolean(loadError)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors shrink-0"
+          className={workspaceButtonClass('primary')}
         >
           <Plus className="w-4 h-4" />
           Agregar Usuario
         </button>
       </div>
 
-      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchUsers()} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
+      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchUsers()} className={`${workspaceButtonClass()} mt-3`}>Reintentar carga</button></div>}
       <div className="">
         <div className="w-full">
           
@@ -194,15 +200,15 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                 users.map((user) => {
                   const isMe = user.email.toLowerCase() === (currentUserEmail || '').toLowerCase();
                   return (
-                    <div key={user.email} className="flex flex-col md:flex-row md:items-start justify-between px-6 py-5 hover:bg-[#FCF9F7] transition-colors gap-4">
+                    <div key={user.email} className="flex flex-col xl:flex-row xl:items-start justify-between px-4 sm:px-6 py-5 hover:bg-[#FCF9F7] transition-colors gap-4">
                       {/* Info del usuario */}
-                      <div className="flex items-center gap-4 shrink-0 md:w-[250px] lg:w-[300px]">
+                      <div className="flex min-w-0 items-center gap-4 xl:w-[300px] xl:shrink-0">
                         <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold ${user.role === 'admin' ? 'bg-[#f8eaea] text-[#8B0000]' : 'bg-[#E5D7D4] text-[#5A4A4A]'}`}>
                           {user.email.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-[#3E3030] truncate flex items-center gap-2">
-                            {user.email}
+                          <p className="font-medium text-[#3E3030] flex flex-wrap items-center gap-2">
+                            <span className="min-w-0 break-all">{user.email}</span>
                             {isMe && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#E5D7D4] text-[#5A4A4A]">TÚ</span>}
                           </p>
                           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
@@ -243,8 +249,9 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                         <div className="flex items-center gap-1 shrink-0 bg-white sm:bg-transparent rounded-lg p-1 sm:p-0 border sm:border-none border-[#E5D7D4]">
                           <button 
                             onClick={() => handleOpenEditModal(user)}
-                            className="p-1.5 text-[#5A4A4A] hover:text-[#3E3030] hover:bg-[#E5D7D4] rounded-md transition-colors"
+                            className={workspaceButtonClass('quiet', true)}
                             title="Editar permisos"
+                            aria-label={`Editar permisos de ${user.email}`}
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -253,13 +260,14 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                           {!isMe ? (
                             <button 
                               onClick={() => setUserToDelete(user.email)}
-                              className="p-1.5 text-[#967070] hover:text-[#8B0000] hover:bg-[#f8eaea] rounded-md transition-colors"
+                              className={workspaceButtonClass('quiet', true)}
                               title="Revocar acceso"
+                              aria-label={`Revocar acceso de ${user.email}`}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           ) : (
-                            <div className="w-[28px] h-[28px]" aria-hidden="true" />
+                            <div className="size-11" aria-hidden="true" />
                           )}
                         </div>
                       </div>
@@ -277,37 +285,38 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
       {/* Modal Agregar / Editar Usuario */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3e3030]/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-[#E5D7D4] overflow-hidden flex flex-col max-h-[90vh]">
+          <div ref={userDialog} role="dialog" aria-modal="true" aria-labelledby="collaborator-dialog-title" tabIndex={-1} className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-[#E5D7D4] overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-[#E5D7D4] bg-[#FCF9F7] shrink-0">
-              <h3 className="font-bold text-[#3E3030] text-lg">
+              <h3 id="collaborator-dialog-title" className="font-bold text-[#3E3030] text-lg">
                 {isEditing ? 'Editar Colaborador' : 'Nuevo Colaborador'}
               </h3>
             </div>
             
             <form onSubmit={handleSaveUser} className="p-6 overflow-y-auto space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-[#3E3030] mb-1.5">Correo de Google (Gmail)</label>
+                <label htmlFor="collaborator-email" className="block text-sm font-semibold text-[#3E3030] mb-2">Correo de la cuenta de Google</label>
                 <input 
+                  id="collaborator-email"
                   type="email" 
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  disabled={isEditing}
+                  disabled={isEditing || saving}
                   placeholder="usuario@gmail.com"
-                  className="w-full px-3 py-2 bg-white border border-[#d8c2c2] rounded-lg text-sm focus:outline-none focus:border-[#8B0000] focus:ring-1 focus:ring-[#8B0000] disabled:bg-[#fbf7f4] disabled:text-[#756565] disabled:cursor-not-allowed"
+                  className={workspaceInputClass()}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#3E3030] mb-1.5">Rol en la plataforma</label>
-                <div className="flex gap-3">
-                  <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors ${newRole === 'editor' ? 'border-[#8B0000] bg-[#f8eaea] text-[#8B0000]' : 'border-[#d8c2c2] text-[#756565] hover:bg-[#FCF9F7]'}`}>
-                    <input type="radio" name="role" value="editor" checked={newRole === 'editor'} onChange={() => setNewRole('editor')} className="sr-only" />
+                <p id="collaborator-role-label" className="block text-sm font-semibold text-[#3E3030] mb-2">Rol en la plataforma</p>
+                <div role="radiogroup" aria-labelledby="collaborator-role-label" className="flex gap-3">
+                  <label className={`min-h-11 flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#8B0000] ${newRole === 'editor' ? 'border-[#8B0000] bg-[#f8eaea] text-[#8B0000]' : 'border-[#d8c2c2] text-[#756565] hover:bg-[#FCF9F7]'}`}>
+                    <input type="radio" name="role" value="editor" disabled={saving} checked={newRole === 'editor'} onChange={() => setNewRole('editor')} className="sr-only" />
                     <UserIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Editor</span>
                   </label>
-                  <label className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors ${newRole === 'admin' ? 'border-[#8B0000] bg-[#f8eaea] text-[#8B0000]' : 'border-[#d8c2c2] text-[#756565] hover:bg-[#FCF9F7]'}`}>
-                    <input type="radio" name="role" value="admin" checked={newRole === 'admin'} onChange={() => setNewRole('admin')} className="sr-only" />
+                  <label className={`min-h-11 flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#8B0000] ${newRole === 'admin' ? 'border-[#8B0000] bg-[#f8eaea] text-[#8B0000]' : 'border-[#d8c2c2] text-[#756565] hover:bg-[#FCF9F7]'}`}>
+                    <input type="radio" name="role" value="admin" disabled={saving} checked={newRole === 'admin'} onChange={() => setNewRole('admin')} className="sr-only" />
                     <Shield className="w-4 h-4" />
                     <span className="text-sm font-medium">Admin</span>
                   </label>
@@ -319,12 +328,12 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                   <label className="block text-sm font-semibold text-[#3E3030] mb-2">Capítulos Asignados</label>
                   <div className="space-y-2 border border-[#d8c2c2] rounded-lg p-3 bg-[#fbf7f4]">
                     {availableChapters.map(chapter => (
-                      <label key={chapter.id} className="flex items-center gap-3 p-1 cursor-pointer group">
+                      <label key={chapter.id} className="group flex min-h-11 items-center gap-3 rounded-md p-2 cursor-pointer focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#8B0000]">
                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${newChapters.includes(chapter.id) ? 'bg-[#8B0000] border-[#8B0000]' : 'border-[#bca5a5] bg-white group-hover:border-[#8B0000]'}`}>
                           {newChapters.includes(chapter.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                         </div>
                         <span className="text-sm text-[#5A4A4A] font-medium leading-tight">{chapter.title}</span>
-                        <input type="checkbox" className="sr-only" checked={newChapters.includes(chapter.id)} onChange={() => toggleChapter(chapter.id)} />
+                        <input type="checkbox" disabled={saving} className="sr-only" checked={newChapters.includes(chapter.id)} onChange={() => toggleChapter(chapter.id)} />
                       </label>
                     ))}
                     {newChapters.length === 0 && <p className="text-xs text-[#967070] pt-1">Debes seleccionar al menos un capítulo para el editor.</p>}
@@ -333,10 +342,10 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
               )}
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E5D7D4]">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-[#756565] hover:bg-[#f4ecea] rounded-lg transition-colors">
+                <button type="button" disabled={saving} onClick={() => setIsModalOpen(false)} className={workspaceButtonClass()}>
                   Cancelar
                 </button>
-                <button type="submit" disabled={saving || (newRole === 'editor' && newChapters.length === 0)} className="flex items-center gap-2 px-4 py-2 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={saving || (newRole === 'editor' && newChapters.length === 0)} className={workspaceButtonClass('primary')}>
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   {saving ? 'Guardando...' : (isEditing ? 'Guardar Cambios' : 'Registrar Acceso')}
                 </button>
@@ -349,16 +358,16 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
       {/* Modal Confirmar Eliminación */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3e3030]/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-[#E5D7D4] overflow-hidden flex flex-col p-6 text-center">
+          <div ref={revokeDialog} role="dialog" aria-modal="true" aria-labelledby="revoke-dialog-title" aria-describedby="revoke-dialog-description" tabIndex={-1} className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-[#E5D7D4] overflow-hidden flex flex-col p-6 text-center">
             <div className="w-12 h-12 rounded-full bg-[#f8eaea] text-[#8B0000] flex items-center justify-center mx-auto mb-4">
               <Trash2 className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-[#3E3030] mb-2">Revocar Acceso</h3>
-            <p className="text-sm text-[#756565] mb-6">
+            <h3 id="revoke-dialog-title" className="text-lg font-bold text-[#3E3030] mb-2">Revocar Acceso</h3>
+            <p id="revoke-dialog-description" className="text-sm text-[#756565] mb-6">
               ¿Estás seguro de que quieres revocar el acceso a <strong>{userToDelete}</strong>?
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setUserToDelete(null)} className="flex-1 px-4 py-2 text-sm font-medium text-[#756565] bg-[#fbf7f4] hover:bg-[#E5D7D4] rounded-lg transition-colors">
+              <button type="button" onClick={() => setUserToDelete(null)} className={`${workspaceButtonClass()} flex-1`}>
                 Cancelar
               </button>
               <button 
@@ -366,7 +375,7 @@ export default function UserManagement({ currentUserEmail }: { currentUserEmail?
                   executeDeleteUser(userToDelete);
                   setUserToDelete(null);
                 }}
-                className="flex-1 px-4 py-2 text-sm font-bold text-white bg-[#8B0000] hover:bg-[#6a0000] rounded-lg transition-colors"
+                className={`${workspaceButtonClass('primary')} flex-1`}
               >
                 Revocar
               </button>

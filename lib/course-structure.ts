@@ -19,10 +19,18 @@ export interface CourseStructureChange {
   section?: Section
 }
 
+export const COURSE_TITLE_MAX_LENGTH = 160
+
+export function courseTitleError(value: string) {
+  if (!value.trim()) return 'Escribe un título.'
+  if (value.trim().length > COURSE_TITLE_MAX_LENGTH) return `El título debe tener como máximo ${COURSE_TITLE_MAX_LENGTH} caracteres.`
+  return ''
+}
+
 function cleanTitle(value: string) {
-  const title = value.trim()
-  if (!title || title.length > 160) throw new Error('Escribe un título de entre 1 y 160 caracteres.')
-  return title
+  const error = courseTitleError(value)
+  if (error) throw new Error(error)
+  return value.trim()
 }
 export function shortSectionSlug(section: Section) { return section.slug?.split('/').pop() || section.id }
 

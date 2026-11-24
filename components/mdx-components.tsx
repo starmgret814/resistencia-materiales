@@ -3,8 +3,10 @@
 import type { ReactNode, CSSProperties, FC } from 'react'
 import { Children, isValidElement, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useContentSlug } from '@/lib/content-context'
+import { useModalFocus } from '@/lib/use-modal-focus'
 
 export function Definition({ children, title = 'Definición' }: { children: ReactNode; title?: string }) {
   return <aside className="my-7 rounded-r-lg border border-y-0 border-r-0 border-l-4 border-l-[#7f0303] dark:border-l-[#f87171] bg-[#f8eaea] dark:bg-[#281517] px-5 py-4"><p className="academic-label mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#765e5e] dark:text-[#fca5a5]">{title}</p><div className="academic-body text-[#4d3838] dark:text-[#ead4d2]">{children}</div></aside>
@@ -65,7 +67,7 @@ export function Example({ children, title, number }: { children: ReactNode; titl
   return <section className="my-8 rounded-r-lg border-y border-r border-l-4 border-y-[#e3caca] dark:border-y-[#3a2022] border-r-[#e3caca] dark:border-r-[#3a2022] border-l-[#8f2525] dark:border-l-[#f87171] bg-[#fdfaf9] dark:bg-[#1c1012] p-5 sm:p-6 shadow-sm"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8f2525] dark:text-[#fca5a5]">{displayTitle}</p><div className="academic-body text-[#604747] dark:text-[#ead4d2]">{children}</div></section>
 }
 
-export function Problem({ children, title, number, image, imageAlt, imageCaption, imageNumber, imageWidth = '38%', imagePosition = 'right', imageLayout = 'auto' }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageNumber?: string; imageWidth?: string; imagePosition?: 'left' | 'right'; imageLayout?: 'auto' | 'wrap' | 'stacked' }) {
+export function Problem({ children, title, number, image, imageAlt, imageCaption, imageNumber, imageWidth = '38%', imagePosition = 'right', imageLayout = 'auto', imageBorder = true }: { children: ReactNode; title?: string; number?: number | string; image?: string; imageAlt?: string; imageCaption?: string; imageNumber?: string; imageWidth?: string; imagePosition?: 'left' | 'right'; imageLayout?: 'auto' | 'wrap' | 'stacked'; imageBorder?: boolean }) {
   const displayTitle = number ? `Problema ${number}${title ? `: ${title}` : ''}` : (title || 'Problema propuesto')
   const parts = Children.toArray(children)
   const isSolution = (child: ReactNode) => isValidElement<{ 'data-course-kind'?: string }>(child) && (child.type === Solution || child.props['data-course-kind'] === 'solution')
@@ -75,7 +77,7 @@ export function Problem({ children, title, number, image, imageAlt, imageCaption
   return <section className="my-8 rounded-lg border-2 border-dashed border-[#d9aaaa] dark:border-[#4d282b] bg-[#fcf7f5] dark:bg-[#1a0e10] p-5 sm:p-6"><p className="academic-label mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8a6262] dark:text-[#fca5a5]">{displayTitle}</p><div className="problem-content academic-body text-[#604747] dark:text-[#ead4d2]">
     {image ? <>
       <div className={cn('problem-illustrated', `problem-image-${imagePosition}`, stacked ? 'problem-layout-stacked' : 'problem-layout-wrap')} style={{ '--problem-image-width': width } as CSSProperties}>
-        <div className="problem-figure min-w-0 [&>figure]:my-0"><Image src={image} alt={imageAlt || title || 'Figura del problema'} caption={imageCaption} number={imageNumber} /></div>
+        <div className="problem-figure min-w-0 [&>figure]:my-0"><Image src={image} alt={imageAlt || title || 'Figura del problema'} caption={imageCaption} number={imageNumber} border={imageBorder} /></div>
         <div className="problem-statement min-w-0">{parts.filter(child => !isSolution(child))}</div>
       </div>
       {parts.filter(isSolution)}
@@ -86,7 +88,7 @@ export function Problem({ children, title, number, image, imageAlt, imageCaption
 export function Solution({ children }: { children?: ReactNode }) {
   return (
     <details className="mt-5 group">
-      <summary className="cursor-pointer list-none border-t border-[#e3caca] dark:border-[#382022] pt-4 font-semibold text-[#8f2525] dark:text-[#f87171] text-[11px] uppercase tracking-[0.16em] hover:text-[#4b1719] dark:hover:text-[#fca5a5] transition-colors">
+      <summary className="min-h-11 content-center cursor-pointer list-none border-t border-[#e3caca] dark:border-[#382022] pt-4 font-semibold text-[#8f2525] dark:text-[#f87171] text-xs uppercase tracking-[0.16em] hover:text-[#4b1719] dark:hover:text-[#fca5a5] transition-colors">
         <span className="inline-flex items-center gap-1.5">
           <svg className="h-3 w-3 transition-transform group-open:rotate-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -116,6 +118,8 @@ export function Image({
   align = 'center',
   width,
   height,
+  border = true,
+  variant = 'figure',
 }: { 
   src: string; 
   alt: string; 
@@ -127,7 +131,43 @@ export function Image({
   align?: 'left' | 'center' | 'right';
   width?: string | number;
   height?: string | number;
+  border?: boolean;
+  variant?: 'figure' | 'table-cell';
 }) {
+  const [expanded, setExpanded] = useState(false)
+  const [zoom, setZoom] = useState(1)
+  const [lightboxFit, setLightboxFit] = useState<{ width: number; height: number } | null>(null)
+  const dialog = useRef<HTMLDivElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const lightboxCanvas = useRef<HTMLDivElement>(null)
+  const lightboxImage = useRef<HTMLImageElement>(null)
+  useModalFocus(expanded, dialog, () => setExpanded(false))
+  useEffect(() => {
+    if (!expanded) {
+      setZoom(1)
+      setLightboxFit(null)
+    }
+  }, [expanded])
+  useEffect(() => {
+    if (!expanded) return
+    const canvas = lightboxCanvas.current
+    if (!canvas) return
+    const fitImage = () => {
+      const image = lightboxImage.current
+      if (!image?.naturalWidth || !image.naturalHeight) return
+      const styles = getComputedStyle(canvas)
+      const horizontalPadding = Number.parseFloat(styles.paddingLeft) + Number.parseFloat(styles.paddingRight)
+      const verticalPadding = Number.parseFloat(styles.paddingTop) + Number.parseFloat(styles.paddingBottom)
+      const availableWidth = Math.max(1, canvas.clientWidth - horizontalPadding)
+      const availableHeight = Math.max(1, canvas.clientHeight - verticalPadding)
+      const scale = Math.min(availableWidth / image.naturalWidth, availableHeight / image.naturalHeight)
+      setLightboxFit({ width: image.naturalWidth * scale, height: image.naturalHeight * scale })
+    }
+    const observer = new ResizeObserver(fitImage)
+    observer.observe(canvas)
+    fitImage()
+    return () => observer.disconnect()
+  }, [expanded])
   const contextSlug = useContentSlug()
   const slug = propSlug || contextSlug
   const anchor = id || (number ? `fig-${number}` : undefined)
@@ -138,6 +178,18 @@ export function Image({
     // Strip leading ./ if present
     const filename = src.replace(/^\.\//, '')
     resolvedSrc = `/api/imagen/${slug}/${filename}`
+  }
+
+  if (variant === 'table-cell') {
+    const length = (value?: string | number) => {
+      if (typeof value === 'number') return value > 0 ? `${value}px` : undefined
+      const clean = value?.trim() || ''
+      return /^\d+(?:\.\d+)?(?:px|%|rem|em)$/.test(clean) ? clean : /^\d+(?:\.\d+)?$/.test(clean) ? `${clean}px` : undefined
+    }
+    return <span className="course-table-image" style={{ width: length(width) || '240px' }}>
+      <img src={resolvedSrc} alt={alt} loading="lazy" decoding="async" style={{ maxHeight: length(height) || '160px' }} />
+      {caption && <span className="course-table-image-caption">{caption}</span>}
+    </span>
   }
 
   const sizeClasses = {
@@ -166,14 +218,43 @@ export function Image({
       className={cn("course-figure my-8 w-full", alignClasses[align], !width && sizeClasses[size])}
       style={maxWidthStyle}
     >
-      <img 
-        src={resolvedSrc} 
-        alt={alt} 
-        className="h-auto w-full rounded-lg border border-[#e5cfcd]" 
-        style={imgStyle}
-        loading="lazy" 
-      />
+      <button ref={trigger} type="button" className="course-figure-trigger group relative block w-full rounded-lg text-left" onClick={() => setExpanded(true)} aria-label={`Ampliar imagen: ${alt}`}>
+        <img
+          src={resolvedSrc}
+          alt={alt}
+          className={cn('h-auto w-full rounded-lg', border && 'border border-[#e5cfcd]')}
+          style={imgStyle}
+          loading="lazy"
+        />
+        <span className="course-figure-zoom-hint" aria-hidden="true"><ZoomIn className="size-4" />Ampliar</span>
+      </button>
       {(caption || number) && <figcaption className="mt-2 text-center text-xs text-[#765e5e] dark:text-[#bca4a3]">{number && <><a className="course-reference" href={`#${anchor}`}>Figura {number}</a>{caption ? '. ' : ''}</>}{caption}</figcaption>}
+      {expanded && createPortal(<div className="course-lightbox" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}>
+        <div ref={dialog} role="dialog" aria-modal="true" aria-label={`Vista ampliada: ${alt}`} tabIndex={-1} className="course-lightbox-dialog">
+          <div className="course-lightbox-toolbar font-sans">
+            <p className="min-w-0 flex-1 truncate text-sm font-semibold">{caption || alt}</p>
+            <output className="text-xs tabular-nums" aria-live="polite">{Math.round(zoom * 100)} %</output>
+            <button type="button" onClick={() => setZoom(value => Math.max(.75, value - .25))} disabled={zoom <= .75} aria-label="Alejar imagen" title="Alejar"><ZoomOut className="size-4" /></button>
+            <button type="button" onClick={() => setZoom(1)} disabled={zoom === 1} aria-label="Restablecer zoom" title="Restablecer zoom"><RotateCcw className="size-4" /></button>
+            <button type="button" onClick={() => setZoom(value => Math.min(3, value + .25))} disabled={zoom >= 3} aria-label="Acercar imagen" title="Acercar"><ZoomIn className="size-4" /></button>
+            <button type="button" onClick={() => setExpanded(false)} aria-label="Cerrar imagen ampliada" title="Cerrar"><X className="size-4" /></button>
+          </div>
+          <div ref={lightboxCanvas} className="course-lightbox-canvas" data-zoomed={zoom > 1 ? 'true' : 'false'}>
+            <div className="course-lightbox-media" style={lightboxFit ? { width: lightboxFit.width * zoom, height: lightboxFit.height * zoom } : undefined}>
+              <img ref={lightboxImage} src={resolvedSrc} alt={alt} decoding="async" onLoad={() => {
+                const canvas = lightboxCanvas.current
+                const image = lightboxImage.current
+                if (!canvas || !image?.naturalWidth || !image.naturalHeight) return
+                const styles = getComputedStyle(canvas)
+                const availableWidth = Math.max(1, canvas.clientWidth - Number.parseFloat(styles.paddingLeft) - Number.parseFloat(styles.paddingRight))
+                const availableHeight = Math.max(1, canvas.clientHeight - Number.parseFloat(styles.paddingTop) - Number.parseFloat(styles.paddingBottom))
+                const scale = Math.min(availableWidth / image.naturalWidth, availableHeight / image.naturalHeight)
+                setLightboxFit({ width: image.naturalWidth * scale, height: image.naturalHeight * scale })
+              }} />
+            </div>
+          </div>
+        </div>
+      </div>, document.body)}
     </figure>
   )
 }
@@ -217,7 +298,7 @@ export const Table: FC<TableProps> = ({ children, title, caption, align = 'cente
   return (
     <div className="my-7">
       {displayTitle && (
-        <p className="academic-label mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#7f0303] dark:text-[#fca5a5]">
+        <p className="course-table-title mb-2 font-bold text-[#7f0303] dark:text-[#fca5a5]">
           {displayTitle}
         </p>
       )}

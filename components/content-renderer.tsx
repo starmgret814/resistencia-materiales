@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react'
+import type { ComponentProps, ComponentPropsWithoutRef, ReactNode } from 'react'
 import { createContext, memo, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkDirective from 'remark-directive'
@@ -12,8 +12,21 @@ import { Image, ImageGrid, Definition, Formula, Example, Problem, Solution, Summ
 import type { CourseDocument } from '@/lib/content-schema'
 import { Tool } from '@/components/interactive-tools'
 
-type TableOptions = { align?: 'left' | 'center' | 'right'; width?: string; columnWidths?: string[] }
+type TableOptions = { title?: string; align?: 'left' | 'center' | 'right'; minWidth?: string; columnWidths?: string[]; imageWidth?: string; imageHeight?: string }
 const TableContext = createContext<TableOptions>({})
+const TableCellContext = createContext(false)
+
+function rehypeClassifyGreekMath() {
+  return (tree: unknown) => {
+    const greek = /[\u0370-\u03ff\u1f00-\u1fff]/u
+    visit(tree as never, 'element', (node: any) => {
+      const classes = Array.isArray(node.properties?.className) ? node.properties.className : []
+      if (!classes.includes('mathnormal')) return
+      const text = (node.children || []).map((child: any) => child.type === 'text' ? child.value : '').join('')
+      if (greek.test(text) && !classes.includes('technical-math-greek')) classes.push('technical-math-greek')
+    })
+  }
+}
 
 function tableLength(value: string): string | undefined {
   const clean = value.trim()
@@ -21,19 +34,27 @@ function tableLength(value: string): string | undefined {
 }
 
 function MarkdownTable({ children }: { children?: ReactNode }) {
-  const { align, width, columnWidths } = useContext(TableContext)
-  return <div className="my-6 max-w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm" style={{ width: width || '100%', marginInline: 'auto' }}>
-    <table style={{ width: '100%', textAlign: align || 'left', tableLayout: columnWidths?.length ? 'fixed' : undefined }}>
+  const { title, align, minWidth, columnWidths } = useContext(TableContext)
+  return <div role="region" aria-label={title || 'Tabla de contenido'} tabIndex={0} className="course-table-scroll my-6 max-w-full overflow-x-auto rounded-lg border border-[#e3caca] dark:border-[#382022] bg-white dark:bg-[#1a0f10] shadow-sm" style={{ width: '100%', marginInline: 'auto' }}>
+    <table aria-label={title} style={{ width: '100%', minWidth, textAlign: align || 'left', tableLayout: columnWidths?.length ? 'fixed' : undefined }}>
       {columnWidths?.length ? <colgroup>{columnWidths.map((value, index) => <col key={index} style={{ width: tableLength(value) }} />)}</colgroup> : null}
       {children}
     </table>
   </div>
 }
 
-function MarkdownCell({ header, children, style }: ComponentPropsWithoutRef<'td'> & { header?: boolean }) {
+function MarkdownCell({ header, children, style, align: columnAlign }: ComponentPropsWithoutRef<'td'> & { header?: boolean }) {
   const { align } = useContext(TableContext)
   const Tag = header ? 'th' : 'td'
-  return <Tag style={{ ...style, textAlign: style?.textAlign || align || 'left', overflowWrap: 'anywhere' }}>{children}</Tag>
+  const cellAlign = columnAlign === 'left' || columnAlign === 'center' || columnAlign === 'right' ? columnAlign : undefined
+  return <Tag scope={header ? 'col' : undefined} style={{ ...style, textAlign: style?.textAlign || cellAlign || align || 'left', overflowWrap: 'anywhere', verticalAlign: 'middle' }}><TableCellContext.Provider value={true}>{children}</TableCellContext.Provider></Tag>
+}
+
+function MarkdownImage({ inline = false, ...props }: ComponentProps<typeof Image> & { inline?: boolean }) {
+  const inCell = useContext(TableCellContext)
+  const options = useContext(TableContext)
+  if (!inCell && !inline) return <Image {...props} />
+  return <Image {...props} variant="table-cell" width={props.width || options.imageWidth} height={props.height || options.imageHeight} />
 }
 
 const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', 'solution', 'quiz', 'summary', 'formula', 'imagegrid', 'image', 'table', 'tablegrid', 'tool'])
@@ -41,7 +62,7 @@ const allowedDirectives = new Set(['definition', 'note', 'example', 'problem', '
 function InlineMarkdown({ children }: { children: string }) {
   return <ReactMarkdown
     remarkPlugins={[remarkMath]}
-    rehypePlugins={[rehypeKatex]}
+    rehypePlugins={[rehypeKatex, rehypeClassifyGreekMath]}
     components={{ p: ({ children: content }) => <>{content}</> }}
   >
     {children}
@@ -53,6 +74,13 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
   return (tree: unknown) => {
     let problemIndex = problemOffset
     visit(tree as never, 'textDirective', (node: any) => {
+      if (node.name === 'cellimage') {
+        node.data ||= {}
+        node.data.hName = 'span'
+        node.data.hProperties = { 'data-course-cell-image': 'true' }
+        for (const key of ['src', 'alt', 'caption', 'width', 'height']) node.data.hProperties[`data-course-${key}`] = node.attributes?.[key] || ''
+        return
+      }
       if (node.name !== 'term') return
       node.data ||= {}
       node.data.hName = 'span'
@@ -84,6 +112,8 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
         'data-course-number': number,
         'data-course-boxed': node.attributes?.boxed || '',
         'data-course-bold': node.attributes?.bold || '',
+        'data-course-border': node.attributes?.border || '',
+        'data-course-image-border': node.attributes?.imageBorder || '',
         'data-course-image': node.attributes?.image || '',
         'data-course-image-alt': node.attributes?.imageAlt || '',
         'data-course-image-caption': node.attributes?.imageCaption || '',
@@ -93,6 +123,9 @@ function remarkCourseDirectives({ chapterNumber, problemOffset = 0 }: { chapterN
         'data-course-image-number': node.attributes?.imageNumber || '',
         'data-course-question': node.attributes?.question || '',
         'data-course-column-widths': node.attributes?.columnWidths || '',
+        'data-course-table-min-width': node.attributes?.minWidth || '',
+        'data-course-table-image-width': node.attributes?.imageWidth || '',
+        'data-course-table-image-height': node.attributes?.imageHeight || '',
         'data-course-columns': node.attributes?.columns || '',
         'data-course-src': node.attributes?.src || '',
         'data-course-alt': node.attributes?.alt || '',
@@ -115,6 +148,8 @@ function CourseDirective({
   number,
   boxed,
   bold,
+  border,
+  imageBorder,
   image,
   imageAlt,
   imageCaption,
@@ -125,6 +160,9 @@ function CourseDirective({
   question,
   columns,
   columnWidths,
+  minWidth,
+  tableImageWidth,
+  tableImageHeight,
   position,
   src,
   alt,
@@ -142,6 +180,8 @@ function CourseDirective({
   number?: string;
   boxed?: string;
   bold?: string;
+  border?: string;
+  imageBorder?: string;
   image?: string;
   imageAlt?: string;
   imageCaption?: string;
@@ -152,6 +192,9 @@ function CourseDirective({
   question?: string;
   columns?: string;
   columnWidths?: string;
+  minWidth?: string;
+  tableImageWidth?: string;
+  tableImageHeight?: string;
   position?: string;
   src?: string;
   alt?: string;
@@ -175,6 +218,7 @@ function CourseDirective({
         height={height || undefined}
         size={(size as any) || undefined}
         align={(align as any) || undefined}
+        border={border !== 'false'}
       />
     )
   }
@@ -194,7 +238,7 @@ function CourseDirective({
     return <Example title={title || undefined} number={number}>{children}</Example>
   }
   if (kind === 'problem') {
-    return <Problem title={title || undefined} number={number} image={image} imageAlt={imageAlt} imageCaption={imageCaption} imageWidth={imageWidth} imagePosition={imagePosition === 'left' ? 'left' : 'right'} imageLayout={imageLayout === 'stacked' || imageLayout === 'wrap' ? imageLayout : 'auto'} imageNumber={imageNumber}>{children}</Problem>
+    return <Problem title={title || undefined} number={number} image={image} imageAlt={imageAlt} imageCaption={imageCaption} imageWidth={imageWidth} imagePosition={imagePosition === 'left' ? 'left' : 'right'} imageLayout={imageLayout === 'stacked' || imageLayout === 'wrap' ? imageLayout : 'auto'} imageNumber={imageNumber} imageBorder={imageBorder !== 'false'}>{children}</Problem>
   }
   if (kind === 'summary') {
     return <Summary title={title}>{children}</Summary>
@@ -205,8 +249,11 @@ function CourseDirective({
   }
   if (kind === 'table') {
     const options: TableOptions = {
-      align: align === 'left' || align === 'center' || align === 'right' ? align : undefined,
-
+      title,
+      align: align === 'left' || align === 'right' ? align : 'center',
+      minWidth: minWidth ? tableLength(minWidth) : undefined,
+      imageWidth: tableImageWidth ? tableLength(tableImageWidth) : undefined,
+      imageHeight: tableImageHeight ? tableLength(tableImageHeight) : undefined,
       columnWidths: columnWidths ? columnWidths.split(',').map(value => value.trim()) : undefined,
     }
     return <TableContext.Provider value={options}>
@@ -248,6 +295,8 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
       number={number}
       boxed={boxed}
       bold={bold}
+      border={String(rest['data-course-border' as keyof typeof rest] || '')}
+      imageBorder={String(rest['data-course-image-border' as keyof typeof rest] || '')}
       image={String(rest['data-course-image' as keyof typeof rest] || '')}
       imageAlt={String(rest['data-course-image-alt' as keyof typeof rest] || '')}
       imageCaption={String(rest['data-course-image-caption' as keyof typeof rest] || '')}
@@ -258,6 +307,9 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
       question={question}
       columns={columns}
       columnWidths={columnWidths}
+      minWidth={String(rest['data-course-table-min-width' as keyof typeof rest] || '')}
+      tableImageWidth={String(rest['data-course-table-image-width' as keyof typeof rest] || '')}
+      tableImageHeight={String(rest['data-course-table-image-height' as keyof typeof rest] || '')}
       position={position}
       src={src}
       alt={alt}
@@ -273,16 +325,20 @@ function DirectiveDiv(props: ComponentPropsWithoutRef<'div'> & { node?: unknown 
 }
 
 export function ContentRenderer({ document, headingPrefix, problemOffset = 0 }: { document: CourseDocument; headingPrefix?: string; problemOffset?: number }) {
-  return <article className="mdx-content">
+  return <article className="mdx-content course-reading-defaults">
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath, remarkDirective, [remarkCourseDirectives, { chapterNumber: headingPrefix?.split('.')[0], problemOffset }], [remarkNumberHeadings, { prefix: headingPrefix }]]}
-      rehypePlugins={[rehypeKatex]}
+      rehypePlugins={[rehypeKatex, rehypeClassifyGreekMath]}
       components={{
         span: ({ node: _node, children, ...rest }: ComponentPropsWithoutRef<'span'> & { node?: unknown }) => {
+          if (rest['data-course-cell-image' as keyof typeof rest]) {
+            const value = (name: string) => String(rest[`data-course-${name}` as keyof typeof rest] || '')
+            return <MarkdownImage inline src={value('src')} alt={value('alt')} caption={value('caption') || undefined} width={value('width') || undefined} height={value('height') || undefined} />
+          }
           const definition = rest['data-course-term' as keyof typeof rest]
           return definition ? <Term definition={<InlineMarkdown>{String(definition)}</InlineMarkdown>}>{children}</Term> : <span {...rest}>{children}</span>
         },
-        img: ({ src, alt, title }: any) => <Image src={src || ''} alt={alt || ''} caption={title || undefined} />,
+        img: ({ src, alt, title }: any) => <MarkdownImage src={src || ''} alt={alt || ''} caption={title || undefined} />,
         div: DirectiveDiv,
         table: MarkdownTable,
         thead: ({ children }: any) => (

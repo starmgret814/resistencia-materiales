@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BookOpen,
   Home,
   Users,
   Command,
@@ -13,8 +14,11 @@ import {
   CircleHelp,
   FileText,
   Menu,
+  Maximize2,
+  Minimize2,
   Moon,
   Search,
+  SlidersHorizontal,
   Sun,
   X,
 } from 'lucide-react'
@@ -22,6 +26,7 @@ import { cn } from '@/lib/utils'
 import { chapters, type Chapter } from '@/lib/course-data'
 import CourseSearch from '@/components/course-search'
 import { useModalFocus } from '@/lib/use-modal-focus'
+import { defaultReadingPreferences, parseReadingPreferences, readingPreferenceStyle, READING_PREFERENCES_KEY, type ReadingPreferences } from '@/lib/reading-preferences'
 
 // ─── Logo ──────────────────────────────────────────────────────────────
 function LogoMark() {
@@ -75,11 +80,11 @@ function Header({ onMenu, onSearch, menuOpen }: { onMenu: () => void; onSearch: 
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <button onClick={onSearch} className="hidden h-9 items-center gap-2 rounded-md border border-[#d5c0c0] dark:border-[#422527] bg-white/70 dark:bg-[#231416] px-3 text-sm text-[#765e5e] dark:text-[#cbb0ae] shadow-sm hover:border-[#b78383] hover:text-[#7f0303] dark:hover:text-[#f87171] md:flex transition-colors" aria-label="Buscar en el curso">
+          <button onClick={onSearch} className="study-control study-search-desktop" aria-label="Buscar en el curso">
             <Search className="size-4" /><span>Buscar en el curso</span><kbd className="ml-3 inline-flex items-center gap-1 rounded border border-[#e3caca] dark:border-[#422527] bg-[#f7f5f0] dark:bg-[#150c0d] px-1.5 py-0.5 text-[10px] text-[#967070] dark:text-[#a08282]">{mac ? <Command className="size-3" aria-label="Command" /> : 'Ctrl'} K</kbd>
           </button>
-          <button onClick={onSearch} className="inline-flex size-9 items-center justify-center rounded-md text-[#7f0303] dark:text-[#f87171] hover:bg-[#f2dddd] dark:hover:bg-[#2d181a] md:hidden transition-colors" aria-label="Buscar"><Search className="size-5" /></button>
-          <button onClick={toggleDark} className="inline-flex size-9 items-center justify-center rounded-md text-[#7f0303] dark:text-[#f87171] hover:bg-[#f2dddd] dark:hover:bg-[#2d181a] transition-colors" title={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'} aria-label={dark ? 'Activar modo claro' : 'Activar modo oscuro'}>
+          <button onClick={onSearch} className="study-control study-control-quiet study-control-icon study-search-mobile" aria-label="Buscar"><Search className="size-5" /></button>
+          <button onClick={toggleDark} className="study-control study-control-quiet study-control-icon" title={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'} aria-label={dark ? 'Activar modo claro' : 'Activar modo oscuro'}>
             {dark ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
           </button>
         </div>
@@ -98,6 +103,7 @@ function Sidebar({
   onNavigate,
   examsActive,
   homeActive,
+  welcomeActive,
   aboutActive,
 }: {
   open: boolean
@@ -108,6 +114,7 @@ function Sidebar({
   onNavigate?: (slug: string) => void
   examsActive: boolean
   homeActive: boolean
+  welcomeActive: boolean
   aboutActive: boolean
 }) {
   const asideRef = useRef<HTMLElement>(null)
@@ -156,7 +163,8 @@ function Sidebar({
           <div className="mb-5 border-b border-[#e3caca] pb-5 dark:border-[#382022]">
             <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#967070] dark:text-[#ab8e8e]">Recursos de estudio</p>
             <a href="/" onClick={onClose} aria-current={homeActive ? 'page' : undefined} className={cn('mb-1 flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors', homeActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}><Home className="size-4 shrink-0" aria-hidden="true" />Inicio</a>
-            <a href="/examenes" onClick={onClose} aria-current={examsActive ? 'page' : undefined} className={cn('flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7f0303]', examsActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}>
+            <a href="/bienvenida" onClick={onClose} aria-current={welcomeActive ? 'page' : undefined} className={cn('mb-1 flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors', welcomeActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}><BookOpen className="size-4 shrink-0" aria-hidden="true" />Bienvenida al curso</a>
+            <a href="/examenes" onClick={onClose} aria-current={examsActive ? 'page' : undefined} className={cn('mb-1 flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7f0303]', examsActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}>
               <FileText className="size-4 shrink-0" aria-hidden="true" /><span className="flex-1">Exámenes pasados</span><ChevronRight className="size-3.5 opacity-50" aria-hidden="true" />
             </a>
             <a href="/acerca-de" onClick={onClose} aria-current={aboutActive ? 'page' : undefined} className={cn('flex items-center gap-3 rounded-lg px-3 py-3 text-[13px] font-semibold transition-colors', aboutActive ? 'bg-[#efdcda] text-[#7f0303] dark:bg-[#381618] dark:text-[#fca5a5]' : 'text-[#604747] hover:bg-[#f3e0df] dark:text-[#dfc2c0] dark:hover:bg-[#2d191b]')}><Users className="size-4 shrink-0" aria-hidden="true" />Acerca del proyecto</a>
@@ -165,7 +173,7 @@ function Sidebar({
             const isExpanded = expanded === chapter.number
             return (
               <div key={chapter.number} className="mb-1">
-                <button aria-expanded={isExpanded} aria-controls={`chapter-${chapter.number}`} onClick={() => setExpanded(isExpanded ? '' : chapter.number)} className={cn('flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors', isExpanded ? 'text-[#4b1719] dark:text-[#fca5a5] font-bold' : 'text-[#604747] dark:text-[#dfc2c0] hover:bg-[#f3e0df] dark:hover:bg-[#2d191b]')}>
+                <button aria-expanded={isExpanded} aria-controls={`chapter-${chapter.number}`} onClick={() => setExpanded(isExpanded ? '' : chapter.number)} className={cn('flex min-h-11 w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors', isExpanded ? 'text-[#4b1719] dark:text-[#fca5a5] font-bold' : 'text-[#604747] dark:text-[#dfc2c0] hover:bg-[#f3e0df] dark:hover:bg-[#2d191b]')}>
                   <span className="w-5 font-mono text-[10px] font-semibold text-[#a47b7b] dark:text-[#b48888]">{chapter.number}</span>
                   <span className="flex-1 text-[13px] font-semibold">{chapter.title}</span>
                   {isExpanded ? <ChevronDown className="size-3.5 text-[#967070] dark:text-[#ab8e8e]" /> : <ChevronRight className="size-3.5 text-[#967070] dark:text-[#ab8e8e]" />}
@@ -194,7 +202,7 @@ function Sidebar({
                           onClose()
                         }}
                         className={cn(
-                          'relative block w-full rounded-r-md px-3 py-2 text-left text-xs leading-tight transition-colors',
+                          'relative flex min-h-11 w-full items-center rounded-r-md px-3 py-2 text-left text-xs leading-relaxed transition-colors',
                           isActive
                             ? 'bg-[#f2dddd] dark:bg-[#381618] font-semibold text-[#7f0303] dark:text-[#fca5a5] before:absolute before:-left-[13px] before:top-0 before:h-full before:w-0.5 before:bg-[#7f0303] dark:before:bg-[#ef4444]'
                             : section.slug
@@ -207,7 +215,7 @@ function Sidebar({
                         ) : (
                           <span className="mr-1.5 text-[10px] text-[#b28a8a] dark:text-[#9c7878]">{section.id}</span>
                         )}
-                        {section.title}
+                        <span className="min-w-0 break-words">{section.title}</span>
                       </a>
                     )
                   })}
@@ -217,7 +225,7 @@ function Sidebar({
           })}
         </nav>
         <div className="border-t border-[#e3caca] dark:border-[#382022] p-4">
-          <details className="rounded-lg bg-[#f1dddd] px-3 py-3 text-xs dark:bg-[#2a1416]"><summary className="flex cursor-pointer items-center gap-2 font-semibold text-[#6a2022] dark:text-[#fca5a5]"><CircleHelp className="size-4" aria-hidden="true" />Guía rápida</summary><div className="mt-3 space-y-2 leading-relaxed text-[#795e5e] dark:text-[#cbb0ae]"><p>Para buscar un tema, pulsa Ctrl + K. En Mac, usa Command + K.</p><p>El índice de la página te lleva a cada apartado. Los enlaces al final del tema te llevan a la sección anterior o siguiente.</p><p>Intenta resolver los problemas antes de abrir sus soluciones.</p></div></details>
+          <details className="rounded-lg bg-[#f1dddd] px-3 py-1 text-xs dark:bg-[#2a1416]"><summary className="flex min-h-11 cursor-pointer items-center gap-2 font-semibold text-[#6a2022] dark:text-[#fca5a5]"><CircleHelp className="size-4" aria-hidden="true" />Guía rápida</summary><div className="mb-2 mt-3 space-y-2 leading-relaxed text-[#795e5e] dark:text-[#cbb0ae]"><p>Para buscar un tema, pulsa Ctrl + K. En Mac, usa Command + K.</p><p>El índice de la página te lleva a cada apartado. Los enlaces al final del tema te llevan a la sección anterior o siguiente.</p><p>Intenta resolver los problemas antes de abrir sus soluciones.</p></div></details>
         </div>
       </aside>
     </>
@@ -298,6 +306,33 @@ function ReadingPosition() {
   </>
 }
 
+function ReadingControls({ preferences, onChange, focusMode, onFocusMode }: { preferences: ReadingPreferences; onChange: (next: ReadingPreferences) => void; focusMode: boolean; onFocusMode: () => void }) {
+  const settings = useRef<HTMLDetailsElement>(null)
+  useEffect(() => {
+    const closeOutside = (event: PointerEvent) => { if (settings.current?.open && !settings.current.contains(event.target as Node)) settings.current.open = false }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [])
+  const sliders = [
+    { label: 'Tamaño del texto', key: 'fontSize' as const, min: 18, max: 26, step: 1, value: `${preferences.fontSize} px` },
+    { label: 'Interlineado', key: 'leading' as const, min: 1.5, max: 2.1, step: .05, value: preferences.leading.toFixed(2).replace('.', ',') },
+    { label: 'Ancho de lectura', key: 'width' as const, min: 680, max: 1080, step: 20, value: `${preferences.width} px` },
+  ]
+  return <div className="reading-controls flex flex-wrap items-center gap-2 font-sans">
+    <details ref={settings} className="reading-settings" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
+      <summary className="reading-context-control"><SlidersHorizontal className="size-4" aria-hidden="true" /><span>Ajustes</span><ChevronDown className="size-3.5" aria-hidden="true" /></summary>
+      <div className="reading-settings-panel" role="group" aria-label="Preferencias de lectura">
+        {sliders.map(slider => <label className="reading-slider" key={slider.key}><span><strong>{slider.label}</strong><output>{slider.value}</output></span><input type="range" min={slider.min} max={slider.max} step={slider.step} value={preferences[slider.key]} onChange={event => onChange({ ...preferences, [slider.key]: Number(event.target.value) })} /></label>)}
+        <button type="button" className="reading-settings-reset" onClick={() => onChange({ ...defaultReadingPreferences })}>Restaurar valores predeterminados</button>
+      </div>
+    </details>
+    <button type="button" className="reading-context-control" aria-pressed={focusMode} onClick={() => { if (settings.current) settings.current.open = false; onFocusMode() }} title={focusMode ? 'Mostrar nuevamente los paneles de navegación' : 'Ocultar los paneles y concentrarse en el contenido'}>
+      {focusMode ? <Minimize2 className="size-4" aria-hidden="true" /> : <Maximize2 className="size-4" aria-hidden="true" />}
+      <span>{focusMode ? 'Salir' : 'Concentración'}</span>
+    </button>
+  </div>
+}
+
 export interface TextbookLayoutProps {
   activeSlug: string | null
   chapterNumber?: string
@@ -307,7 +342,7 @@ export interface TextbookLayoutProps {
   previous?: { slug: string; title: string } | null
   next?: { slug: string; title: string } | null
   customChapters?: Chapter[]
-  variant?: 'course' | 'archive' | 'exam' | 'home' | 'about'
+  variant?: 'course' | 'archive' | 'exam' | 'home' | 'welcome' | 'about'
   children: React.ReactNode
 }
 
@@ -325,6 +360,28 @@ export default function TextbookLayout({
 }: TextbookLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [navigatingSlug, setNavigatingSlug] = useState<string | null>(null)
+  const [readingPreferences, setReadingPreferences] = useState<ReadingPreferences>(defaultReadingPreferences)
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false)
+  const [focusMode, setFocusMode] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(READING_PREFERENCES_KEY)
+      if (saved) setReadingPreferences(parseReadingPreferences(JSON.parse(saved)))
+    } catch {}
+    setPreferencesLoaded(true)
+  }, [])
+  useEffect(() => {
+    if (!preferencesLoaded) return
+    try { localStorage.setItem(READING_PREFERENCES_KEY, JSON.stringify(readingPreferences)) } catch {}
+  }, [preferencesLoaded, readingPreferences])
+  useEffect(() => {
+    if (!focusMode) return
+    setSidebarOpen(false)
+    const exit = (event: KeyboardEvent) => { if (event.key === 'Escape') setFocusMode(false) }
+    document.addEventListener('keydown', exit)
+    return () => document.removeEventListener('keydown', exit)
+  }, [focusMode])
 
   useEffect(() => {
     setNavigatingSlug(null)
@@ -348,7 +405,7 @@ export default function TextbookLayout({
   const sectionIndex = available.findIndex(section => section.slug === activeSlug)
 
   return (
-    <div className="textbook-shell min-h-screen bg-[#fbf7f4] dark:bg-[#140b0c] text-[#3b2022] dark:text-[#f3e6e4] transition-colors duration-200">
+    <div className={cn('textbook-shell min-h-screen bg-[#fbf7f4] dark:bg-[#140b0c] text-[#3b2022] dark:text-[#f3e6e4] transition-colors duration-200', variant === 'course' && 'reading-preferences-active', focusMode && 'reading-focus-mode')} style={variant === 'course' ? readingPreferenceStyle(readingPreferences) : undefined}>
       <a href="#main-content" className="skip-to-content">Saltar al contenido</a>
       <Header menuOpen={sidebarOpen} onMenu={() => setSidebarOpen(true)} onSearch={() => {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))
@@ -356,7 +413,7 @@ export default function TextbookLayout({
       <CourseSearch courseChapters={courseChapters} />
       {variant === 'course' && activeSlug && <ReadingPosition key={activeSlug} />}
       <div className="mx-auto flex max-w-[1600px]">
-        <Sidebar 
+        {!focusMode && <Sidebar
           open={sidebarOpen} 
           onClose={() => setSidebarOpen(false)} 
           activeSlug={activeSlug} 
@@ -365,8 +422,9 @@ export default function TextbookLayout({
           onNavigate={setNavigatingSlug}
           examsActive={variant === 'archive' || variant === 'exam'}
           homeActive={variant === 'home'}
+          welcomeActive={variant === 'welcome'}
           aboutActive={variant === 'about'}
-        />
+        />}
         <main id="main-content" tabIndex={-1} className="min-w-0 flex-1">
           <div className="flex justify-center">
             {/* ─── Content area ─── */}
@@ -375,10 +433,10 @@ export default function TextbookLayout({
               {chapterNumber && chapterTitle && (
                 <div className="chapter-context mb-7">
                   <div className="chapter-context-title"><span className="chapter-context-number">{chapterNumber}</span><div><p className="chapter-context-label">Capítulo</p><p className="chapter-context-name">{chapterTitle}</p></div></div>
-                  {available.length > 0 && <details className="chapter-switcher" onBlur={event => { if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false }} onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
+                  <div className="chapter-context-actions">{variant === 'course' && <ReadingControls preferences={readingPreferences} onChange={setReadingPreferences} focusMode={focusMode} onFocusMode={() => setFocusMode(value => !value)} />}{available.length > 0 && <details className="chapter-switcher" onBlur={event => { if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false }} onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
                     <summary><span>Secciones</span>{sectionIndex >= 0 && <span className="chapter-switcher-count" title={sectionTitle}>{sectionIndex + 1} / {available.length}</span>}<ChevronDown className="size-4" aria-hidden="true" /></summary>
                     <nav aria-label="Secciones de este capítulo">{available.map(section => <a key={section.id} href={`/curso/${section.slug}`} aria-current={section.slug === activeSlug ? 'page' : undefined} onClick={event => event.currentTarget.closest('details')?.removeAttribute('open')}><span>{section.id}</span><span>{section.title}</span></a>)}</nav>
-                  </details>}
+                  </details>}</div>
                 </div>
               )}
 
@@ -423,7 +481,7 @@ export default function TextbookLayout({
               )}
             </article>
 
-            <TableOfContents headings={headings} />
+            {!focusMode && <TableOfContents headings={headings} />}
           </div>
         </main>
       </div>

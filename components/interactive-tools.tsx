@@ -21,7 +21,7 @@ function CalculatorTool({ tool, title }: { tool: ToolDefinition; title?: string 
     <header className="flex items-start gap-3 border-b border-[#eedfdd] bg-[#fbf3f0] px-5 py-4 dark:border-[#382022] dark:bg-[#281517]">
       <Calculator className="mt-0.5 size-5 shrink-0 text-[#8f2525] dark:text-[#fca5a5]" aria-hidden="true" />
       <div className="min-w-0 flex-1"><p className="font-semibold">{title || tool.title}</p><p className="mt-1 text-xs leading-5 text-[#866b6b] dark:text-[#cbb0ae]">{tool.description}</p></div>
-      <button type="button" onClick={() => setInputs(initial())} className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs hover:bg-[#efdcda] focus-visible:outline-2 focus-visible:outline-[#7f0303] dark:hover:bg-[#381618]" aria-label={`Restablecer ${title || tool.title}`}><RotateCcw className="size-3.5" aria-hidden="true" /><span className="hidden sm:inline">Restablecer</span></button>
+      <button type="button" onClick={() => setInputs(initial())} className="study-control study-control-quiet study-control-icon" aria-label={`Restablecer ${title || tool.title}`}><RotateCcw className="size-4" aria-hidden="true" /><span className="hidden sm:inline">Restablecer</span></button>
     </header>
     <div className="p-5">
       <div className="tool-equation mb-5 overflow-x-auto text-center" dangerouslySetInnerHTML={{ __html: katex.renderToString(tool.formula, { displayMode: true, output: 'htmlAndMathml', throwOnError: false }) }} />
@@ -29,7 +29,7 @@ function CalculatorTool({ tool, title }: { tool: ToolDefinition; title?: string 
         {tool.fields.map(field => {
           const id = `${instance}-${field.key}`
           return <div key={field.key}><label htmlFor={id} className="mb-1.5 block text-xs font-semibold">{field.label} <span className="font-normal text-[#967070] dark:text-[#ab8e8e]">({field.unit})</span></label>
-            <input id={id} type="text" inputMode="decimal" value={inputs[field.key]} onChange={event => setInputs(current => ({ ...current, [field.key]: event.target.value }))} aria-invalid={Boolean(errors[field.key])} aria-describedby={errors[field.key] ? `${id}-error` : undefined} className="w-full min-w-0 rounded-lg border border-[#dcc3c3] bg-white px-3 py-2 text-sm outline-none focus:border-[#a35a5a] focus:ring-2 focus:ring-[#7f0303]/10 dark:border-[#422527] dark:bg-[#231416]" />
+            <input id={id} type="text" inputMode="decimal" value={inputs[field.key]} onChange={event => setInputs(current => ({ ...current, [field.key]: event.target.value }))} aria-invalid={Boolean(errors[field.key])} aria-describedby={errors[field.key] ? `${id}-error` : undefined} className="study-input w-full" />
             {errors[field.key] && <p id={`${id}-error`} className="mt-1 text-xs text-[#a51f1f] dark:text-[#fca5a5]">{errors[field.key]}</p>}
           </div>
         })}

@@ -112,7 +112,7 @@ export default function CourseSearch({ courseChapters = chapters }: { courseChap
         <div className="overflow-hidden rounded-xl border border-[#e3caca] dark:border-[#382022] bg-[#fbf7f4] dark:bg-[#1a0f10] shadow-2xl shadow-[#7f0303]/10">
           <div className="flex items-center justify-between gap-3 px-5 pb-1 pt-3">
             <h2 id="course-search-title" className="text-[13px] font-semibold text-[#4b1719] dark:text-[#ead4d2]">Buscar en el curso</h2>
-            <button type="button" onClick={() => setOpen(false)} className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-[#866b6b] hover:bg-[#f2dddd] dark:text-[#cbb0ae] dark:hover:bg-[#381618]" aria-label="Cerrar búsqueda"><X className="size-3.5" strokeWidth={1.75} aria-hidden="true" /></button>
+            <button type="button" onClick={() => setOpen(false)} className="study-control study-control-quiet study-control-icon" aria-label="Cerrar búsqueda"><X className="size-4" strokeWidth={1.75} aria-hidden="true" /></button>
           </div>
           {/* Search input */}
           <div className="course-search-field mx-5 mb-3 flex items-center gap-2.5 rounded-lg px-3">
@@ -125,7 +125,7 @@ export default function CourseSearch({ courseChapters = chapters }: { courseChap
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleInputKeyDown}
               placeholder="Tema, capítulo o número de sección"
-              className="h-10 min-w-0 flex-1 bg-transparent text-sm text-[#3b2022] dark:text-[#f3e6e4] outline-none placeholder:text-[#967070] dark:placeholder:text-[#ab8e8e]"
+              className="min-h-11 min-w-0 flex-1 bg-transparent text-sm text-[#3b2022] dark:text-[#f3e6e4] outline-none placeholder:text-[#967070] dark:placeholder:text-[#ab8e8e]"
               aria-label="Buscar en el curso"
               aria-describedby="course-search-hint"
             />
@@ -137,7 +137,7 @@ export default function CourseSearch({ courseChapters = chapters }: { courseChap
             {results.length === 0 ? (
               <div className="px-3 py-8 text-center">
                 <p className="text-sm text-[#967070] dark:text-[#a08282]">No se encontraron resultados</p>
-                <p className="mt-1 text-xs text-[#b28a8a] dark:text-[#7d5e60]">Intenta con otro término</p>
+                <p className="mt-1 text-xs text-[#765e5e] dark:text-[#cbb0ae]">Intenta con otro término</p>
               </div>
             ) : (
               results.map((section, index) => (

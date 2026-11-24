@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { auth } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, type User } from 'firebase/auth';
 import { establishLoginSession, LoginSessionError, loginErrorMessage } from '@/lib/client-login';
+import { workspaceButtonClass } from '@/lib/workspace-controls';
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +15,15 @@ export default function LoginForm() {
 
   const completeLogin = async (user: User) => {
     if (mounted.current) setStage('Verificando acceso…');
-    await establishLoginSession(await user.getIdToken());
+    try {
+      await establishLoginSession(await user.getIdToken());
+    } catch (cause) {
+      // A restored Firebase user can briefly expose an expired cached token.
+      // Force one refresh before asking the user to authenticate again.
+      if (!(cause instanceof LoginSessionError) || cause.status !== 401) throw cause;
+      if (mounted.current) setStage('Renovando sesión…');
+      await establishLoginSession(await user.getIdToken(true));
+    }
     completedUser.current = user.uid;
     if (mounted.current) window.location.assign('/workspace-mc361/content/chapters');
   };
@@ -70,7 +79,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#FCF9F7] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl shadow-[#4b1719]/5 border border-[#E5D7D4]">
+      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-6 sm:p-10 shadow-xl shadow-[#4b1719]/5 border border-[#E5D7D4]">
         <div>
           <h2 className="mt-2 text-center font-sans text-3xl font-bold tracking-tight text-[#3E3030]">
             Acceso a la Plataforma
@@ -93,7 +102,7 @@ export default function LoginForm() {
             aria-busy={loading || !ready}
             onClick={handleGoogleLogin}
             disabled={loading || !ready}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d5baba] bg-white px-4 py-3.5 text-sm font-semibold text-[#3E3030] transition hover:bg-[#FCF9F7] hover:border-[#8B0000] focus:outline-none focus:ring-2 focus:ring-[#8B0000]/20 disabled:opacity-50"
+            className={`${workspaceButtonClass()} w-full`}
           >
             {loading || !ready ? (
               <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#8B0000] border-t-transparent" />

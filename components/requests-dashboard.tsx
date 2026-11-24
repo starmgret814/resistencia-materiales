@@ -4,6 +4,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { loadCourseCatalog } from '@/lib/course-structure-store';
 import { shortSectionSlug } from '@/lib/course-structure';
 import { findSubtopicTitle } from '@/lib/course-titles';
+import { workspaceButtonClass } from '@/lib/workspace-controls';
 import { Loader2, FileText, ChevronRight, MessageSquare, CheckCircle2 } from 'lucide-react';
 
 interface DraftRequest {
@@ -99,7 +100,7 @@ export default function RequestsDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 text-[#3b2022]">
-      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchRequests()} className="mt-2 font-semibold underline">Reintentar carga</button></div>}
+      {loadError && <div role="alert" className="mb-5 rounded-lg border border-[#d5baba] bg-[#f8eaea] p-4 text-sm"><p>{loadError}</p><button type="button" onClick={() => void fetchRequests()} className={`${workspaceButtonClass()} mt-3`}>Reintentar carga</button></div>}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-sans font-bold text-[#4b1719]">Solicitudes de Revisión</h1>
@@ -129,22 +130,22 @@ export default function RequestsDashboard() {
                 key={req.id}
                 href={`/workspace-mc361/content/chapters/${req.chapterId}/edit?slug=${req.slug}&from=requests`}
                 data-astro-reload
-                className="flex items-center justify-between px-6 py-5 hover:bg-[#FCF9F7] transition-colors group"
+                className="group flex flex-col gap-4 px-4 py-5 hover:bg-[#FCF9F7] transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex min-w-0 items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[#f5ecec] flex items-center justify-center text-[#7d6060] shrink-0 group-hover:bg-[#8B0000] group-hover:text-white transition-colors">
                     <FileText className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h4 className="flex items-center gap-2 font-semibold text-[#3E3030] group-hover:text-[#8B0000] transition-colors">
+                  <div className="min-w-0">
+                    <h4 className="flex flex-wrap items-center gap-2 font-semibold text-[#3E3030] group-hover:text-[#8B0000] transition-colors">
                       {req.sectionId && (
                         <span className="inline-flex shrink-0 items-center justify-center rounded bg-[#8B0000]/10 px-1.5 py-0.5 font-mono text-xs font-bold text-[#8B0000] border border-[#8B0000]/20">
                           {req.sectionId}
                         </span>
                       )}
-                      <span>Capítulo {req.chapterId} · {req.title}</span>
+                      <span className="min-w-0 break-words">Capítulo {req.chapterId} · {req.title}</span>
                     </h4>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs font-medium text-[#756565]">
                         Editado por <strong className="text-[#5A4A4A]">{formatName(req.authorEmail)}</strong>
                       </span>
@@ -155,9 +156,9 @@ export default function RequestsDashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3 pl-[52px] sm:pl-0">
                   <span className="px-3 py-1 bg-[#fff8ed] text-[#b47a2b] text-xs font-bold rounded-md border border-[#fce9cc]">
-                    Por Revisar
+                    Revisar cambios
                   </span>
                   <ChevronRight className="w-5 h-5 text-[#dcc3c3] group-hover:text-[#8B0000] transition-colors" />
                 </div>

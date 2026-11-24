@@ -1,7 +1,8 @@
 ---
 export const prerender = true;
 import Layout from '@/src/layouts/Layout.astro';
-import { ArrowRight, Copy, Eye, History } from 'lucide-react';
+import { ArrowRight, Copy, Eye, History, ImageUp } from 'lucide-react';
+import { imageTableSnippet } from '@/lib/table-snippets';
 ---
 
 <Layout title="Guía para Colaboradores | Resistencia de Materiales — UNI" description="Manual práctico para redactores y colaboradores del espacio digital de estudio de Resistencia de Materiales">
@@ -42,11 +43,26 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
           <a href="#guia-completa" class="inline-flex items-center gap-1.5 rounded-md py-1 text-xs font-semibold text-[#7f0303] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-[#fca5a5]">Ir a la guía completa <ArrowRight size={15} aria-hidden="true" /></a>
         </div>
         <details open class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
-          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-18">18 de noviembre de 2026</time> · Gestión de capítulos e historial del editor</summary>
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-22">22 de noviembre de 2026</time> · Subir imágenes e insertar su enlace</summary>
+          <p class="mt-4 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">La barra del editor de capítulos incluye <strong>Subir imagen e insertar enlace</strong>, junto al botón de imagen. Coloca el cursor, selecciona el archivo y la URL se insertará en el documento, sin panel ni acción de copia. <a href="#guia-imagen-enlace" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver cómo usarla</a>.</p>
+        </details>
+        <details class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-22">22 de noviembre de 2026</time> · Imágenes sin borde y títulos de tablas</summary>
           <ul class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
-            <li><strong>Capítulos administrables.</strong> Los administradores pueden crear, renombrar, ordenar, archivar y restaurar capítulos desde el panel. La estructura no está limitada a los 13 capítulos iniciales. <a href="#guia-gestion-capitulos" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver instrucciones</a>.</li>
+            <li><strong>Imágenes sin borde.</strong> Añade <code>border="false"</code> a <code>&lt;Image /&gt;</code>. Para la figura lateral de un problema, usa <code>imageBorder="false"</code>. Si no indicas esta opción, se mantiene el borde habitual. <a href="#guia-imagenes" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver instrucciones y ejemplo</a>.</li>
+            <li><strong>Títulos tal como los escribes.</strong> Las cabeceras y el título de una tabla conservan las mayúsculas y minúsculas originales. Puedes escribir «Tipo de carga», «TIPO DE CARGA» o combinar estilos en columnas distintas; ya no se convierten automáticamente a mayúsculas.</li>
+            <li><strong>Tipografía académica uniforme.</strong> Las celdas, cabeceras, títulos y leyendas de imágenes dentro de tablas usan la misma fuente y tamaño del texto del capítulo. No necesitas agregar una opción para igualarlos.</li>
+          </ul>
+        </details>
+        <details class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-22">22 de noviembre de 2026</time> · Tablas con imágenes y fórmulas editables</summary>
+          <p class="mt-4 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">Usa <strong>Insertar componente → Tabla con imágenes</strong> para combinar dibujos, texto y LaTeX en celdas nativas. Puedes ajustar el tamaño de las imágenes y el ancho mínimo de la tabla. <a href="#guia-tablas-imagenes" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver ejemplo y opciones</a>.</p>
+        </details>
+        <details class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
+          <summary class="cursor-pointer text-sm font-semibold text-[#7f0303] dark:text-[#fca5a5]"><time datetime="2026-11-18">18 de noviembre de 2026</time> · Historial del editor y gestión de subtemas</summary>
+          <ul class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
             <li><strong>Deshacer y rehacer.</strong> El editor conserva su historial al ampliar la vista previa. Las inserciones e importaciones son pasos deshacibles. Usa Ctrl + Z para deshacer y Ctrl + Y o Ctrl + Shift + Z para rehacer; en Mac, Command + Z y Command + Shift + Z.</li>
-            <li><strong>Ediciones simultáneas.</strong> Los cambios de estructura se guardan mediante transacciones sobre el catálogo actual, conservando las direcciones del contenido existente. Un error conserva el estado anterior.</li>
+            <li><strong>Ediciones simultáneas.</strong> Al añadir, renombrar u ordenar subtemas de tus capítulos asignados, se conserva el trabajo de otras personas y las direcciones existentes. Si la operación falla, se conserva el estado anterior.</li>
           </ul>
         </details>
         <details class="mt-5 border-t border-[#ead5d4] pt-4 dark:border-[#382022]">
@@ -60,7 +76,6 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
             <li><strong>Problemas con imágenes.</strong> La numeración es automática por capítulo. Usa <code>imageLayout="auto"</code>, <code>"wrap"</code> o <code>"stacked"</code> para acomodar la figura sin estrechar demasiado el enunciado. <a href="#guia-problemas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver opciones de problemas</a>.</li>
             <li><strong>Tablas personalizables.</strong> Puedes definir alineación, ancho y tamaños de columna, o usar <code>TableGrid</code> para colocar varias tablas en una fila. <a href="#guia-tablas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver ejemplos de tablas</a>.</li>
             <li><strong>Herramientas interactivas.</strong> Inserta los simuladores de Mohr, esfuerzo normal o deformación axial desde <strong>Insertar componente</strong>. <a href="#guia-herramientas" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver herramientas disponibles</a>.</li>
-            <li><strong>Exámenes como páginas web · solo administradores.</strong> El editor permite importar Markdown, insertar componentes, revisar la vista previa y publicar por periodo. <a href="#guia-examenes" class="font-semibold text-[#7f0303] underline underline-offset-4 dark:text-[#fca5a5]">Ver cómo publicar evaluaciones</a>.</li>
           </ul>
           <p class="mt-4 rounded-lg bg-[#fbf2f0] px-3 py-2 text-xs leading-6 text-[#765e5e] dark:bg-[#241215] dark:text-[#cbb0ae]">Puedes incorporar estas opciones al adaptar tu capítulo; no necesitas reescribir todo el material. La autoría de las presentaciones originales corresponde al <strong>Ing. Eden Angel Molina Capcha</strong>.</p>
         </details>
@@ -77,7 +92,7 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
           <div>
             <h2 class="font-sans text-lg font-bold text-[#6a1518] dark:text-[#fca5a5]">No necesitas conocimientos técnicos previos</h2>
             <p class="mt-1.5 text-sm sm:text-base leading-relaxed text-[#5c3e3e] dark:text-[#e4cccc]">
-              <strong>No necesitas instalar ningún programa ni conocer Git, GitHub o programación.</strong> Todo el contenido se redacta, formatea y publica directamente desde la plataforma en tu navegador web.
+              <strong>No necesitas instalar ningún programa ni conocer Git, GitHub o programación.</strong> Puedes redactar, dar formato, guardar avances y enviar tu contenido a revisión desde el navegador.
             </p>
           </div>
         </div>
@@ -116,7 +131,7 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
           <div class="mt-4 grid gap-3 sm:grid-cols-2 text-sm text-[#5f4445] dark:text-[#d9c4c2]">
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">1. Cómo entrar</p>
-              <p class="mt-1">Inicia sesión con tu correo electrónico institucional (@uni.pe) en la página de acceso.</p>
+              <p class="mt-1">Pulsa «Continuar con Google» en la página de acceso y utiliza la cuenta que tienes autorizada en la plataforma.</p>
             </div>
             <div class="rounded-lg border border-[#f0dedd] dark:border-[#331c1e] bg-[#faf6f5] dark:bg-[#1e1113] p-4">
               <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">2. Cómo abrir un capítulo</p>
@@ -141,27 +156,22 @@ import { ArrowRight, Copy, Eye, History } from 'lucide-react';
           </div>
         </section>
 
+
         <section id="guia-respaldo" aria-labelledby="guia-respaldo-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
           <h2 id="guia-respaldo-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Respaldo local y recuperación</h2>
           <div class="mt-4 space-y-3 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
-            <p>Los editores de capítulos y exámenes guardan una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento; este respaldo no envía el texto a Firestore ni publica cambios.</p>
-            <p>Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar <strong>Recuperar copia</strong>. Después, usa <strong>Guardar Avance</strong>, solicita revisión o publica según tus permisos.</p>
-            <p>La copia está solo en <strong>ese navegador y dispositivo</strong>. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa <strong>Descargar Markdown</strong> en capítulos o <strong>Descargar copia</strong> en exámenes.</p>
+            <p>El editor de capítulos guarda una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento; este respaldo no envía el texto a Firestore ni publica cambios.</p>
+            <p>Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar <strong>Recuperar copia</strong>. Después, usa <strong>Guardar Avance</strong>, solicita revisión cuando esté listo.</p>
+            <p>La copia está solo en <strong>ese navegador y dispositivo</strong>. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa <strong>Exportar MD</strong> en el editor.</p>
             <p>Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.</p>
           </div>
         </section>
 
-        <section id="guia-gestion-capitulos" aria-labelledby="guia-capitulos-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
-          <h2 id="guia-capitulos-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Gestionar los capítulos del curso</h2>
-          <ol class="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
-            <li>Los administradores encuentran <strong>Nuevo capítulo</strong> en el panel de contenido. Escribe un título; el identificador se asigna automáticamente.</li>
-            <li>Junto a cada encabezado puedes <strong>renombrar</strong> el capítulo y cambiar su orden. Los identificadores, las asignaciones de los colaboradores y las direcciones existentes se conservan.</li>
-            <li><strong>Archivar</strong> retira el capítulo de la navegación pública y conserva sus secciones, borradores y publicaciones. Usa <strong>Ver archivados → Restaurar</strong> para recuperarlo.</li>
-            <li>Los editores gestionan las secciones de sus capítulos asignados. Pueden añadir, renombrar y ordenar secciones; la eliminación de una sección publicada requiere un administrador.</li>
-          </ol>
-          <p class="mt-4 text-sm leading-7 text-[#765e5e] dark:text-[#cbb0ae]">La lista se guarda en Firestore. No necesitas editar el archivo inicial ni volver a desplegar la web cada vez que cambias la estructura. Las opciones de asignación y los menús de las páginas consultan esa misma lista.</p>
-          <p class="mt-3 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]"><strong>Configuración inicial de esta actualización:</strong> un administrador del proyecto Firebase debe publicar el archivo <code>firestore.rules</code> actualizado para habilitar la validación de capítulos de tamaño variable. Los cambios en el código de la web no publican estas reglas automáticamente.</p>
-          <p class="mt-3 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]">Ctrl + Z revierte cambios de texto en el editor; las publicaciones y los cambios guardados en la estructura del curso se administran por separado. El historial se conserva mientras la instancia del editor permanezca abierta.</p>
+
+        <section id="guia-subtemas" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
+          <h2 class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Organizar los subtemas asignados</h2>
+          <p class="mt-4 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">Puedes añadir, renombrar y ordenar subtemas dentro de tus capítulos asignados. Revisa el título antes de guardar. La eliminación de un subtema ya publicado requiere solicitar ayuda al responsable de la publicación.</p>
+          <p class="mt-3 text-sm leading-6 text-[#765e5e] dark:text-[#cbb0ae]">Ctrl + Z revierte texto mientras el editor permanece abierto. No deshace cambios ya guardados en la estructura del curso ni publicaciones.</p>
         </section>
 
         <!-- 3. Markdown básico -->
@@ -403,6 +413,8 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
                 <code>align="center"</code> centra todas las celdas; también acepta <code>left</code> y <code>right</code>.
                 <code>width="80%"</code> o <code>width="600px"</code> define el ancho total.
                 <code>columnWidths="40%, 30%, 30%"</code> define el ancho de cada columna.
+                Tanto el título como las cabeceras conservan las mayúsculas y minúsculas que escribas.
+                La tabla hereda la fuente, el tamaño y el interlineado del contenido académico, incluidos su título y las leyendas de las imágenes.
                 En la fila separadora, usa <code>:---:</code> para centrar una columna, <code>:---</code> para alinearla a la izquierda,
                 <code>---:</code> a la derecha o <code>---</code> para heredar la alineación de la tabla.
               </p>
@@ -411,6 +423,19 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
                 Para colocar varias tablas en una fila, envuelve sus bloques <code>&lt;Table&gt;</code> en <code>&lt;TableGrid columns="2"&gt; ... &lt;/TableGrid&gt;</code>.
                 Puedes usar 2, 3 o 4 columnas; en pantallas chicas se apilan. El editor incluye la plantilla <strong>Tablas en una fila</strong>.
               </p>
+              <div id="guia-tablas-imagenes" class="mt-5 scroll-mt-24 border-t border-[#ebd0cf] pt-4 dark:border-[#3a1f22]">
+                <h3 class="font-sans text-base font-bold text-[#7f0303] dark:text-[#fca5a5]">Imágenes dentro de las celdas</h3>
+                <p class="mt-2 text-sm leading-6">El texto y las fórmulas siguen siendo seleccionables y editables; solo el dibujo es una imagen. Se admiten imágenes Markdown y <code>&lt;Image /&gt;</code> dentro de una celda, sin los márgenes ni el marco de una figura independiente.</p>
+                <pre class="mt-3 overflow-x-auto rounded border border-[#ead0ce] bg-white p-3 font-mono text-xs text-[#8B0000] dark:border-[#3b1e21] dark:bg-[#281315] dark:text-[#fca5a5]"><code>{imageTableSnippet.trim()}</code></pre>
+                <ul class="mt-3 list-disc space-y-2 pl-5 text-xs leading-6 text-[#6e5051] dark:text-[#c4aba9]">
+                  <li><code>imageWidth="260px"</code> define el ancho de las imágenes y <code>imageHeight="140px"</code> limita su altura. Se conserva la proporción y no se recortan. También puedes usar porcentajes o rem. Sin opciones se usan 240 px de ancho y un máximo de 160 px de alto.</li>
+                  <li>Para una imagen con tamaño propio, escribe en una sola línea: <code>&lt;Image src="esquema.png" alt="Descripción del esquema" width="180px" height="120px" /&gt;</code>. Puedes añadir <code>caption="..."</code> para mostrar una explicación debajo del dibujo.</li>
+                  <li><code>minWidth="44rem"</code> evita comprimir demasiado las columnas. Si no cabe en el teléfono, se desplaza la tabla horizontalmente; también se puede enfocar con Tab y desplazar con las flechas.</li>
+                  <li>Las rutas relativas, como <code>esquema.png</code>, buscan la imagen en la sección actual. También se admiten rutas públicas como <code>/imagenes/esquema.svg</code> y direcciones HTTPS.</li>
+                  <li>Escribe cada fila en una sola línea y las fórmulas entre <code>$...$</code>. Para barras verticales matemáticas usa <code>\vert</code>. Una tabla que ya es una captura debe reconstruirse en filas y columnas, conservando sus textos, ecuaciones y dibujos por separado.</li>
+                  <li><strong>¿Aparecen dos filas?</strong> Si pulsas Enter después de la imagen y continúas las fórmulas en otra línea que empieza con <code>|</code>, se crea otra fila. Mantén la imagen y las demás celdas en la misma línea. El ajuste visual automático del editor puede ocupar varios renglones sin crear un salto real.</li>
+                </ul>
+              </div>
               <div class="mt-3 rounded bg-[#fbf2f0] dark:bg-[#251316] p-3 text-xs text-[#734c4d] dark:text-[#e4cccc] space-y-1">
                 <p class="font-bold text-[#7f0303] dark:text-[#fca5a5]">¿Por qué puede fallar una tabla?</p>
                 <ul class="list-disc pl-4 space-y-1">
@@ -425,7 +450,7 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
         </section>
 
         <!-- 6. Imágenes -->
-        <section class="rounded-xl border border-[#ead5d4] dark:border-[#382022] bg-white dark:bg-[#1a0f10] p-6 sm:p-8 shadow-sm">
+        <section id="guia-imagenes" class="scroll-mt-24 rounded-xl border border-[#ead5d4] dark:border-[#382022] bg-white dark:bg-[#1a0f10] p-6 sm:p-8 shadow-sm">
           <div class="flex items-center gap-2.5 text-[#8B0000] dark:text-[#f87171]">
             <span class="flex size-7 items-center justify-center rounded-full bg-[#f6e5e5] dark:bg-[#341619] font-mono text-xs font-bold">6</span>
             <h2 class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd] m-0">Imágenes</h2>
@@ -446,8 +471,20 @@ Por el principio de Saint-Venant: cerca de cargas concentradas se forman concent
               <li><strong>height:</strong> Limita la altura máxima sin deformar la figura (ejemplo: <code>height="300px"</code>).</li>
               <li><strong>size:</strong> Tamaños predefinidos: <code>"small"</code> (384px), <code>"medium"</code> (672px), <code>"large"</code> (896px) o <code>"full"</code> (100%).</li>
               <li><strong>align:</strong> Alineación horizontal: <code>"center"</code> (por defecto), <code>"left"</code> o <code>"right"</code>.</li>
+              <li><strong>border:</strong> Usa <code>border="false"</code> para quitar el borde de esa imagen; también se admite <code>border=&#123;false&#125;</code>. Si lo omites o usas <code>border="true"</code>, se conserva el borde habitual. No cambia la transparencia, el tamaño, el pie ni la numeración. Las imágenes en tablas ya se muestran sin borde.</li>
+              <li>Para la figura lateral de un problema, añade <code>imageBorder="false"</code> a <code>&lt;Problem image="esquema.png" ...&gt;</code>. Solo se quita el borde de la imagen, no el recuadro del problema.</li>
               <li><strong>Nota:</strong> Si ya importaste la imagen y la quieres reutilizar, solo usa el link que se genera en el atributo src="https://...", no es necesario importar la imagen otra vez.</li>
             </ul>
+            <pre class="overflow-x-auto rounded border border-[#ead0ce] bg-[#fdf9f8] p-3 font-mono text-xs text-[#8B0000] dark:border-[#3b1e21] dark:bg-[#281315] dark:text-[#fca5a5]"><code>&lt;Image src="https://res.cloudinary.com/dtjpmhekb/image/upload/v1795396514/azazmev0ea8exhfa8qxy.svg" alt="Esquema de fuerza concentrada" border="false" /&gt;</code></pre>
+          </div>
+          <div id="guia-imagen-enlace" class="mt-6 scroll-mt-24 border-t border-[#ead0ce] pt-5 dark:border-[#3b1e21]">
+            <h3 class="flex items-center gap-2 font-sans text-lg font-bold text-[#7f0303] dark:text-[#fca5a5]"><ImageUp size={19} aria-hidden="true" />Subir una imagen e insertar solo el enlace</h3>
+            <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
+              <li>Coloca el cursor donde quieres que aparezca la dirección. Pulsa <strong>Subir imagen e insertar enlace</strong>, al lado de <strong>Imagen</strong>, y selecciona el archivo.</li>
+              <li>Al terminar la subida, la URL queda insertada en la posición del cursor. Si había texto seleccionado, se reemplaza por la dirección. No aparece un panel ni hace falta copiar nada.</li>
+              <li>Usa la URL insertada, por ejemplo, dentro de <code>![Descripción](ENLACE)</code> en una celda de tabla o en el valor de <code>src="..."</code> de una imagen existente. Conserva el resto de sus atributos.</li>
+            </ol>
+            <p class="mt-3 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]">El botón habitual <strong>Imagen</strong> sigue subiendo e insertando el bloque completo. La inserción del enlace se puede deshacer con el historial del editor. Esta opción no guarda ni publica el documento.</p>
           </div>
           <div class="mt-4 rounded bg-[#fdf9f8] dark:bg-[#281315] border border-[#ead0ce] dark:border-[#3b1e21] p-4">
             <p class="m-0 text-sm text-[#5f4445] dark:text-[#d9c4c2]">
@@ -600,25 +637,6 @@ Explicación concisa de la respuesta correcta.
           </ul>
         </section>
 
-        <section id="guia-examenes" aria-labelledby="guia-examenes-titulo" class="scroll-mt-24 rounded-xl border border-[#ead5d4] bg-white p-6 shadow-sm sm:p-8 dark:border-[#382022] dark:bg-[#1a0f10]">
-          <p class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8B0000] dark:text-[#fca5a5]">Solo administradores autorizados</p>
-          <h2 id="guia-examenes-titulo" class="font-sans text-2xl font-bold text-[#4a1719] dark:text-[#f7dfdd]">Editor de exámenes</h2>
-          <ol class="mt-4 list-decimal space-y-3 pl-5 text-sm leading-6 text-[#5f4445] dark:text-[#d9c4c2]">
-            <li>En el panel administrativo, abre <strong>Exámenes</strong> y pulsa <strong>Nueva evaluación</strong>. Completa el periodo, el tipo y el título.</li>
-            <li>Escribe el contenido o usa <strong>Importar Markdown</strong> con un archivo <code>.md</code>, <code>.mdx</code> o <code>.markdown</code>. La importación reemplaza el texto tras confirmarlo y se puede deshacer con Ctrl + Z. El título, periodo y tipo se conservan.</li>
-            <li>Usa <strong>Insertar</strong> para añadir problemas, fórmulas, imágenes o tablas y revisa <strong>Vista previa</strong>. El límite es de 200 000 caracteres.</li>
-            <li>Pulsa <strong>Publicar evaluación</strong> para hacerla visible en el archivo público bajo su periodo. Importar un archivo o abrir la vista previa no lo publica.</li>
-          </ol>
-          <p class="mt-4 text-xs leading-6 text-[#765e5e] dark:text-[#cbb0ae]"><strong>Descargar copia</strong> guarda el Markdown como archivo independiente. El respaldo automático solo permanece en el mismo navegador; descargarlo permite conservarlo aunque borres sus datos. Para editar una evaluación existente, selecciónala en la lista de publicadas.</p>
-          <div id="guia-examenes-permisos" class="mt-5 scroll-mt-24 rounded-lg border border-[#ead5d4] p-4 text-sm leading-6 dark:border-[#382022]">
-            <h3 class="font-semibold text-[#7f0303] dark:text-[#fca5a5]">Si Firestore rechaza el acceso a los exámenes</h3>
-            <p class="mt-2">El código <code>permission-denied</code> indica un rechazo de permisos. Tener el archivo <code>firestore.rules</code> en el proyecto no publica sus reglas en Firebase. Un administrador del proyecto Firebase debe revisar la colección <code>exams</code> en <strong>Firestore Database → Reglas</strong>.</p>
-            <p class="mt-2">Para publicar las reglas del proyecto desde la terminal, inicia sesión con una cuenta que tenga permisos en Firebase y ejecuta:</p>
-            <pre class="mt-3 overflow-x-auto rounded bg-[#fbf2f0] p-3 text-xs dark:bg-[#281315]"><code>npx firebase-tools login
-npx firebase-tools deploy --only firestore:rules --project resistencia-materiales</code></pre>
-            <p class="mt-2">Este despliegue reemplaza las reglas publicadas por el archivo local: revisa sus diferencias si también se editaron desde la consola. No es necesario habilitar escrituras públicas. El archivo del proyecto permite consultar los exámenes y reserva su publicación y eliminación a administradores registrados. Después, vuelve al editor y pulsa <strong>Reintentar carga</strong>.</p>
-          </div>
-        </section>
 
         <!-- Checklist de 5 cosas -->
         <section class="rounded-2xl border-2 border-[#1c663b]/30 bg-[#f3f9f5] dark:bg-[#0f1f15] p-6 sm:p-8 shadow-sm">

@@ -20,5 +20,5 @@ export default function ExamManagementLink() {
     return () => { version++; unsubscribe() }
   }, [])
   if (!admin) return null
-  return <a href="/workspace-mc361/management/exams" data-astro-reload className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#d5baba] px-4 py-2.5 text-sm font-semibold text-[#7f0303] hover:bg-[#f8eaea] dark:border-[#422527] dark:text-[#fca5a5] dark:hover:bg-[#281517]"><FilePenLine className="size-4" aria-hidden="true" />Editor de exámenes</a>
+  return <a href="/workspace-mc361/management/exams" data-astro-reload className="study-control mt-5"><FilePenLine className="size-4" aria-hidden="true" />Editor de exámenes</a>
 }

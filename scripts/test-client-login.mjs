@@ -11,6 +11,7 @@ function load(file, require, globals = {}) {
   vm.runInNewContext(code, { exports, require, Error, AbortSignal, ...globals })
   return exports
 }
+const workspaceControls = load('lib/workspace-controls.ts', () => {})
 let response = () => Response.json({ success: true })
 let calls = 0
 const login = load('lib/client-login.ts', () => {}, { fetch: async (_url, options) => {
@@ -53,7 +54,7 @@ const firebase = {
   },
   onAuthStateChanged: (_auth, callback) => { observer = callback; return () => {} },
 }
-const form = load('components/login-form.tsx', name => ({ react, 'react/jsx-runtime': jsx, '@/lib/firebase': { auth }, 'firebase/auth': firebase, '@/lib/client-login': login })[name], {
+const form = load('components/login-form.tsx', name => ({ react, 'react/jsx-runtime': jsx, '@/lib/firebase': { auth }, 'firebase/auth': firebase, '@/lib/client-login': login, '@/lib/workspace-controls': workspaceControls })[name], {
   window: { location: { hostname: 'localhost', assign: () => { navigations++ } } },
 })
 function findButton(node) {

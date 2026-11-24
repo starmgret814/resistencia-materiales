@@ -1,6 +1,6 @@
 'use client'
 
-import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Bold,
   Pencil,
@@ -11,6 +11,7 @@ import {
   Heading2,
   Heading3,
   ImageIcon,
+  ImageUp,
   Italic,
   Link,
   List,
@@ -26,13 +27,21 @@ import {
   CheckCircle2,
   BookOpen,
   Table as TableIcon,
+  Plus,
+  ChevronDown,
+  FileDiff,
   X
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
 import { workspaceFetch } from '@/lib/workspace-api'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { workspaceButtonClass, workspaceInputClass } from '@/lib/workspace-controls'
+import { workspaceGuide } from '@/lib/workspace-guides'
+import { imageTableSnippet } from '@/lib/table-snippets'
+import { uploadCourseImage } from '@/lib/image-upload'
+import { doc, getDoc } from 'firebase/firestore'
 import Editor from '@/components/markdown-editor'
-import { insertEditorText, replaceEditorText } from '@/lib/editor-history'
+import { defineCourseEditorTheme } from '@/lib/markdown-editor-theme'
+import { insertEditorText, insertEditorTextAtRange, replaceEditorText, type MarkdownEditorSelection } from '@/lib/editor-history'
 import PreviewErrorBoundary from '@/components/preview-error-boundary'
 import { LocalDraftNotice, LocalDraftStatus } from '@/components/local-draft-notice'
 import { localDraftKey } from '@/lib/local-draft'
@@ -41,14 +50,19 @@ import { chapters, type Chapter } from '@/lib/course-data'
 import { changeCourseStructure, loadCourseCatalog } from '@/lib/course-structure-store'
 import { findSubtopicNumber, findSubtopicTitle, withSubtopicTitle } from '@/lib/course-titles'
 import { matchesPreviousChapterOneRevision } from '@/lib/chapter-one-revision'
+import { loadContentReview } from '@/lib/content-review-client'
+import { sameReviewBaseline, REVIEW_CONFLICT_MESSAGE, type ContentReviewBaseline } from '@/lib/content-review'
+import { publishReviewedContent, saveDraftPreservingPublication } from '@/lib/content-publication'
 import {
   starterDocument,
   validateCourseDocument,
   type CourseDocument,
 } from '@/lib/content-schema'
 
+const ContentReview = lazy(() => import('@/components/content-review'))
 
 export default function ContentEditor({ session, initialChapter, initialSlug }: { session?: any, initialChapter: string, initialSlug: string }) {
+  const guide = workspaceGuide(session?.role)
   const [document, setDocument] = useState<CourseDocument>(() => ({ ...structuredClone(starterDocument), chapterId: initialChapter, slug: initialSlug }))
   const deferredDocument = useDeferredValue(document)
   const [previewExpanded, setPreviewExpanded] = useState(false)
@@ -66,6 +80,10 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [titleInput, setTitleInput] = useState('')
   const [isRenaming, setIsRenaming] = useState(false)
+  const [reviewDocument, setReviewDocument] = useState<CourseDocument | null>(null)
+  const reviewButton = useRef<HTMLButtonElement>(null)
+  const publicationInFlight = useRef(false)
+  const automaticallyReviewed = useRef('')
   const titleEditCancelled = useRef(false)
   const titleSaveInFlight = useRef(false)
 
@@ -107,6 +125,15 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     isLoaded && !loadError && document.chapterId === initialChapter && document.slug === initialSlug,
   )
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
+
+  useEffect(() => {
+    if (localBackup.pending) { setReviewDocument(null); automaticallyReviewed.current = ''; return }
+    if (session?.role !== 'admin' || !isLoaded || loadError || document.chapterId !== initialChapter) return
+    const key = `${initialChapter}/${initialSlug}`
+    if (automaticallyReviewed.current === key || new URLSearchParams(window.location.search).get('from') !== 'requests') return
+    automaticallyReviewed.current = key
+    setReviewDocument({ ...document })
+  }, [session?.role, isLoaded, loadError, localBackup.pending, initialChapter, initialSlug, document])
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type })
@@ -192,26 +219,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
       setIsSaving(true);
       const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
       const currentDocument = withSubtopicTitle(document, currentTitle);
-      const draftId = `${document.chapterId}_${document.slug}`;
-      const draftRef = doc(db, 'drafts', draftId);
-
-      // Preservar el autor original si existe para evitar conflictos de permisos y colaboración
-      const existingSnap = await getDoc(draftRef).catch(() => null);
-      const existingAuthor = existingSnap?.exists() ? existingSnap.data()?.authorEmail : null;
-      
-      let authorEmail = session.email;
-      if (session.role === 'admin' && existingAuthor) {
-        // El admin preserva el autor original si colabora sobre el trabajo de un editor
-        authorEmail = existingAuthor;
-      }
-
-      await setDoc(draftRef, {
-        ...currentDocument,
-        authorEmail,
-        lastEditedBy: session.email,
-        status,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+      await saveDraftPreservingPublication(currentDocument, status, session);
 
       setDocument(currentDocument);
       localBackup.acknowledge({ contentMarkdown: currentDocument.contentMarkdown });
@@ -224,43 +232,32 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     }
   }
 
-  const publishDraft = async () => {
-    if (localBackup.pending) return;
-    if (!session?.email || session.role !== 'admin') return showToast('No tienes permisos.', 'error');
+  const publishDraft = async (candidate: CourseDocument, baseline?: ContentReviewBaseline) => {
+    if (localBackup.pending) throw new Error('Resuelve la copia local antes de aprobar.');
+    if (!session?.email || session.role !== 'admin') throw new Error('No tienes permisos para aprobar.');
+    if (!candidate.contentMarkdown.trim()) throw new Error('El contenido no puede estar vacío.');
+    if (publicationInFlight.current) return;
+    publicationInFlight.current = true;
     try {
       setIsSaving(true);
-      const currentTitle = await loadSubtopicTitle(document.chapterId, document.slug);
-      const currentDocument = withSubtopicTitle(document, currentTitle);
-      
-      // 1. Guardar la versión oficial aprobada en 'drafts' con 'publishedContent' separado
-      const draftId = `${document.chapterId}_${document.slug}`;
-      const nowIso = new Date().toISOString();
-      const draftRef = doc(db, 'drafts', draftId);
-      const existingSnap = await getDoc(draftRef).catch(() => null);
-      const originalAuthor = existingSnap?.exists() ? existingSnap.data()?.authorEmail : session.email;
-
-      await setDoc(draftRef, {
-        ...currentDocument,
-        authorEmail: originalAuthor || session.email,
-        lastEditedBy: session.email,
-        status: 'approved',
-        publishedContent: currentDocument.contentMarkdown,
-        publishedTitle: currentTitle || document.title,
-        publishedAt: nowIso,
-        publishedBy: session.email,
-        updatedAt: nowIso
-      }, { merge: true });
+      // Recheck the public view, then guard the write against concurrent drafts/publications.
+      const current = await loadContentReview(candidate.chapterId, candidate.slug);
+      if (baseline && !sameReviewBaseline(baseline, current)) throw new Error(REVIEW_CONFLICT_MESSAGE);
+      if (candidate.title !== current.sectionTitle) throw new Error('El nombre de la sección cambió. Vuelve al editor y carga el nombre actual antes de aprobar.');
+      const currentDocument = { ...candidate, chapterId: current.chapterId, slug: current.slug };
+      await publishReviewedContent(currentDocument, current.revision, session);
 
       localBackup.acknowledge({ contentMarkdown: currentDocument.contentMarkdown });
+      setReviewDocument(null);
 
       // 2. Sincronización secundaria en segundo plano con GitHub (respaldo en el repositorio)
       workspaceFetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chapterId: document.chapterId,
-          slug: document.slug,
-          title: currentTitle || document.title,
+          chapterId: currentDocument.chapterId,
+          slug: currentDocument.slug,
+          title: currentDocument.title,
           contentMarkdown: currentDocument.contentMarkdown
         })
       }).catch(err => {
@@ -276,13 +273,23 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
 
     } catch (e: any) {
       console.error(e);
-      showToast(e.message || 'Error al aprobar el documento.', 'error');
+      publicationInFlight.current = false;
       setIsSaving(false);
+      throw e;
     }
   }
 
   const editorRef = useRef<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function closeReview() {
+    setReviewDocument(null)
+    setTimeout(() => { reviewButton.current?.focus(); editorRef.current?.layout() }, 0)
+  }
+
+  function publishDirectly() {
+    void publishDraft({ ...document }).catch(error => showToast(error instanceof Error ? error.message : 'No se pudo publicar el contenido.', 'error'))
+  }
 
   function execCommand(command: string) {
     const editor = editorRef.current
@@ -379,68 +386,80 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     else if (kind === 'tool-mohr-strain') insertMarkdown('\n\n<Tool id="mohr-deformaciones" />\n\n')
     else if (kind === 'summary') insertMarkdown('\n<Summary title="Resumen">\n', '\n</Summary>\n', 'Resume los puntos principales.')
     else if (kind === 'table') insertMarkdown('\n<Table title="Título de la tabla" align="center" width="100%" columnWidths="40%, 30%, 30%">\n\n| Columna 1 | Columna 2 | Columna 3 |\n| --- | --- | --- |\n| Dato 1 | Valor A | $x$ |\n| Dato 2 | Valor B | $y$ |\n\n</Table>\n')
+    else if (kind === 'image-table') insertMarkdown(imageTableSnippet)
     else if (kind === 'tablegrid') insertMarkdown('\n<TableGrid columns="2">\n\n<Table title="Tabla 1" align="center">\n\n| A | B |\n| --- | --- |\n| 1 | 2 |\n\n</Table>\n\n<Table title="Tabla 2" align="center">\n\n| C | D |\n| --- | --- |\n| 3 | 4 |\n\n</Table>\n\n</TableGrid>\n')
     else if (kind === 'imagegrid') insertMarkdown('\n<ImageGrid columns={2}>\n  <Image src="imagen-1.png" alt="Descripción de la primera imagen" caption="Figura 1" />\n\n  <Image src="imagen-2.png" alt="Descripción de la segunda imagen" caption="Figura 2" />\n</ImageGrid>\n')
   }
 
   const [isUploading, setIsUploading] = useState(false)
+  const uploadMode = useRef<'insert' | 'url'>('insert')
+  const uploadInFlight = useRef(false)
+  const uploadSelection = useRef<MarkdownEditorSelection | null>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      uploadSelection.current = null
+      return
+    }
+    if (uploadInFlight.current) return
+    const mode = uploadMode.current
+    uploadInFlight.current = true
 
     try {
       setIsUploading(true)
 
-      const formData = new FormData()
-      formData.append('file', file) // Cloudinary usa 'file', no 'image'
-
-      // Credenciales de Cloudinary
-      const cloudName = 'dtjpmhekb'
-      const uploadPreset = 'resistencia-materiales-imagenes'
-
-      formData.append('upload_preset', uploadPreset)
-
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData
-      })
-
-      const data = await response.json()
-
-      if (data.secure_url) {
-        insertMarkdown('\n<Image src="', '" alt="Descripción de la imagen" caption="Figura" />\n', data.secure_url)
+      const url = await uploadCourseImage(file)
+      if (mode === 'url') {
+        const editor = editorRef.current
+        const model = editor?.getModel()
+        if (!editor || !model || model.isDisposed() || !uploadSelection.current) {
+          showToast('La imagen se subió, pero no se pudo insertar el enlace en el editor.', 'error')
+          return
+        }
+        editor.updateOptions({ readOnly: isSaving || Boolean(localBackup.pending) })
+        if (!insertEditorTextAtRange(editor, uploadSelection.current, url, 'image-upload')) {
+          showToast('La imagen se subió, pero no se pudo insertar el enlace en el editor.', 'error')
+          return
+        }
+        updateMarkdown(model.getValue())
+        showToast('Enlace insertado en el documento.', 'success')
       } else {
-        throw new Error(data.error?.message || 'Error desconocido de Cloudinary')
+        insertMarkdown('\n<Image src="', '" alt="Descripción de la imagen" caption="Figura" />\n', url)
       }
 
     } catch (err) {
-      console.error('Error subiendo imagen:', err)
-      showToast('Hubo un error al subir la imagen. Verifica tu conexión o tu API Key.', 'error')
+      showToast(err instanceof Error ? err.message : 'No se pudo subir la imagen. Vuelve a intentarlo.', 'error')
     } finally {
       setIsUploading(false)
+      uploadInFlight.current = false
+      uploadSelection.current = null
       // Reset input value to allow uploading the same file again
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
-  const handleImageUploadClick = () => {
+  const handleImageUploadClick = (mode: 'insert' | 'url') => {
+    if (uploadInFlight.current) return
+    uploadMode.current = mode
+    uploadSelection.current = editorRef.current?.getSelection() ?? null
     fileInputRef.current?.click()
   }
 
-  const toolClass = 'inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[#6f5050] hover:bg-[#f1dddd] hover:text-[#7f0303]'
+  const toolClass = 'editor-toolbar-icon inline-flex shrink-0 items-center justify-center rounded-md text-[#6f5050] hover:bg-[#f1dddd] hover:text-[#7f0303] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B0000] disabled:cursor-not-allowed disabled:opacity-40'
 
   if (!isLoaded || loadError) {
     return (
       <div className="flex h-[calc(100dvh-4rem)] items-center justify-center bg-[#f8f5f4]">
         <div className="flex flex-col items-center gap-3">
-          {loadError ? <div role="alert" className="max-w-md space-y-4 p-5 text-center text-sm"><p>{loadError}</p><button onClick={() => void loadDraft(initialChapter, initialSlug)} className="rounded-lg border border-[#d5baba] px-4 py-2 font-semibold text-[#7f0303]">Reintentar carga</button></div> : <><Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" /><p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p></>}
+          {loadError ? <div role="alert" className="max-w-md space-y-4 p-5 text-center text-sm"><p>{loadError}</p><button type="button" onClick={() => void loadDraft(initialChapter, initialSlug)} className={workspaceButtonClass()}>Reintentar carga</button></div> : <><Loader2 className="w-8 h-8 animate-spin text-[#8B0000]" /><p className="text-sm font-semibold text-[#8b6d6d] animate-pulse">Cargando documento...</p></>}
         </div>
       </div>
     );
   }
 
   return <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden bg-[#f3ece8] text-[#3b2022]">
+    {session?.role === 'admin' && reviewDocument && <Suspense fallback={<div role="status" className="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-4 bg-[#fbf7f4]"><p>Abriendo revisión…</p><button type="button" onClick={closeReview} className={workspaceButtonClass()}>Volver al editor</button></div>}><ContentReview candidate={reviewDocument} onClose={closeReview} onPublish={publishDraft} onReloadDraft={current => { if (editorRef.current) replaceEditorText(editorRef.current, current.contentMarkdown, 'review-reload', true); setDocument(current); setReviewDocument({ ...current }); localBackup.acknowledge({ contentMarkdown: current.contentMarkdown }) }} /></Suspense>}
     {localBackup.pending && <div className="shrink-0 px-4 pt-3 sm:px-6"><LocalDraftNotice savedAt={localBackup.pending.savedAt} content={localBackup.pending.values.contentMarkdown} onRecover={() => { const recovered = localBackup.recover(); if (recovered) updateMarkdown(recovered.contentMarkdown) }} onDiscard={localBackup.discard} /></div>}
     {toast && (
       <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl shadow-[#4b1719]/10 border flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-[#f4fbf7] border-[#d1e8da] text-[#1c663b]' : 'bg-[#fdf6f6] border-[#f1dada] text-[#8B0000]'}`}>
@@ -450,6 +469,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
     )}
     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
+    <div hidden={Boolean(reviewDocument)} className={reviewDocument ? 'hidden' : 'flex min-h-0 flex-1 flex-col'}>
     <div className="flex shrink-0 gap-2 border-b border-[#ddcaca] bg-white px-4 py-2 xl:hidden" role="group" aria-label="Vista del editor">
       <button type="button" aria-pressed={mobilePane === 'edit' && !previewExpanded} onClick={() => { setMobilePane('edit'); setPreviewExpanded(false) }} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold ${mobilePane === 'edit' && !previewExpanded ? 'bg-[#f1dddd] text-[#7f0303]' : 'text-[#765e5e]'}`}><Pencil className="size-4" aria-hidden="true" />Editar</button>
       <button type="button" aria-pressed={mobilePane === 'preview' || previewExpanded} onClick={() => setMobilePane('preview')} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold ${mobilePane === 'preview' || previewExpanded ? 'bg-[#f1dddd] text-[#7f0303]' : 'text-[#765e5e]'}`}><Eye className="size-4" aria-hidden="true" />Vista previa</button>
@@ -488,7 +508,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   onFocus={event => event.currentTarget.select()}
                   onChange={event => setTitleInput(event.target.value)}
                   readOnly={isRenaming}
-                  className="min-w-0 flex-1 border-b-2 border-[#8B0000] bg-transparent py-0.5 font-sans text-lg font-bold text-[#4b1719] outline-none"
+                  className={`${workspaceInputClass()} min-w-0 flex-1`}
                   onBlur={() => { void renameSubtopic(); }}
                   onKeyDown={event => {
                     if (event.key === 'Enter') { event.preventDefault(); void renameSubtopic(); }
@@ -506,7 +526,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                     {currentSection.id}
                   </span>
                 )}
-                <h2 className="break-words font-sans text-lg font-bold text-[#4b1719]">{document.title}</h2>
+                <h2 className="min-w-0 break-words font-sans text-lg font-bold text-[#4b1719]">{document.title}</h2>
                 <button
                   type="button"
                   disabled={isSaving}
@@ -515,7 +535,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                     setTitleInput(document.title);
                     setIsEditingTitle(true);
                   }}
-                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-[#6a2022] hover:bg-[#f1dddd] focus-visible:outline-2 focus-visible:outline-[#8B0000] disabled:opacity-50 transition-colors"
+                  className={workspaceButtonClass('quiet', true)}
                   title="Cambiar nombre del subtema"
                   aria-label="Cambiar nombre del subtema"
                 >
@@ -525,16 +545,17 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={importProjectMarkdown} disabled={isSaving || isImporting || isEditingTitle} className="inline-flex items-center gap-2 rounded-md border border-[#d8c1c1] bg-white px-3 py-1.5 text-xs font-semibold text-[#6a2022] hover:bg-[#f1dddd] disabled:opacity-50" title="Cargar el archivo MDX del proyecto; no guarda ni publica automáticamente">
+            <button type="button" onClick={importProjectMarkdown} disabled={isSaving || isImporting || isEditingTitle} className={workspaceButtonClass()} title="Cargar el archivo MDX del proyecto; no guarda ni publica automáticamente">
               {isImporting ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <FileInput className="size-4" aria-hidden="true" />}
               {isImporting ? 'Importando…' : 'Importar del proyecto'}
             </button>
             <a
-              href="/guia-colaboradores"
+              href={guide.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8eaea] border border-[#d5baba] hover:bg-[#f1dddd] text-[#8B0000] text-sm font-semibold rounded-md shadow-sm transition-colors"
-              title="Abrir la Guía para Colaboradores en una nueva pestaña"
+              className={workspaceButtonClass()}
+              title={`Abrir ${guide.label.toLowerCase()} en una nueva pestaña`}
+              aria-label={`Abrir ${guide.label.toLowerCase()} en una nueva pestaña`}
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Guía</span>
@@ -542,22 +563,27 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
              <button
               onClick={() => saveDraft('draft')}
               disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#d8c1c1] hover:bg-[#f1dddd] text-[#3b2022] text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
+              className={workspaceButtonClass()}
               title="Guardar progreso en la nube (borrador)"
             >
               <Cloud className="w-4 h-4" />
               {isSaving ? 'Guardando...' : 'Guardar Avance'}
             </button>
             {session?.role === 'admin' ? (
+              <>
               <button
-                onClick={publishDraft}
+                ref={reviewButton}
+                type="button"
+                onClick={() => setReviewDocument({ ...document })}
                 disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#1c663b] hover:bg-[#15502e] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
-                title="Publicar directamente en la web"
+                className={workspaceButtonClass()}
+                title="Comparar con la versión publicada"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                Aprobar y Publicar
+                <FileDiff className="w-4 h-4" aria-hidden="true" />
+                Revisar cambios
               </button>
+              <button type="button" onClick={publishDirectly} disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)} className={workspaceButtonClass('success')} title="Publicar el texto actual sin abrir la comparación"><CheckCircle2 className="size-4" aria-hidden="true" />{publicationInFlight.current ? 'Publicando…' : 'Publicar'}</button>
+              </>
             ) : (
               <button
                 onClick={() => {
@@ -567,7 +593,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                   saveDraft('pending_approval');
                 }}
                 disabled={isSaving || isImporting || isEditingTitle || Boolean(localBackup.pending)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#8B0000] hover:bg-[#6a0000] text-white text-sm font-semibold rounded-md shadow-sm transition-colors disabled:opacity-50"
+                className={workspaceButtonClass('primary')}
                 title="Enviar a revisión del administrador"
               >
                 <Send className="w-4 h-4" />
@@ -578,10 +604,11 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         </div>
 
         <div className="flex flex-1 min-h-0 flex-col rounded-xl border border-[#ddcaca] bg-white shadow-sm">
-          <fieldset disabled={isSaving || Boolean(localBackup.pending)} onMouseDown={(event) => { if ((event.target as HTMLElement).closest('button')) event.preventDefault() }} className="min-w-0 shrink-0 flex flex-wrap items-center gap-1 border-b border-[#eadada] bg-[#fbf7f4] p-2 rounded-t-xl">
+          <fieldset disabled={isSaving || Boolean(localBackup.pending)} onMouseDown={(event) => { if ((event.target as HTMLElement).closest('button')) event.preventDefault() }} className="editor-toolbar min-w-0 shrink-0 flex items-center gap-2 border-b border-[#eadada] bg-[#fbf7f4] p-2 rounded-t-xl">
+            <div role="group" aria-label="Formato del texto" className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto p-1.5">
             <button type="button" className={toolClass} title="Deshacer" aria-label="Deshacer" onClick={() => execCommand('undo')}><Undo2 className="size-4" /></button>
             <button type="button" className={toolClass} title="Rehacer" aria-label="Rehacer" onClick={() => execCommand('redo')}><Redo2 className="size-4" /></button>
-            <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
+            <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" aria-hidden="true" />
             <button type="button" className={toolClass} title="Negrita" aria-label="Negrita" onClick={() => insertMarkdown('**', '**', 'texto')}><Bold className="size-4" /></button>
             <button type="button" className={toolClass} title="Cursiva" aria-label="Cursiva" onClick={() => insertMarkdown('*', '*', 'texto')}><Italic className="size-4" /></button>
             <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
@@ -605,12 +632,16 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             >
               <TableIcon className="size-4" />
             </button>
-            <button type="button" disabled={isUploading} className={`${toolClass} ${isUploading ? 'opacity-50 cursor-wait' : ''}`} title="Subir Imagen a la Nube" aria-label="Imagen" onClick={handleImageUploadClick}>
-              {isUploading ? <span className="size-4 animate-spin rounded-full border-2 border-[#8b6d6d] border-t-transparent" /> : <ImageIcon className="size-4" />}
+            <button type="button" disabled={isUploading} className={toolClass} title="Subir e insertar imagen" aria-label="Imagen" onClick={() => handleImageUploadClick('insert')}>
+              {isUploading && uploadMode.current === 'insert' ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <ImageIcon className="size-4" aria-hidden="true" />}
             </button>
-            <span className="mx-1 h-6 w-px shrink-0 bg-[#decaca]" />
+            <button type="button" disabled={isUploading} className={toolClass} title="Subir imagen e insertar su enlace en el cursor" aria-label="Subir imagen e insertar enlace" onClick={() => handleImageUploadClick('url')}>
+              {isUploading && uploadMode.current === 'url' ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <ImageUp className="size-4" aria-hidden="true" />}
+            </button>
+            </div>
             <ToolbarSelect onChange={insertEducationalBlock} />
           </fieldset>
+          {isUploading && <p role="status" className="shrink-0 border-b border-[#eadada] px-3 py-2 text-xs text-[#765e5e]">{uploadMode.current === 'url' ? 'Subiendo imagen e insertando su enlace…' : 'Subiendo imagen para insertarla…'}</p>}
           <div className="relative flex-1 min-h-0">
             <Editor
               documentId={`${document.chapterId}_${document.slug}`}
@@ -618,65 +649,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
               defaultLanguage="markdown"
               value={document.contentMarkdown}
               onChange={(value) => updateMarkdown(value || '')}
-              beforeMount={(monaco) => {
-                monaco.editor.defineTheme('resistenciaTheme', {
-                  base: 'vs',
-                  inherit: true,
-                  rules: [
-                    { token: 'identifier', foreground: '3E3030' },
-                    { token: 'variable', foreground: '3E3030' },
-
-                    { token: 'keyword', foreground: '8B0000', fontStyle: 'bold' },
-                    { token: 'keyword.md', foreground: '8B0000', fontStyle: 'bold' },
-                    { token: 'tag', foreground: '8B0000', fontStyle: 'bold' },
-                    { token: 'tag.html', foreground: '8B0000', fontStyle: 'bold' },
-                    { token: 'tag.md', foreground: '8B0000', fontStyle: 'bold' },
-                    { token: 'type.identifier', foreground: '8B0000', fontStyle: 'bold' },
-
-                    { token: 'attribute.name', foreground: 'A52A2A' },
-                    { token: 'attribute.name.html', foreground: 'A52A2A' },
-                    { token: 'attribute.name.md', foreground: 'A52A2A' },
-
-                    { token: 'string', foreground: '8A5A20' },
-                    { token: 'string.html', foreground: '8A5A20' },
-                    { token: 'string.md', foreground: '8A5A20' },
-                    { token: 'string.xml', foreground: '8A5A20' },
-                    { token: 'string.link.md', foreground: '8A5A20', fontStyle: 'underline' },
-                    { token: 'attribute.value', foreground: '8A5A20' },
-                    { token: 'attribute.value.html', foreground: '8A5A20' },
-                    { token: 'attribute.value.md', foreground: '8A5A20' },
-
-                    { token: 'constant', foreground: '9B3F3F' },
-                    { token: 'type', foreground: '9B3F3F' },
-                    { token: 'math.md', foreground: '9B3F3F' },
-
-                    { token: 'number', foreground: '7A5A8E' },
-
-                    { token: 'comment', foreground: '756565', fontStyle: 'italic' },
-                    { token: 'delimiter', foreground: '756565' },
-                    { token: 'delimiter.html', foreground: '756565' },
-                    { token: 'delimiter.md', foreground: '756565' },
-
-                    { token: 'invalid', foreground: '3E3030' },
-                    { token: 'escape', foreground: '3E3030' },
-                    { token: 'string.escape', foreground: '3E3030' },
-                    { token: 'keyword.escape', foreground: '3E3030' },
-                    { token: 'punctuation', foreground: '756565' },
-                    { token: 'punctuation.md', foreground: '756565' },
-                  ],
-                  colors: {
-                    'editor.foreground': '#3E3030',
-                    'editor.background': '#FCF9F7',
-                    'editorCursor.foreground': '#8B0000',
-                    'editor.lineHighlightBackground': '#8B000012',
-                    'editorLineNumber.foreground': '#E5D7D4',
-                    'editorLineNumber.activeForeground': '#8B0000',
-                    'editor.selectionBackground': '#F3D9D7',
-                    'editorBracketHighlight.unexpectedBracket.foreground': '#3E3030',
-                    'editorError.foreground': '#3E3030',
-                  }
-                })
-              }}
+              beforeMount={defineCourseEditorTheme}
               onMount={(editor, monaco) => {
                 editorRef.current = editor
                 monaco.editor.setTheme('resistenciaTheme')
@@ -685,7 +658,7 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
                 }, 50)
               }}
               options={{
-                readOnly: isSaving || Boolean(localBackup.pending),
+                readOnly: isSaving || isUploading || Boolean(localBackup.pending),
                 automaticLayout: true,
                 lineNumbers: 'on',
                 wordWrap: 'on',
@@ -714,20 +687,20 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
             <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.13em] text-[#765e5e]">
               <Eye className="size-4 text-[#7f0303]" />Vista previa en vivo
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               {document.contentMarkdown.trim() !== '' && (
                 <span
                   title={validation.errors.join(' | ')}
-                  className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${validation.success ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}
+                  className={`max-w-full break-words rounded-full px-2.5 py-1 text-xs font-semibold ${validation.success ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}
                 >
                   {validation.success ? 'Markdown válido' : (validation.errors[0] || 'Observación')}
                 </span>
               )}
-              <button type="button" onClick={downloadMarkdown} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" title="Descargar como archivo Markdown">
+              <button type="button" onClick={downloadMarkdown} className={workspaceButtonClass()} title="Descargar como archivo Markdown" aria-label="Descargar Markdown">
                 <Download className="size-3.5" />
                 <span className="hidden sm:inline">Exportar MD</span>
               </button>
-              <button type="button" onClick={() => setPreviewExpanded((expanded) => !expanded)} className="inline-flex items-center gap-1.5 rounded-md border border-[#d5baba] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#6a2022] hover:bg-[#f8eaea]" aria-label={previewExpanded ? 'Mostrar editor Markdown' : 'Expandir vista previa'}>
+              <button type="button" onClick={() => setPreviewExpanded((expanded) => !expanded)} className={workspaceButtonClass()} aria-label={previewExpanded ? 'Mostrar editor Markdown' : 'Expandir vista previa'}>
                 {previewExpanded ? <PanelLeftOpen className="size-3.5" /> : <Maximize2 className="size-3.5" />}
                 <span className="hidden sm:inline">{previewExpanded ? 'Volver a editar' : 'Vista completa'}</span>
               </button>
@@ -745,12 +718,19 @@ export default function ContentEditor({ session, initialChapter, initialSlug }: 
         </div>
       </aside>
     </div>
+    </div>
   </div>
 }
 
 function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const optionsId = useId()
+
+  useEffect(() => {
+    if (open) containerRef.current?.querySelector<HTMLButtonElement>('[data-block-option]')?.focus()
+  }, [open])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -779,28 +759,45 @@ function ToolbarSelect({ onChange }: { onChange: (value: string) => void }) {
     { value: 'summary', label: 'Resumen' },
     { value: 'tablegrid', label: 'Tablas en una fila' },
     { value: 'table', label: 'Tabla con título' },
+    { value: 'image-table', label: 'Tabla con imágenes' },
     { value: 'imagegrid', label: 'Cuadrícula de imágenes' },
   ]
 
   return (
-    <div className="relative shrink-0" ref={containerRef}>
+    <div className="relative shrink-0" ref={containerRef}
+      onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false) }}
+      onKeyDown={event => {
+        if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setOpen(false); triggerRef.current?.focus(); return }
+        if (!open || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[data-block-option]'))
+        const index = buttons.indexOf(event.target as HTMLButtonElement)
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : event.key === 'ArrowDown' ? (index + 1) % buttons.length : (index - 1 + buttons.length) % buttons.length
+        event.preventDefault(); buttons[next]?.focus()
+      }}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-8 items-center justify-between gap-1.5 rounded-md border border-[#d8c1c1] bg-white pl-2 pr-2 text-xs font-semibold text-[#6f5050] outline-none transition hover:border-[#b78383] hover:bg-[#f1dddd]"
+        aria-expanded={open}
+        aria-controls={open ? optionsId : undefined}
+        aria-label="Insertar componente"
+        title="Insertar componente"
+        className="editor-toolbar-trigger inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-[#d8c1c1] bg-white px-2.5 text-xs font-semibold leading-5 text-[#6a2022] hover:bg-[#f8eaea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B0000]"
       >
+        <Plus className="size-3.5" aria-hidden="true" />
         <span>Insertar componente</span>
-        <svg className="h-3 w-3 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <ChevronDown className="size-3.5" aria-hidden="true" />
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 z-50 mt-1 max-h-80 w-64 overflow-y-auto rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10">
+        <div id={optionsId} role="group" aria-label="Componentes disponibles" className="absolute top-full right-0 z-50 mt-2 max-h-[min(20rem,50dvh)] w-64 max-w-[calc(100vw-3rem)] overflow-y-auto rounded-lg border border-[#e5cfcd] bg-white py-1 shadow-xl shadow-[#4b1719]/10">
           {options.map((option) => (
             <button
               key={option.value}
               type="button"
+              data-block-option
               onClick={() => { onChange(option.value); setOpen(false) }}
-              className="flex w-full items-center px-3 py-2 text-left text-xs font-medium text-[#4d3838] transition-colors hover:bg-[#f8eaea] hover:text-[#7f0303]"
+              className="flex min-h-11 w-full items-center px-3 py-2 text-left text-sm font-medium text-[#4d3838] transition-colors hover:bg-[#f8eaea] hover:text-[#7f0303] focus-visible:bg-[#f8eaea] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#8B0000]"
             >
               {option.label}
             </button>

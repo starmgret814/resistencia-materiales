@@ -12,11 +12,24 @@ Esta guía rápida contiene todo lo necesario para redactar, estructurar y envia
 
 <!-- Añadir las próximas actualizaciones arriba, con fecha y enlaces a las instrucciones. Conservar las entradas anteriores y actualizar también la guía web. -->
 
-### 18 de noviembre de 2026 · Gestión de capítulos e historial del editor
+### 22 de noviembre de 2026 · Subir imágenes e insertar su enlace
 
-- **Capítulos administrables:** los administradores pueden crear, renombrar, ordenar, archivar y restaurar capítulos. La estructura no está limitada a los 13 capítulos iniciales. [Ver instrucciones](#guia-gestion-capitulos).
+- **Subir imagen e insertar enlace:** nueva opción junto a **Imagen** en la barra del editor de capítulos. Coloca el cursor, selecciona el archivo y su URL quedará insertada en el documento, sin un panel ni una acción de copia. [Ver cómo usarla](#guia-imagen-enlace).
+
+### 22 de noviembre de 2026 · Imágenes sin borde y títulos de tablas
+
+- **Imágenes sin borde:** añade `border="false"` a `Image` para dibujos transparentes que no necesitan marco. Para la imagen lateral de un problema, usa `imageBorder="false"`. [Ver opciones de imágenes](#guia-imagenes).
+- **Títulos tal como los escribes:** las cabeceras y el título de cada tabla conservan las mayúsculas y minúsculas originales. Puedes escribir «Tipo de carga», «TIPO DE CARGA» o usar estilos distintos en cada columna.
+- **Tipografía académica uniforme:** las celdas, cabeceras, títulos y leyendas de imágenes dentro de tablas usan la misma fuente y tamaño del texto del capítulo. No necesitas agregar una opción para igualarlos.
+
+### 22 de noviembre de 2026 · Tablas con imágenes y fórmulas editables
+
+- **Tabla con imágenes:** disponible en **Insertar componente**. Combina dibujos, texto y LaTeX en celdas nativas; puedes ajustar las dimensiones de las imágenes y el ancho mínimo sin convertir toda la tabla en una captura. [Ver ejemplo y opciones](#guia-tablas-imagenes).
+
+### 18 de noviembre de 2026 · Historial del editor y gestión de subtemas
+
 - **Deshacer y rehacer:** el editor conserva su historial al ampliar la vista previa. Las inserciones e importaciones son pasos deshacibles. Usa Ctrl + Z para deshacer y Ctrl + Y o Ctrl + Shift + Z para rehacer; en Mac, Command + Z y Command + Shift + Z.
-- **Ediciones simultáneas:** las operaciones usan transacciones sobre el catálogo actual y conservan las direcciones existentes. Un error conserva el estado anterior.
+- **Ediciones simultáneas:** al añadir, renombrar u ordenar subtemas de tus capítulos asignados, se conserva el trabajo de otras personas y las direcciones existentes. Si la operación falla, se conserva el estado anterior.
 
 ### 15 de noviembre de 2026 · Puesta al día del editor y los contenidos
 
@@ -28,7 +41,6 @@ Esta guía rápida contiene todo lo necesario para redactar, estructurar y envia
 - **Problemas con imágenes:** la numeración es automática por capítulo. Usa `imageLayout="auto"`, `"wrap"` o `"stacked"` para acomodar la figura sin estrechar demasiado el enunciado. [Ver opciones de problemas](#guia-problemas).
 - **Tablas personalizables:** define alineación, ancho y tamaños de columna. Usa `TableGrid` para colocar varias tablas en una fila. [Ver ejemplos de tablas](#guia-tablas).
 - **Herramientas interactivas:** inserta los simuladores de Mohr, esfuerzo normal o deformación axial desde **Insertar componente**. [Ver herramientas disponibles](#guia-herramientas).
-- **Exámenes como páginas web · solo administradores:** importa Markdown, inserta componentes, revisa la vista previa y publica por periodo. [Ver cómo publicar evaluaciones](#guia-examenes).
 
 Puedes incorporar estas opciones al adaptar tu capítulo; no necesitas reescribir todo el material. La autoría de las presentaciones originales corresponde al **Ing. Eden Angel Molina Capcha**.
 
@@ -39,7 +51,7 @@ Puedes incorporar estas opciones al adaptar tu capítulo; no necesitas reescribi
 ## 1. Bienvenida
 
 ### ¿Qué es la plataforma?
-Es un libro digital interactivo diseñado para los estudiantes de Resistencia de Materiales. Su propósito es brindar una experiencia de aprendizaje moderna y accesible que combine explicaciones claras, fórmulas matemáticas nítidas, figuras técnicas y ejercicios prácticos resueltos paso a paso.
+Es un espacio digital de estudio diseñado para los estudiantes de Resistencia de Materiales. Su propósito es brindar una experiencia de aprendizaje moderna y accesible que combine explicaciones claras, fórmulas matemáticas nítidas, figuras técnicas y ejercicios prácticos resueltos paso a paso.
 
 ### ¿Qué debe hacer el colaborador?
 - Redactar y actualizar los temas teóricos de los capítulos asignados.
@@ -52,45 +64,39 @@ Es un libro digital interactivo diseñado para los estudiantes de Resistencia de
 ## 2. Acceso y editor
 
 1. **Cómo entrar:**
-   - Ingresa a la plataforma e inicia sesión con el correo y contraseña que te fueron asignados.
+   - Ingresa a la plataforma, pulsa **Continuar con Google** y utiliza la cuenta autorizada en la plataforma.
 2. **Cómo abrir un capítulo:**
    - Una vez que inicies sesión, verás la lista de capítulos del curso.
    - Haz clic sobre el capítulo o subtema que deseas editar para ingresar al editor.
 3. **Cómo escribir:**
    - En el lado izquierdo tienes el **Editor**, donde escribirás tu texto con formato Markdown.
-   - En la parte superior dispones de una barra de herramientas con botones de acceso rápido para títulos, negrita, cursiva, fórmulas matemáticas y bloques del libro.
+   - En la parte superior dispones de una barra de herramientas con botones de acceso rápido para títulos, negrita, cursiva, fórmulas matemáticas y bloques didácticos.
 4. **Vista previa:**
    - En el lado derecho verás la **Vista Previa en tiempo real**. Todo lo que escribas se reflejará al instante tal como lo verá el estudiante en la página final.
 5. **Guardar:**
-   - Haz clic en el botón **"Guardar"** en la barra superior del editor para respaldar tu avance en cualquier momento.
+   - Haz clic en el botón **Guardar Avance** en la barra superior del editor para respaldar tu avance en cualquier momento.
 6. **Enviar a revisión:**
-   - Cuando hayas concluido el tema y verificado que todo se ve correctamente en la vista previa, pulsa **"Enviar a revisión"**. El equipo docente o administrador revisará tu contenido para publicarlo en la web del curso.
+   - Cuando hayas concluido el tema y verificado que todo se ve correctamente en la vista previa, pulsa **Solicitar Revisión**. El equipo docente o administrador revisará tu contenido para publicarlo en la web del curso.
 
 ---
 
-<a id="guia-gestion-capitulos"></a>
+<a id="guia-subtemas"></a>
 
-### Gestionar los capítulos del curso
+### Organizar los subtemas asignados
 
-Los administradores encuentran **Nuevo capítulo** en el panel de contenido. Al crear uno, escribe su título; el identificador se asigna automáticamente. Junto a cada encabezado puedes renombrar y ordenar los capítulos. Los identificadores, las asignaciones de los colaboradores y las direcciones existentes se conservan.
+Puedes añadir, renombrar y ordenar subtemas dentro de tus capítulos asignados. Revisa el título antes de guardar. La eliminación de un subtema ya publicado requiere solicitar ayuda al responsable de la publicación.
 
-**Archivar** retira el capítulo de la navegación pública y conserva sus secciones, borradores y publicaciones. Usa **Ver archivados → Restaurar** para recuperarlo. Los editores gestionan las secciones de sus capítulos asignados; eliminar una sección publicada requiere un administrador.
-
-La estructura se guarda en Firestore. No necesitas editar el catálogo inicial ni volver a desplegar la web cada vez que cambias los capítulos. Los menús y las opciones de asignación consultan esa misma lista.
-
-**Configuración inicial:** publica el archivo `firestore.rules` actualizado para habilitar la validación de estructuras de tamaño variable. El despliegue del código web no publica las reglas automáticamente.
-
-Ctrl + Z revierte texto en el editor. Las publicaciones y los cambios guardados en la estructura son operaciones independientes. El historial se conserva mientras la instancia del editor permanezca abierta.
+Ctrl + Z revierte texto mientras el editor permanece abierto. No deshace cambios ya guardados en la estructura del curso ni publicaciones.
 
 <a id="guia-respaldo"></a>
 
 ### Respaldo local y recuperación
 
-Los editores de capítulos y exámenes guardan una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento. Este respaldo no envía el texto a Firestore ni publica cambios.
+El editor de capítulos guarda una copia local después de una pausa al escribir. Cada copia corresponde a tu cuenta y documento. Este respaldo no envía el texto a Firestore ni publica cambios.
 
-Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar **Recuperar copia**. Después, usa **Guardar Avance**, solicita revisión o publica según tus permisos.
+Al volver al mismo documento, si hay una copia distinta de la versión cargada, verás un aviso. Puedes consultar su texto y pulsar **Recuperar copia**. Después, usa **Guardar Avance**, solicita revisión cuando esté listo.
 
-La copia está solo en **ese navegador y dispositivo**. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa **Descargar Markdown** en capítulos o **Descargar copia** en exámenes. Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.
+La copia está solo en **ese navegador y dispositivo**. Puede perderse al borrar sus datos o salir de una sesión privada. No reemplaza el guardado en la plataforma. Para conservar un archivo independiente, usa **Exportar MD** en el editor. Si el navegador bloquea el almacenamiento o se queda sin espacio, el editor lo indica para que puedas descargar el texto o guardarlo manualmente.
 
 ## 3. Markdown básico
 
@@ -268,9 +274,7 @@ $$
 
 El capítulo 1 incluye estas ayudas escritas directamente en sus archivos MDX: ecuaciones numeradas, figuras enlazables y términos con explicación. Puedes copiarlas o modificarlas desde el editor; no hay una transformación automática especial para ese capítulo.
 
-Para conectar esos archivos con las versiones antiguas que ya estaban publicadas, la página y el editor cargan el MDX actualizado únicamente si el texto coincide exactamente con la revisión anterior conocida. Un borrador o una publicación con contenido diferente conserva prioridad. Esta compatibilidad no escribe en Firestore: el editor muestra un aviso para que revises y guardes la versión cargada.
-
-El editor carga el borrador de Firestore. Para cargar la versión de los archivos del proyecto, usa **Importar del proyecto**. Esta acción reemplaza el texto visible, pide confirmación y puede deshacerse con Ctrl + Z. No guarda ni publica automáticamente: revisa la vista previa y luego guarda el borrador o publica cuando corresponda. Una sección sin archivo local mostrará un aviso y conservará su contenido actual.
+El editor carga el borrador de Firestore. Para cargar la versión de los archivos del proyecto, usa **Importar del proyecto**. Esta acción reemplaza el texto visible, pide confirmación y puede deshacerse con Ctrl + Z. No guarda ni publica automáticamente: revisa la vista previa y luego guarda el borrador y solicita revisión cuando esté listo. Una sección sin archivo local mostrará un aviso y conservará su contenido actual.
 
 Para citar una ecuación numerada, escribe `[ecuación (8.3.2)](#eq-8.3.2)`. Al pulsar el enlace, se muestra y destaca la ecuación correspondiente. Si prefieres un identificador que no cambie al renumerar, agrega `id="eq-esfuerzo-normal"` a `<Formula>` y enlaza a `#eq-esfuerzo-normal`.
 
@@ -450,7 +454,22 @@ Muestra tablas ordenadas con tipografía clara y barras de desplazamiento respon
 
 ---
 
+<a id="guia-imagenes"></a>
+
 ## 6. Imágenes
+
+<a id="guia-imagen-enlace"></a>
+
+### Subir una imagen e insertar solo el enlace
+
+1. Coloca el cursor en el punto del documento donde debe aparecer la dirección.
+2. Pulsa **Subir imagen e insertar enlace**, al lado de **Imagen**, y selecciona el archivo.
+3. La URL se inserta en la posición del cursor. Si había texto seleccionado, se reemplaza por la URL. No aparece un panel ni hace falta copiar nada.
+4. Usa la dirección insertada, por ejemplo, dentro de `![Descripción](ENLACE)` en una celda de tabla o en el atributo `src="..."` de una imagen existente, conservando sus otros atributos. Mantén toda la fila de la tabla en una misma línea.
+
+El botón habitual **Imagen** sigue subiendo e insertando el bloque completo. La inserción del enlace forma parte del historial de Deshacer. Esta opción no guarda ni publica el documento.
+
+### Subir e insertar el bloque completo
 
 1. **Cómo utilizar el botón de imagen del editor:**
    - Coloca el cursor en el editor en la línea donde deseas que aparezca la figura.
@@ -465,6 +484,9 @@ Muestra tablas ordenadas con tipografía clara y barras de desplazamiento respon
    - **`height`**: Limita la altura máxima sin deformar la imagen (ejemplo: `height="300px"`).
    - **`size`**: Tamaños predeterminados: `"small"` (384px), `"medium"` (672px), `"large"` (896px), o `"full"` (100% de ancho).
    - **`align`**: Alineación horizontal: `"center"` (por defecto), `"left"` o `"right"`.
+   - **`border`**: Usa `border="false"` para quitar el borde de esa imagen; también se admite `border={false}`. Si lo omites o usas `border="true"`, se conserva el borde habitual. La transparencia, el tamaño, el pie y la numeración no cambian. Las imágenes dentro de tablas ya se muestran sin borde.
+
+   Para la figura lateral de un problema, añade `imageBorder="false"` a `<Problem image="esquema.png" ...>`. Esto quita únicamente el borde de la imagen, no el recuadro del problema.
 
    *Ejemplo con dimensiones y alineación:*
    ```markdown
@@ -604,6 +626,9 @@ Antes de pulsar el botón de envío, verifica estos 5 puntos:
 
 ### Personalizar la alineación y el ancho de las tablas
 
+El título y las cabeceras respetan las mayúsculas y minúsculas que escribas; no hay conversión automática a mayúsculas.
+La tabla hereda la fuente, el tamaño y el interlineado del contenido académico, incluidos su título y las leyendas de las imágenes.
+
 ```mdx
 <Table title="Propiedades" align="center" width="80%" columnWidths="40%, 30%, 30%">
 
@@ -654,50 +679,32 @@ Para mostrar dos o más tablas una al lado de otra, usa:
 `columns` acepta `2`, `3` o `4`. Agrega tantas tablas como necesites: las siguientes pasan a otra fila. Las tablas se alinean por arriba y en pantallas pequeñas se apilan. Dentro de la cuadrícula cada tabla ocupa su columna; puedes seguir usando `columnWidths` y `align` en cada una.
 
 El menú de componentes del editor incluye **Tablas en una fila** para insertar esta plantilla.
+
+<a id="guia-tablas-imagenes"></a>
+
+### Tablas con imágenes y fórmulas editables
+
+Usa **Insertar componente → Tabla con imágenes**. El texto y las fórmulas siguen siendo seleccionables y editables; solo el dibujo es una imagen. Las imágenes se ajustan a la celda, sin el marco ni los márgenes de una figura independiente.
+
+```mdx
+<Table title="Tabla de cargas" align="center" columnWidths="34%, 22%, 22%, 22%" minWidth="44rem" imageWidth="260px" imageHeight="140px">
+
+| Tipo de carga | Función de carga $w(x)$ | Fuerza cortante $V$ | Momento flector $M$ |
+| --- | --- | --- | --- |
+| ![Fuerza concentrada P aplicada a una distancia a](https://res.cloudinary.com/dtjpmhekb/image/upload/v1795396514/azazmev0ea8exhfa8qxy.svg "Fuerza concentrada") | $w = P\langle x-a\rangle^{-1}$ | $V = P\langle x-a\rangle^0$ | $M = P\langle x-a\rangle^1$ |
+
+</Table>
+```
+
+- `imageWidth="260px"` define el ancho de las imágenes; `imageHeight="140px"` limita su altura. Se conserva la proporción y no se recortan. También se admiten porcentajes o rem. Sin opciones se usan 240 px de ancho y un máximo de 160 px de alto.
+- Para un tamaño individual, escribe dentro de la celda, en una sola línea: `<Image src="esquema.png" alt="Descripción del esquema" width="180px" height="120px" />`. Puedes añadir `caption="..."` para una explicación debajo del dibujo. El tamaño individual tiene prioridad sobre el de la tabla.
+- `minWidth="44rem"` evita comprimir demasiado las columnas. En pantallas pequeñas se desplaza la tabla horizontalmente; también se puede enfocar con Tab y desplazar con las flechas.
+- Las rutas relativas, como `esquema.png`, corresponden a la sección actual. También puedes usar rutas públicas como `/imagenes/esquema.svg` y direcciones HTTPS. En exámenes, usa una ruta pública o una URL.
+- Escribe cada fila en una sola línea y las fórmulas entre `$...$`; usa `\displaystyle` dentro de la fórmula si necesitas una integral o fracción en estilo de ecuación. Para barras verticales matemáticas usa `\vert`.
+- Si pulsas Enter después de la imagen y continúas las fórmulas en otra línea que empieza con `|`, Markdown crea otra fila. Mantén la imagen y las demás celdas en la misma línea. El ajuste visual automático del editor puede mostrarlas en varios renglones sin crear un salto real.
+
+Una tabla que ya es una captura debe reconstruirse en filas y columnas, conservando sus textos, ecuaciones y dibujos por separado. Esta función no extrae automáticamente datos de una imagen. Al adaptar una tabla, conserva el convenio de signos de su material original.
+
 # Enlaces a ecuaciones
 
 Las fórmulas con `number` tienen un enlace directo. Por ejemplo, para citar una fórmula con `number="8.3.1"`, escribe `[ecuación (8.3.1)](#eq-8.3.1)` en el mismo tema. También puedes enlazarla desde otro tema usando `/curso/ruta-del-tema#eq-8.3.1`. Usa un número único para cada fórmula dentro de una página.
-
-<a id="guia-examenes"></a>
-
-## Publicar exámenes como páginas web
-
-El editor está en `/workspace-mc361/management/exams`, en la pestaña **Exámenes** del panel administrativo. Si tienes una sesión de administrador activa, también aparece **Editor de exámenes** en `/examenes`. La gestión y publicación están reservadas a administradores.
-
-1. Pulsa **Nueva evaluación** y completa el periodo (`2026-1`, `2026-2`, etc.), tipo y título.
-2. Escribe el contenido o usa **Importar Markdown** para cargar un archivo `.md`, `.mdx` o `.markdown`. La importación reemplaza únicamente el contenido, pide confirmación y se puede deshacer con Ctrl + Z. No publica el archivo automáticamente.
-3. Usa **Insertar** para añadir problemas con soluciones, fórmulas, imágenes o tablas. Son los mismos componentes de los capítulos. Las imágenes necesitan una URL o una ruta de `public/`, por ejemplo `/imagenes/figura.png`.
-4. Revisa **Vista previa** y pulsa **Publicar evaluación**. Aparecerá en el archivo público bajo su periodo y tipo. Para modificarla, selecciónala en la lista de evaluaciones publicadas.
-
-**Descargar copia** guarda el contenido como Markdown en un archivo independiente, incluso antes de publicarlo. El respaldo automático solo permanece en el mismo navegador; descargarlo permite conservarlo aunque borres sus datos. El límite es de 200 000 caracteres por evaluación.
-
-<a id="guia-examenes-permisos"></a>
-
-### Si Firestore rechaza el acceso a los exámenes
-
-El código `permission-denied` indica un rechazo de permisos. Tener `firestore.rules` en el proyecto no publica sus reglas en Firebase. Un administrador del proyecto Firebase debe revisar la colección `exams` en **Firestore Database → Reglas**.
-
-Para publicar las reglas del proyecto desde la terminal, usa una cuenta con permisos en Firebase:
-
-```powershell
-npx firebase-tools login
-npx firebase-tools deploy --only firestore:rules --project resistencia-materiales
-```
-
-Este despliegue reemplaza las reglas publicadas por el archivo local: revisa sus diferencias si también se editaron desde la consola. No habilites escrituras públicas. El archivo del proyecto permite consultar los exámenes y reserva su publicación y eliminación a administradores registrados. Vuelve al editor y pulsa **Reintentar carga** tras aplicar las reglas.
-
-## Presentación del proyecto y su equipo
-
-La página pública es `/acerca-de`. Sus textos y el equipo se configuran en `lib/project-info.ts`. Los créditos distinguen la **Autoría del material académico**, el **Desarrollo de la plataforma** y la **Adaptación de contenidos a la web**. Las presentaciones originales son del **Ing. Eden Angel Molina Capcha**; el equipo adapta ese material al formato web. Esta presentación no concede acceso al editor: los permisos se administran en el panel privado. El proyecto no se presenta como código abierto ni se enlaza su repositorio desde la página pública. Añade un objeto a `projectMembers` por persona:
-
-```ts
-{
-  name: 'Nombre completo',
-  role: 'Desarrollo frontend',
-  area: 'development',
-  description: 'Contribuciones de esta persona.',
-}
-```
-
-`area` acepta `development` (desarrollo), `content` (adaptación a la web) o `academic` (autoría del material académico). `description` y `url` son opcionales. Para vincular contribuciones a capítulos, usa `chapterIds: ['01']`: el título se obtiene del catálogo actual y refleja sus cambios de nombre. Una persona puede aparecer en más de un área si tiene varias contribuciones. Añade solo nombres y enlaces que deban mostrarse públicamente; no se exponen las cuentas ni los correos del panel de colaboradores.
-

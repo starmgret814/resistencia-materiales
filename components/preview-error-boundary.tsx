@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { workspaceButtonClass } from '@/lib/workspace-controls'
 
 interface Props {
   children: ReactNode
@@ -25,7 +26,7 @@ export default class PreviewErrorBoundary extends Component<Props, { failed: boo
     return <div role="alert" className="rounded-lg border border-[#e3caca] bg-[#fcf7f5] p-5 text-sm text-[#604747]">
       <p className="font-semibold text-[#7f0303]">No se pudo mostrar la vista previa</p>
       <p className="mt-2 leading-relaxed">Puedes seguir editando y guardar tu documento. Si acabas de cambiar el contenido, revisa su formato e inténtalo de nuevo.</p>
-      <button type="button" onClick={this.props.onRetry} className="mt-4 rounded-md border border-[#d5baba] px-3 py-2 font-semibold text-[#7f0303] hover:bg-[#f2dddd]">Reintentar vista previa</button>
+      <button type="button" onClick={this.props.onRetry} className={`${workspaceButtonClass()} mt-4`}>Reintentar vista previa</button>
     </div>
   }
 }

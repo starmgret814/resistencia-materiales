@@ -19,9 +19,10 @@ function compile(file, name, replacements = []) {
 try {
   compile('lib/utils.ts', 'utils.mjs')
   compile('lib/content-context.tsx', 'context.mjs')
+  compile('lib/use-modal-focus.ts', 'modal-focus.mjs')
   compile('lib/course-markdown.ts', 'markdown.mjs')
   compile('lib/remark-number-headings.ts', 'headings.mjs')
-  compile('components/mdx-components.tsx', 'components.mjs', [["'@/lib/utils'", "'./utils.mjs'"], ["'@/lib/content-context'", "'./context.mjs'"]])
+  compile('components/mdx-components.tsx', 'components.mjs', [["'@/lib/utils'", "'./utils.mjs'"], ["'@/lib/content-context'", "'./context.mjs'"], ["'@/lib/use-modal-focus'", "'./modal-focus.mjs'"]])
   compile('components/content-renderer.tsx', 'renderer.mjs', [
     ["'@/lib/remark-number-headings'", "'./headings.mjs'"], ["'@/lib/course-markdown'", "'./markdown.mjs'"],
     ["'@/components/mdx-components'", "'./components.mjs'"], ["import { Tool } from '@/components/interactive-tools'", 'const Tool = () => null'],
@@ -67,6 +68,9 @@ $$
   }
   assert(render(fixtures[2]).includes('katex-display'), 'Bracket delimiters produce display math')
   assert(render(fixtures[2]).includes('large-op'), 'Display integrals use the large LaTeX operator')
+  const technicalMath = render(String.raw`$σ = N/A$`)
+  assert(technicalMath.includes('mdx-content course-reading-defaults'), 'Academic content uses the approved reading defaults.')
+  assert(technicalMath.includes('mathnormal technical-math-greek'), 'Greek variables are classified for the italic mathematical face.')
   assert(render(fixtures[3]).includes('katex-display'), 'Standalone same-line dollars produce display math')
   assert(render(fixtures[5]).includes('id="eq-8.3.1"'))
   const alignedBox = render(fixtures.at(-1))
@@ -93,6 +97,17 @@ El <Term definition="Supera el límite cuando $\sigma > \sigma_y$.">esfuerzo nor
   const customFigure = render('<Image id="fig-barra" src="barra.png" alt="Diagrama" number="1.2" />')
   assert(customFigure.includes('id="fig-barra"'))
   assert(customFigure.includes('href="#fig-barra"'))
+  assert(customFigure.includes('aria-label="Ampliar imagen: Diagrama"'), 'Course figures expose the image viewer trigger.')
+  const imageClass = source => render(source).match(/<img[^>]*class="([^"]*)"/)?.[1] || ''
+  for (const option of ['border="false"', 'border={false}']) {
+    assert(!imageClass(`<Image src="diagrama.svg" alt="Diagrama" ${option} />`).split(' ').includes('border'), 'The no-border option must survive Markdown normalization even without size attributes.')
+  }
+  assert(imageClass('<Image src="diagrama.svg" alt="Diagrama" />').split(' ').includes('border'), 'Existing images keep their default border.')
+  assert(imageClass('<Image src="diagrama.svg" alt="Diagrama" border="true" />').split(' ').includes('border'))
+  const transparentFigure = render('<Image src="diagrama.svg" alt="Diagrama" border="false" number="2.1" caption="Explicación" width="300px" />')
+  assert(transparentFigure.includes('id="fig-2.1"') && transparentFigure.includes('Explicación') && transparentFigure.includes('max-width:300px'), 'Removing the border must preserve sizing, captions and references.')
+  assert(!imageClass('<Problem image="diagrama.svg" imageBorder="false">\n\nEnunciado.\n\n</Problem>').split(' ').includes('border'))
+  assert(imageClass('<Problem image="diagrama.svg">\n\nEnunciado.\n\n</Problem>').split(' ').includes('border'))
   assert(normalizeLegacyMdx(`<Term definition="Una explicación con apóstrofo: l'acier.">acero</Term>`).includes("l'acier"))
   const termCode = '`<Term definition="No transformar">ejemplo</Term>`'
   assert.equal(normalizeLegacyMdx(termCode), termCode)

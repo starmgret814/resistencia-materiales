@@ -6,7 +6,7 @@ import ts from 'typescript'
 const exports = {}
 const source = fs.readFileSync(new URL('../lib/editor-history.ts', import.meta.url), 'utf8')
 vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, { exports })
-const { replaceEditorText, insertEditorText } = exports
+const { replaceEditorText, insertEditorText, insertEditorTextAtRange } = exports
 let text = 'Texto original', stopped = 0, restored = 0
 const undo = [], redo = []
 const editor = {
@@ -28,6 +28,12 @@ undo.push(text); text = redo.pop()
 assert.equal(text, 'Copia recuperada')
 insertEditorText(editor, '<Formula>…</Formula>')
 assert.equal(stopped, 4, 'Each toolbar action is a separate undoable operation')
+const savedRange = { startLineNumber: 2, startColumn: 4, endLineNumber: 2, endColumn: 4 }
+let insertedRange
+editor.executeEdits = (_source, edits) => { insertedRange = edits[0].range; undo.push(text); redo.length = 0; text = edits[0].text }
+assert.equal(insertEditorTextAtRange(editor, savedRange, 'https://example.com/image.png', 'image-upload'), true)
+assert.equal(insertedRange, savedRange, 'Async inserts use the exact range captured before opening a file picker.')
+assert.equal(stopped, 6, 'Insertion at a saved range remains undoable')
 replaceEditorText(editor, '# Nombre actualizado', 'rename', true)
 assert.equal(restored, 2)
 const content = fs.readFileSync(new URL('../components/content-editor.tsx', import.meta.url), 'utf8')

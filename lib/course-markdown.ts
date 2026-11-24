@@ -39,7 +39,7 @@ export function normalizeLegacyMdx(markdown: string): string {
     return `:term[${body.trim()}]{definition="${definition}"}`
   })
 
-  normalized = normalized.replace(/<Image\b([\s\S]*?)\/>/gi, (_match, attrs) => {
+  normalized = normalized.replace(/<Image\b([\s\S]*?)\/>/gi, (match, attrs, offset, source) => {
     const src = attribute(attrs, 'src')
     const alt = attribute(attrs, 'alt') || 'Imagen del curso'
     const caption = attribute(attrs, 'caption').replace(/"/g, "'")
@@ -49,8 +49,20 @@ export function normalizeLegacyMdx(markdown: string): string {
     const align = attribute(attrs, 'align')
     const number = attribute(attrs, 'number')
     const id = attribute(attrs, 'id')
+    const border = attribute(attrs, 'border')
 
-    if (width || height || size || align || number || id) {
+    // A block directive would split a Markdown table into several blocks.
+    // Keep images on table rows inline, including their individual dimensions.
+    const lineStart = source.lastIndexOf('\n', offset) + 1
+    const nextLine = source.indexOf('\n', offset + match.length)
+    const line = source.slice(lineStart, nextLine < 0 ? source.length : nextLine)
+    if (line.replace(match, '').includes('|')) {
+      const escape = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/\|/g, '&#124;')
+      const props = Object.entries({ src, alt, caption: attribute(attrs, 'caption'), width, height }).filter(([, value]) => value).map(([key, value]) => `${key}="${escape(value)}"`).join(' ')
+      return `:cellimage[]{${props}}`
+    }
+
+    if (width || height || size || align || number || id || border) {
       let props = `src="${src}" alt="${alt}"`
       if (caption) props += ` caption="${caption}"`
       if (width) props += ` width="${width}"`
@@ -59,6 +71,7 @@ export function normalizeLegacyMdx(markdown: string): string {
       if (align) props += ` align="${align}"`
       if (number) props += ` number="${number}"`
       if (id) props += ` id="${id}"`
+      if (border) props += ` border="${border}"`
       return `:::image{${props}}\n:::`
     }
 
@@ -82,7 +95,7 @@ export function normalizeLegacyMdx(markdown: string): string {
 
   normalized = normalized.replace(/<Table([^>]*)>\s*([\s\S]*?)\s*<\/Table>/gi, (_match, attrs, body) => {
     const title = attribute(attrs, 'title') || attribute(attrs, 'caption')
-    const options = { title, align: attribute(attrs, 'align'), width: attribute(attrs, 'width'), columnWidths: attribute(attrs, 'columnWidths'), position: attribute(attrs, 'position') }
+    const options = { title, align: attribute(attrs, 'align'), width: attribute(attrs, 'width'), columnWidths: attribute(attrs, 'columnWidths'), position: attribute(attrs, 'position'), imageWidth: attribute(attrs, 'imageWidth'), imageHeight: attribute(attrs, 'imageHeight'), minWidth: attribute(attrs, 'minWidth') }
     const properties = Object.entries(options).filter(([, value]) => value).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(' ')
     return `\n\n::::table{${properties}}\n\n${body.trim()}\n\n::::\n\n`
   })
@@ -93,7 +106,7 @@ export function normalizeLegacyMdx(markdown: string): string {
       const kind = tag.toLowerCase()
       const title = attribute(attrs, 'title')
       const number = attribute(attrs, 'number')
-      const options = { title, number, image: attribute(attrs, 'image'), imageAlt: attribute(attrs, 'imageAlt'), imageCaption: attribute(attrs, 'imageCaption'), imageWidth: attribute(attrs, 'imageWidth'), imagePosition: attribute(attrs, 'imagePosition'), imageLayout: attribute(attrs, 'imageLayout'), imageNumber: attribute(attrs, 'imageNumber') }
+      const options = { title, number, image: attribute(attrs, 'image'), imageAlt: attribute(attrs, 'imageAlt'), imageCaption: attribute(attrs, 'imageCaption'), imageWidth: attribute(attrs, 'imageWidth'), imagePosition: attribute(attrs, 'imagePosition'), imageLayout: attribute(attrs, 'imageLayout'), imageNumber: attribute(attrs, 'imageNumber'), imageBorder: attribute(attrs, 'imageBorder') }
       const properties = Object.entries(options).filter(([, value]) => value).map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`).join(' ')
       return `\n\n::::${kind}${properties ? `{${properties}}` : ''}\n\n${body.trim()}\n\n::::\n\n`
     })

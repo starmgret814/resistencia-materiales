@@ -1,0 +1,22 @@
+---
+import Layout from '@/src/layouts/Layout.astro';
+import ReadingPreview from '@/components/reading-preview';
+import markdown from '@/src/content/resistencia/01-esfuerzos-falla/subtema-inicial/index.mdx?raw';
+import '@/src/styles/reading-preview.css';
+
+// This comparison is a development sample, never a published course setting.
+if (!import.meta.env.DEV) return new Response('No encontrado', { status: 404 });
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+const document = {
+  schemaVersion: 2 as const,
+  chapterId: '01',
+  slug: 'subtema-inicial',
+  title: 'Concepto de esfuerzo',
+  contentMarkdown: markdown,
+};
+---
+
+<Layout title="Muestra de lectura · Etapa 2 | MC361">
+  <ReadingPreview client:load document={document} slug="01-esfuerzos-falla/subtema-inicial" />
+</Layout>

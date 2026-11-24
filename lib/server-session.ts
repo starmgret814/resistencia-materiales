@@ -22,9 +22,18 @@ export async function verifyWorkspaceSession(idToken: string): Promise<Workspace
       issuer: `https://securetoken.google.com/${projectId}`,
       audience: projectId,
       algorithms: ['RS256'],
+      clockTolerance: 30,
     }))
-  } catch {
-    throw new SessionError('La sesión expiró o no es válida. Inicia sesión nuevamente.', 401)
+  } catch (error) {
+    const code = (error as { code?: string } | null)?.code
+    if (code === 'ERR_JWT_EXPIRED') {
+      throw new SessionError('La sesión expiró. Se intentará renovar automáticamente.', 401)
+    }
+    if (code === 'ERR_JWT_CLAIM_VALIDATION_FAILED' || code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED' || code === 'ERR_JWS_INVALID' || code === 'ERR_JWT_INVALID') {
+      throw new SessionError('La sesión no es válida para esta plataforma. Inicia sesión nuevamente.', 401)
+    }
+    console.error('No se pudieron obtener o validar las claves públicas de Google.', error)
+    throw new SessionError('No se pudo contactar con Google para validar la sesión. Comprueba la conexión e inténtalo nuevamente.', 503)
   }
   if (typeof payload.email !== 'string' || !payload.sub || payload.email_verified !== true) {
     throw new SessionError('Se requiere una cuenta con correo verificado.', 401)

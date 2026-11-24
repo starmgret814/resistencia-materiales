@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const workspace = Astro.url.pathname === '/workspace-mc361' || Astro.url.pathname.startsWith('/workspace-mc361/');
 ---
 
 <!doctype html>
@@ -37,7 +38,7 @@ const { title, description } = Astro.props;
       document.addEventListener('astro:after-swap', applyTheme);
     </script>
   </head>
-  <body class="bg-[#faf5f3] dark:bg-[#140b0c] text-[#4d3838] dark:text-[#f2e1df] antialiased min-h-screen selection:bg-[#dfc4c4] dark:selection:bg-[#522024] selection:text-[#4b1719] dark:selection:text-[#fee2e2]">
+  <body data-workspace={workspace || undefined} class="bg-[#faf5f3] dark:bg-[#140b0c] text-[#4d3838] dark:text-[#f2e1df] antialiased min-h-screen selection:bg-[#dfc4c4] dark:selection:bg-[#522024] selection:text-[#4b1719] dark:selection:text-[#fee2e2]">
     <!-- Barra de progreso superior al navegar (Top Progress Bar) -->
     <div id="navigation-progress" class="fixed top-0 left-0 right-0 h-[3px] z-[99999] pointer-events-none opacity-0 transition-opacity duration-150">
       <div id="navigation-progress-bar" class="h-full bg-gradient-to-r from-[#8B0000] via-[#c92a2a] to-[#ff6b6b] shadow-[0_0_12px_rgba(201,42,42,0.8)] transition-all ease-out duration-300 w-0"></div>

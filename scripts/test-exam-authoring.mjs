@@ -12,10 +12,11 @@ function load(path, dependencies = {}, globals = {}) {
   vm.runInNewContext(outputText, { exports, require: name => dependencies[name], ...globals })
   return exports
 }
-const authoring = load('../lib/exam-authoring.ts')
+const authoring = load('../lib/exam-authoring.ts', { './table-snippets': load('../lib/table-snippets.ts') })
 const data = load('../lib/exam-data.ts')
 const errors = load('../lib/exam-errors.ts')
 const history = load('../lib/editor-history.ts')
+const workspaceControls = load('../lib/workspace-controls.ts')
 assert.equal(errors.examFailure({ code: 'firestore/permission-denied' }, 'load').code, 'permission-denied')
 assert.match(errors.examFailure({ code: 'unavailable' }, 'load').message, /conectar/)
 assert.equal(authoring.validateExamImport('examen.MDX', 100, '\uFEFF## Enunciado\r\n\r\n$\\sigma$\r\n'), '## Enunciado\n\n$\\sigma$')
@@ -45,6 +46,8 @@ const { default: Management } = load('../components/exam-management.tsx', {
   '@/lib/exam-data': data, '@/lib/exam-authoring': authoring, '@/components/preview-error-boundary': { default: 'boundary' },
   '@/lib/exam-errors': errors,
   '@/lib/editor-history': history,
+  '@/lib/workspace-controls': workspaceControls,
+  '@/lib/workspace-guides': load('../lib/workspace-guides.ts'),
   '@/lib/local-draft': { localDraftKey: () => 'isolated-exam-test' },
   '@/lib/use-local-draft': { useLocalDraft: () => ({ pending: null, failed: false, savedAt: null, acknowledge() {} }) },
   '@/components/local-draft-notice': { LocalDraftStatus: 'local-status', LocalDraftNotice: 'local-notice' },

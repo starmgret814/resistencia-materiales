@@ -1,0 +1,50 @@
+/* Scoped to the development sample: course pages keep their existing typography. */
+.reading-preview-sample > .mdx-content {
+  font-family: var(--reading-preview-font, var(--font-serif));
+  font-size: var(--reading-preview-size, var(--course-font-size));
+  line-height: var(--reading-preview-leading, 1.8);
+}
+.reading-preview-sample .mdx-content :is(h1, h2, h3, h4, h5, h6) { font-family: inherit; }
+
+/* Technical LaTeX proposal: Latin identifiers are upright while Greek
+   variables retain the mathematical italic face shown in the reference. */
+.reading-math-latex .katex .mathnormal {
+  font-family: KaTeX_Main, "Times New Roman", serif;
+  font-style: normal;
+  margin-right: 0 !important;
+}
+.reading-math-latex .katex .mathnormal.technical-math-greek {
+  font-family: KaTeX_Math, "STIX Two Text", serif;
+  font-style: italic;
+}
+.reading-math-medium .katex-html { font-weight: 500; }
+.reading-math-semibold .katex-html { font-weight: 600; }
+.reading-math-bold .katex-html { font-weight: 700; }
+.reading-math-medium .katex .mathnormal { font-weight: 500; }
+.reading-math-semibold .katex .mathnormal { font-weight: 600; }
+.reading-math-bold .katex .mathnormal { font-weight: 700; }
+.reading-math-compact .mdx-content :is(p, li, td, th) > .katex,
+.reading-math-compact .formula-equation { font-size: 1em; }
+.reading-math-balanced .mdx-content :is(p, li, td, th) > .katex { font-size: 1.035em; }
+.reading-math-balanced .formula-equation { font-size: 1.08em; }
+.reading-math-large .mdx-content :is(p, li, td, th) > .katex { font-size: 1.075em; }
+.reading-math-large .formula-equation { font-size: 1.16em; }
+.reading-math-larger .mdx-content :is(p, li, td, th) > .katex { font-size: 1.12em; }
+.reading-math-larger .formula-equation { font-size: 1.24em; }
+.reading-text-black .mdx-content { color: #111; }
+.dark .reading-text-black .mdx-content { color: #f6f1f0; }
+.reading-preview-sample[class*="reading-math-"] .formula-number {
+  font-family: var(--font-serif);
+  font-size: .9em;
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .reading-math-large .formula-equation { font-size: 1.12em; }
+  .reading-math-larger .formula-equation { font-size: 1.18em; }
+}
+.reading-preview .study-control:focus-visible {
+  outline: 2px solid #8b0000;
+  outline-offset: 3px;
+}
+.dark .reading-preview .study-control:focus-visible { outline-color: #fca5a5; }
+.reading-preview fieldset { min-width: 0; }

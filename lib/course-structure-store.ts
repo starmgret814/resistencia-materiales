@@ -11,8 +11,8 @@ export function readCourseCatalog(data: unknown): Chapter[] {
   return list
 }
 
-export async function loadCourseCatalog(): Promise<Chapter[]> {
-  const snapshot = await getDoc(doc(db, 'course', 'chapters'))
+export async function loadCourseCatalog(server = false): Promise<Chapter[]> {
+  const snapshot = await (server ? getDocFromServer : getDoc)(doc(db, 'course', 'chapters'))
   return snapshot.exists() ? readCourseCatalog(snapshot.data()) : structuredClone(seedChapters)
 }
 
